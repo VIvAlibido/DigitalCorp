@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.nl-keuzemenu.nl/sitemap.xml
+# Replace with actual domain once live, for now, this is a placeholder

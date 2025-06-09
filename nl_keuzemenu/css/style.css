@@ -1,0 +1,292 @@
+/* Placeholder for potential Bootstrap integration */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #FFFFFF;
+}
+
+header {
+    padding: 20px;
+    background-color: #f8f9fa; /* Light grey, similar to Telefoonboek */
+    border-bottom: 1px solid #dee2e6;
+}
+
+header h1 {
+    color: #003366;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+header input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ced4da;
+    border-radius: 5px 0 0 5px;
+    width: 300px; /* Adjust as needed */
+}
+
+header button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #007bff; /* Bootstrap primary blue */
+    color: white;
+    border: 1px solid #007bff;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+main {
+    padding: 20px;
+}
+
+section {
+    background-color: #F5F5F5;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+section h2 {
+    color: #003366;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#popular-categories div {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 10px; /* Spacing between blocks */
+    justify-content: center; /* Center blocks */
+}
+
+#popular-categories a {
+    display: block;
+    background-color: #007bff; /* Example background */
+    color: white;
+    padding: 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    min-width: 120px; /* Minimum width for blocks */
+    border: 1px solid #0056b3; /* Darker border for definition */
+}
+
+#popular-categories a:hover {
+    background-color: #0056b3; /* Darker on hover */
+}
+
+#most-consulted ul {
+    list-style: none;
+    padding: 0;
+}
+
+#most-consulted li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+#most-consulted li:last-child {
+    border-bottom: none;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #343a40; /* Dark footer */
+    color: white;
+}
+
+footer a {
+    color: #ffffff; /* White links */
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Placeholder */
+@media (max-width: 768px) {
+    /* Mobile-specific styles will go here */
+    header h1 {
+        font-size: 24px; /* Smaller H1 for mobile */
+    }
+
+    header input[type="text"] {
+        width: 70%; /* Adjust search input width */
+    }
+
+    #popular-categories div {
+        flex-direction: column; /* Stack category blocks vertically */
+        align-items: center; /* Center stacked blocks */
+    }
+
+    #popular-categories a {
+        width: 80%; /* Make blocks wider on mobile */
+        margin-bottom: 10px;
+    }
+}
+
+/* Company Page Specific Styles */
+.company-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.company-header h1 { /* Already styled by header h1, but can be more specific if needed */
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.contact-info {
+    background-color: #ffffff; /* White background to stand out on #F5F5F5 main */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.contact-info h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.4em; /* Slightly smaller than section H2 */
+}
+
+.contact-info p {
+    margin: 5px 0;
+    line-height: 1.6;
+}
+
+.button-call {
+    display: inline-block;
+    background-color: #003366; /* Accent color */
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.button-call:hover {
+    background-color: #002244; /* Darker accent color on hover */
+}
+
+.phone-menu h2, .tips h2 {
+    margin-top: 0; /* Already in a section, so h2 styling from general section applies */
+    margin-bottom: 10px;
+}
+
+.phone-menu div[itemprop="description"] ol,
+.tips ul {
+    padding-left: 20px; /* Indent list items */
+    margin-bottom: 10px;
+}
+
+.phone-menu div[itemprop="description"] ol li,
+.tips ul li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.phone-menu div[itemprop="description"] ol ul {
+    padding-left: 20px; /* Indent nested lists */
+    margin-top: 5px;
+}
+
+/* Schema.org styling notes:
+   - Generally, Schema.org attributes (itemscope, itemprop, itemtype) do not require specific CSS
+     as they are for search engines and data parsers.
+   - Any visual styling should be based on existing classes or new classes added for that purpose.
+*/
+
+/* Category Page Specific Styles */
+.category-page main {
+    /* Specific padding for category page if different from general main */
+}
+
+.category-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.category-header h1 {
+    color: #003366; /* Same as other main H1s */
+    font-size: 2em; /* Adjust as needed */
+}
+
+.company-list-section {
+    /* background-color: #F5F5F5; already on section */
+    padding: 15px; /* Padding within the section for the list */
+    border-radius: 5px;
+}
+
+.company-list-section h2 {
+    /* color: #003366; already on section h2 */
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.company-list {
+    list-style: none;
+    padding: 0;
+}
+
+.company-list li {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.company-list li:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.company-list li a {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+    color: #003366; /* Primary link color */
+    font-weight: bold;
+}
+
+.company-list li a:hover {
+    color: #0056b3; /* Darker on hover */
+    text-decoration: underline;
+}
+
+/* For a simple grid/column layout in the future (placeholder) */
+/*
+.company-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+.company-list li {
+    margin-bottom: 0; // remove when using grid gap
+}
+*/
+
+/*
+Cookie Consent Banner:
+Styling for the cookie consent banner is primarily handled inline in the HTML
+(see id="cookie-consent-banner" in HTML files) for immediate visibility
+before all CSS might be loaded or if CSS loading fails.
+Future refinements to banner styling can be centralized here if needed.
+*/
