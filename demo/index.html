@@ -1,0 +1,190 @@
+<title>Nieuwsradio — alles in 1 minuut (demo)</title>
+<style>
+  :root{
+    --bg:#F5F3EE; --surface:#FFFFFF; --ink:#181C20; --muted:#5A6B7A;
+    --line:#DCD8CE; --accent:#E23B2E; --accent-ink:#FFFFFF; --live:#2E8B57;
+    --chip:#ECE9E1;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#101418; --surface:#181E24; --ink:#EDEAE3; --muted:#8B9AA8;
+      --line:#2A323B; --accent:#E8493C; --chip:#222A32; }
+  }
+  :root[data-theme="dark"]{ --bg:#101418; --surface:#181E24; --ink:#EDEAE3; --muted:#8B9AA8;
+    --line:#2A323B; --accent:#E8493C; --chip:#222A32; }
+  :root[data-theme="light"]{ --bg:#F5F3EE; --surface:#FFFFFF; --ink:#181C20; --muted:#5A6B7A;
+    --line:#DCD8CE; --accent:#E23B2E; --chip:#ECE9E1; }
+
+  body{ font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg);
+    color:var(--ink); margin:0; }
+  .wrap{ max-width:680px; margin:0 auto; padding:28px 20px 64px; }
+
+  header{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .brand{ font-size:26px; font-weight:800; letter-spacing:-.02em; }
+  .brand span{ color:var(--accent); }
+  .tag{ color:var(--muted); font-size:14px; margin:2px 0 0; }
+  .clockbox{ text-align:right; font-variant-numeric:tabular-nums; }
+  #clock{ font-size:26px; font-weight:800; letter-spacing:.02em; }
+  #refresh{ font-size:13px; color:var(--muted); }
+
+  .demoband{ margin:20px 0 24px; padding:10px 14px; border:1px solid var(--line);
+    background:var(--surface); border-left:4px solid var(--accent); font-size:13.5px; color:var(--muted); }
+  .demoband b{ color:var(--ink); }
+
+  .rowhead{ display:flex; align-items:center; justify-content:space-between; margin:0 0 10px; }
+  .rowhead h2{ font-size:13px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted);
+    font-weight:700; margin:0; }
+  #playall{ font:inherit; font-size:13.5px; font-weight:700; padding:8px 16px; border-radius:999px;
+    border:none; background:var(--accent); color:var(--accent-ink); cursor:pointer; }
+  #playall:focus-visible, .card button:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    margin-bottom:12px; overflow:hidden; }
+  .cardtop{ display:flex; align-items:center; gap:14px; padding:14px 16px; }
+  .playbtn{ flex:0 0 44px; height:44px; border-radius:50%; border:2px solid var(--ink);
+    background:transparent; color:var(--ink); font-size:15px; cursor:pointer; }
+  .card.playing .playbtn{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .meta{ flex:1; min-width:0; }
+  .cat{ font-weight:800; letter-spacing:-.01em; }
+  .cat .dur{ font-weight:400; color:var(--muted); font-size:13.5px; font-variant-numeric:tabular-nums; }
+  .src{ font-size:12.5px; color:var(--muted); }
+  .onair{ display:none; font-size:11px; font-weight:800; letter-spacing:.14em; color:var(--accent); }
+  .card.playing .onair{ display:block; }
+  .bar{ height:3px; background:var(--chip); }
+  .bar i{ display:block; height:100%; width:0; background:var(--accent); transition:width .25s linear; }
+  .script{ display:none; padding:12px 16px 16px; border-top:1px solid var(--line);
+    font-size:14.5px; color:var(--muted); max-width:62ch; }
+  .card.playing .script, .card.open .script{ display:block; }
+
+  .dist{ margin-top:36px; }
+  .dist h2{ font-size:13px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); font-weight:700; }
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chips span{ background:var(--chip); border-radius:999px; padding:6px 14px; font-size:13.5px; }
+  footer{ margin-top:36px; font-size:12.5px; color:var(--muted); border-top:1px solid var(--line); padding-top:14px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">Nieuwsradio<span>.</span></div>
+      <p class="tag">Alles in 1 minuut — gecontroleerd nieuws, weer en verkeer voor de Benelux</p>
+    </div>
+    <div class="clockbox">
+      <div id="clock">--:--</div>
+      <div id="refresh">volgende verversing over --:--</div>
+    </div>
+  </header>
+
+  <p class="demoband"><b>Demo.</b> Alle berichten hieronder zijn fictief voorbeeldmateriaal. In productie komen berichten uit gelicentieerde bronnen (ANP, KNMI, NDW) en worden ze redactioneel goedgekeurd vóór uitzending. Afspelen gebruikt de spraaksynthese van je browser als plaatsvervanger voor de productiestem.</p>
+
+  <div class="rowhead">
+    <h2>Bulletins van dit halfuur</h2>
+    <button id="playall">▶ Speel alles af</button>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="dist">
+    <h2>Beschikbaar via</h2>
+    <div class="chips"><span>Web</span><span>Podcast</span><span>Apple CarPlay</span><span>Android Auto</span><span>Fase 2: regionale edities &amp; personalisatie</span></div>
+  </div>
+
+  <footer>Conceptdemo bij het advies «Nieuwsradio — positionering» · Bronvermelding per bulletin · Redactie eindverantwoordelijk · Geen bericht zonder goedgekeurde bron.</footer>
+</div>
+
+<script>
+const BULLETINS = [
+  { cat:"Nationaal", src:"Bron: ANP (demo)", lines:[
+    "Het kabinet presenteert vandaag de hoofdlijnen van de nieuwe woonagenda; de nadruk ligt op versnelde vergunningen.",
+    "De Tweede Kamer debatteert vanmiddag over de zorgpremies voor komend jaar.",
+    "In Rotterdam is de haven-cao met twee jaar verlengd na een akkoord tussen bonden en werkgevers."]},
+  { cat:"Internationaal", src:"Bron: ANP Internationaal (demo)", lines:[
+    "De Europese Commissie stelt nieuwe regels voor rondom kunstmatige intelligentie in de media.",
+    "In Parijs zijn de onderhandelingen over het klimaatfonds hervat.",
+    "De Duitse economie groeide afgelopen kwartaal licht, meldt het federale statistiekbureau."]},
+  { cat:"Economie", src:"Bron: ANP Economie (demo)", lines:[
+    "De AEX opent naar verwachting hoger na positieve cijfers uit de chipsector.",
+    "De inflatie in de eurozone komt uit op twee komma één procent.",
+    "Een grote Belgische retailer kondigt vijfhonderd nieuwe banen aan in Vlaanderen."]},
+  { cat:"Sport", src:"Bron: ANP Sport (demo)", lines:[
+    "Het Nederlands elftal oefent vanavond in De Kuip tegen Denemarken.",
+    "In de Tour-voorbereiding wint een Belgische sprinter de slotrit van de Ronde van Wallonië.",
+    "De hockeysters plaatsen zich voor de halve finale van het EK."]},
+  { cat:"Weer", src:"Bron: KNMI (demo)", lines:[
+    "Vandaag wisselend bewolkt met in de middag brede opklaringen.",
+    "Maximaal drieëntwintig graden aan zee tot zevenentwintig graden in het binnenland.",
+    "Vanavond vanuit het westen kans op een enkele bui; morgen overwegend droog en zonnig."]},
+  { cat:"Verkeer", src:"Bron: NDW / verkeerscentrale (demo)", lines:[
+    "Op de A6 bij Almere is de eerdere afsluiting opgeheven; alle rijstroken zijn weer open.",
+    "Op de ring Antwerpen richting Gent staat acht kilometer vertraging na een ongeval.",
+    "De Velsertunnel is vannacht afgesloten voor onderhoud tussen middernacht en vijf uur."]}
+];
+
+const cardsEl = document.getElementById("cards");
+BULLETINS.forEach((b,i)=>{
+  const c=document.createElement("div"); c.className="card"; c.dataset.i=i;
+  c.innerHTML =
+    '<div class="cardtop">'+
+      '<button class="playbtn" aria-label="Speel '+b.cat+' af">▶</button>'+
+      '<div class="meta"><div class="cat">'+b.cat+' <span class="dur">· 1 min</span></div>'+
+      '<div class="src">'+b.src+'</div></div>'+
+      '<div class="onair">ON AIR</div>'+
+    '</div>'+
+    '<div class="bar"><i></i></div>'+
+    '<div class="script">'+b.lines.join(" ")+'</div>';
+  cardsEl.appendChild(c);
+});
+
+const synth = window.speechSynthesis;
+let current=null, queue=[], timer=null;
+
+function nlVoice(){
+  const v = synth ? synth.getVoices() : [];
+  return v.find(x=>/^nl/i.test(x.lang)) || null;
+}
+function stopAll(){
+  if(synth) synth.cancel();
+  clearInterval(timer); timer=null;
+  document.querySelectorAll(".card").forEach(c=>{ c.classList.remove("playing"); c.querySelector(".bar i").style.width="0"; c.querySelector(".playbtn").textContent="▶"; });
+  current=null; queue=[];
+}
+function play(i){
+  stopAll();
+  const b=BULLETINS[i], card=cardsEl.children[i];
+  current=i; card.classList.add("playing");
+  card.querySelector(".playbtn").textContent="■";
+  const barI=card.querySelector(".bar i");
+  const text = "Dit is Nieuwsradio. " + b.cat + ", in één minuut. " + b.lines.join(" ") + " Dit was " + b.cat + ". " + b.src.replace("Bron: ","Bron: ").replace(" (demo)","") + ".";
+  let started=Date.now();
+  timer=setInterval(()=>{ const p=Math.min(100,(Date.now()-started)/600); barI.style.width=p+"%"; },250);
+  const done=()=>{ if(current!==i) return; clearInterval(timer); barI.style.width="100%";
+    card.classList.remove("playing"); card.classList.add("open"); card.querySelector(".playbtn").textContent="▶"; current=null;
+    if(queue.length) play(queue.shift());
+  };
+  if(synth){
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="nl-NL"; const v=nlVoice(); if(v) u.voice=v; u.rate=1.02;
+    u.onend=done; u.onerror=done;
+    synth.speak(u);
+  } else { setTimeout(done, 8000); }
+}
+cardsEl.addEventListener("click",e=>{
+  const card=e.target.closest(".card"); if(!card) return;
+  const i=+card.dataset.i;
+  if(e.target.closest(".playbtn")){ (current===i) ? stopAll() : play(i); }
+  else card.classList.toggle("open");
+});
+document.getElementById("playall").addEventListener("click",()=>{
+  stopAll(); queue=[1,2,3,4,5]; play(0);
+});
+
+function tick(){
+  const n=new Date(), p=x=>String(x).padStart(2,"0");
+  document.getElementById("clock").textContent=p(n.getHours())+":"+p(n.getMinutes());
+  const next=new Date(n); next.setSeconds(0,0);
+  next.setMinutes(n.getMinutes()<30?30:60);
+  const s=Math.max(0,Math.round((next-n)/1000));
+  document.getElementById("refresh").textContent="volgende verversing over "+p(Math.floor(s/60))+":"+p(s%60);
+}
+tick(); setInterval(tick,1000);
+if(synth) synth.getVoices();
+</script>
