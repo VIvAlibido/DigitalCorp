@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nieuwsradio — Stemmenstudio</title>
+<style>
+  :root{
+    --bg:#F5F3EE; --surface:#FFFFFF; --ink:#181C20; --muted:#5A6B7A;
+    --line:#DCD8CE; --accent:#E23B2E; --accent-ink:#FFFFFF; --chip:#ECE9E1;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#101418; --surface:#181E24; --ink:#EDEAE3; --muted:#8B9AA8;
+      --line:#2A323B; --accent:#E8493C; --chip:#222A32; }
+  }
+  :root[data-theme="dark"]{ --bg:#101418; --surface:#181E24; --ink:#EDEAE3; --muted:#8B9AA8;
+    --line:#2A323B; --accent:#E8493C; --chip:#222A32; }
+  :root[data-theme="light"]{ --bg:#F5F3EE; --surface:#FFFFFF; --ink:#181C20; --muted:#5A6B7A;
+    --line:#DCD8CE; --accent:#E23B2E; --chip:#ECE9E1; }
+
+  body{ font:15.5px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); margin:0; }
+  .wrap{ max-width:980px; margin:0 auto; padding:28px 20px 64px; }
+  header{ display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:8px; }
+  .brand{ font-size:24px; font-weight:800; letter-spacing:-.02em; }
+  .brand span{ color:var(--accent); }
+  .tag{ color:var(--muted); font-size:14px; margin:2px 0 18px; }
+  a.back{ color:var(--muted); font-size:13.5px; text-decoration:none; }
+  a.back:hover{ color:var(--accent); }
+
+  .cols{ display:grid; grid-template-columns: 260px 1fr; gap:20px; }
+  @media (max-width:760px){ .cols{ grid-template-columns:1fr; } }
+
+  .panel{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px; }
+  .panel h2{ font-size:12.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); font-weight:700; margin:0 0 12px; }
+
+  .plist{ display:flex; flex-direction:column; gap:6px; }
+  .plist button{ font:inherit; text-align:left; padding:10px 12px; border-radius:8px; border:1px solid var(--line);
+    background:transparent; color:var(--ink); cursor:pointer; }
+  .plist button.active{ border-color:var(--accent); background:var(--chip); font-weight:700; }
+  .plist .voice{ display:block; font-size:12px; color:var(--muted); font-weight:400; }
+  .newbtn{ margin-top:10px; width:100%; font:inherit; font-weight:700; font-size:13.5px; padding:9px; border-radius:8px;
+    border:1px dashed var(--muted); background:transparent; color:var(--muted); cursor:pointer; }
+
+  label{ display:block; font-size:12.5px; font-weight:700; letter-spacing:.04em; color:var(--muted); margin:14px 0 4px; }
+  label:first-of-type{ margin-top:0; }
+  input, select, textarea{ font:inherit; width:100%; box-sizing:border-box; padding:9px 10px; border-radius:8px;
+    border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+  textarea{ resize:vertical; min-height:64px; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible{ outline:3px solid var(--accent); outline-offset:1px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:0 14px; }
+  @media (max-width:560px){ .grid2{ grid-template-columns:1fr; } }
+  .hint{ font-size:12px; color:var(--muted); margin:4px 0 0; }
+  .hint.warn{ color:var(--accent); }
+
+  .prompt{ background:var(--chip); border-radius:8px; padding:12px 14px; font-size:13.5px; color:var(--ink);
+    white-space:pre-wrap; margin-top:6px; max-width:100%; overflow-x:auto; }
+
+  .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+  .actions button{ font:inherit; font-size:13.5px; font-weight:700; padding:9px 16px; border-radius:999px; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--ink); }
+  .actions .primary{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .actions .danger{ color:var(--accent); border-color:var(--accent); }
+  #status{ font-size:13px; color:var(--muted); align-self:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">Nieuwsradio<span>.</span> Stemmenstudio</div>
+      <p class="tag">Bouw per stem een persona voor Gemini 2.5 TTS Pro — de stijlinstructie hieronder gaat mee in elke generatie-opdracht.</p>
+    </div>
+    <a class="back" href="index.html">← naar de bulletins-demo</a>
+  </header>
+
+  <div class="cols">
+    <div class="panel">
+      <h2>Persona's</h2>
+      <div class="plist" id="plist"></div>
+      <button class="newbtn" id="newp">+ Nieuwe persona</button>
+    </div>
+
+    <div class="panel">
+      <h2>Persona-instellingen</h2>
+
+      <div class="grid2">
+        <div>
+          <label for="f_name">Naam persona</label>
+          <input id="f_name" placeholder="bijv. Eva — nationaal nieuws">
+        </div>
+        <div>
+          <label for="f_voice">Gemini 2.5-stem</label>
+          <select id="f_voice">
+            <option>Kore</option><option>Charon</option><option>Fenrir</option>
+            <option>Aoede</option><option>Puck</option><option>Leda</option>
+            <option>Orus</option><option>Zephyr</option><option>Autonoe</option>
+            <option>Enceladus</option><option>Iapetus</option><option>Despina</option>
+          </select>
+          <p class="hint">Basisstem; de persona stuurt de voordracht via de stijlinstructie.</p>
+        </div>
+        <div>
+          <label for="f_role">Rol / rubriek</label>
+          <select id="f_role">
+            <option>Nationaal</option><option>Internationaal</option><option>Economie</option>
+            <option>Sport</option><option>Weer</option><option>Verkeer</option><option>Algemeen / station</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_tempo">Tempo</label>
+          <select id="f_tempo">
+            <option value="rustig">Rustig en gedragen</option>
+            <option value="normaal" selected>Normaal nieuws-tempo</option>
+            <option value="vlot">Vlot en energiek</option>
+            <option value="urgent">Hoog tempo, urgent (verkeer/breaking)</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_tone">Toon</label>
+          <select id="f_tone">
+            <option value="autoritair">Autoritair en betrouwbaar</option>
+            <option value="warm">Warm en toegankelijk</option>
+            <option value="zakelijk">Zakelijk en neutraal</option>
+            <option value="licht">Licht en opgewekt (sport/weer)</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_pitch">Stemligging</label>
+          <select id="f_pitch">
+            <option value="">Natuurlijk (van de basisstem)</option>
+            <option value="laag">Iets lager / donkerder</option>
+            <option value="hoog">Iets lichter / helderder</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="f_soundalike">Klinkt als (bekende stem als referentie)</label>
+      <input id="f_soundalike" placeholder="bijv. een doorgewinterde NOS Journaal-anchor">
+      <p class="hint warn">Referentie voor de vóórdrachtstijl (timing, intonatie, energie) — niet om de stem van een echte persoon na te bootsen. Een herkenbare imitatie van een bestaand persoon mag juridisch niet zonder toestemming en ondermijnt bovendien je eigen merkstem.</p>
+
+      <label for="f_notes">Extra regie-aanwijzingen</label>
+      <textarea id="f_notes" placeholder="bijv. korte pauze na de openingszin; cijfers rustig uitspreken; Engelse namen op z'n Engels"></textarea>
+
+      <label>Gegenereerde stijlinstructie (gaat mee naar Gemini TTS)</label>
+      <div class="prompt" id="prompt"></div>
+
+      <div class="actions">
+        <button class="primary" id="save">Bewaar persona</button>
+        <button id="test">▶ Test voordracht</button>
+        <button id="export">Exporteer alle persona's (JSON)</button>
+        <button class="danger" id="del">Verwijder</button>
+        <span id="status"></span>
+      </div>
+      <p class="hint">Testen gebruikt nu de spraaksynthese van je browser als plaatsvervanger. Zodra de Gemini-key als omgevingsvariabele beschikbaar is, wordt de test met de echte 2.5 Pro-stem gegenereerd en komen de persona's in de bulletin-pijplijn.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORE="nieuwsradio_personas_v1";
+const DEFAULTS=[
+  {name:"Eva — nationaal nieuws", voice:"Kore", role:"Nationaal", tempo:"normaal", tone:"autoritair", pitch:"", soundalike:"een doorgewinterde NOS Journaal-anchor", notes:"Korte pauze na de openingszin."},
+  {name:"Daan — verkeer", voice:"Fenrir", role:"Verkeer", tempo:"urgent", tone:"zakelijk", pitch:"laag", soundalike:"", notes:"Wegnummers duidelijk articuleren: A-zes, niet 'a6'."}
+];
+let personas = load(), sel = 0;
+
+function load(){ try{ const v=JSON.parse(localStorage.getItem(STORE)); return Array.isArray(v)&&v.length?v:DEFAULTS.slice(); }catch(e){ return DEFAULTS.slice(); } }
+function persist(){ localStorage.setItem(STORE, JSON.stringify(personas)); }
+
+const $=id=>document.getElementById(id);
+const fields=["name","voice","role","tempo","tone","pitch","soundalike","notes"];
+
+function renderList(){
+  const el=$("plist"); el.innerHTML="";
+  personas.forEach((p,i)=>{
+    const b=document.createElement("button");
+    b.innerHTML=(p.name||"(naamloos)")+'<span class="voice">'+p.voice+" · "+p.role+"</span>";
+    if(i===sel) b.classList.add("active");
+    b.onclick=()=>{ sel=i; renderList(); renderForm(); };
+    el.appendChild(b);
+  });
+}
+function renderForm(){
+  const p=personas[sel];
+  fields.forEach(f=>{ $("f_"+f).value=p[f]||""; });
+  renderPrompt();
+}
+function readForm(){
+  const p={}; fields.forEach(f=>p[f]=$("f_"+f).value); return p;
+}
+function stylePrompt(p){
+  const tempoTxt={rustig:"een rustig, gedragen tempo",normaal:"een normaal nieuwslees-tempo",vlot:"een vlot, energiek tempo",urgent:"een hoog, urgent tempo zoals bij verkeersinformatie"}[p.tempo]||"een normaal nieuwslees-tempo";
+  const toneTxt={autoritair:"autoritair en betrouwbaar",warm:"warm en toegankelijk",zakelijk:"zakelijk en neutraal",licht:"licht en opgewekt"}[p.tone]||"neutraal";
+  let s="Lees het volgende voor als een professionele Nederlandse nieuwslezer voor de rubriek "+(p.role||"nieuws")+". ";
+  s+="Spreek "+toneTxt+", in "+tempoTxt+". ";
+  if(p.pitch==="laag") s+="Houd de stemligging iets lager en donkerder dan neutraal. ";
+  if(p.pitch==="hoog") s+="Houd de stemligging iets lichter en helderder dan neutraal. ";
+  if(p.soundalike) s+="Hanteer een voordrachtstijl (timing, intonatie, energie) die doet denken aan "+p.soundalike+", zonder een specifieke echte stem te imiteren. ";
+  if(p.notes) s+="Extra aanwijzingen: "+p.notes.trim().replace(/\s+/g," ")+" ";
+  s+="Articuleer helder, eindig zinnen dalend, geen radiostem-overdrijving.";
+  return s;
+}
+function renderPrompt(){ $("prompt").textContent=stylePrompt(readForm()); }
+fields.forEach(f=>{ $("f_"+f).addEventListener("input",renderPrompt); $("f_"+f).addEventListener("change",renderPrompt); });
+
+$("save").onclick=()=>{ personas[sel]=readForm(); persist(); renderList(); flash("Bewaard."); };
+$("newp").onclick=()=>{ personas.push({name:"Nieuwe persona",voice:"Kore",role:"Algemeen / station",tempo:"normaal",tone:"zakelijk",pitch:"",soundalike:"",notes:""}); sel=personas.length-1; persist(); renderList(); renderForm(); };
+$("del").onclick=()=>{ if(personas.length<=1){ flash("Minimaal één persona nodig."); return; } personas.splice(sel,1); sel=Math.max(0,sel-1); persist(); renderList(); renderForm(); };
+$("export").onclick=()=>{
+  const blob=new Blob([JSON.stringify(personas.map(p=>({...p, style_prompt:stylePrompt(p)})),null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="nieuwsradio-personas.json"; a.click();
+  flash("Geëxporteerd.");
+};
+$("test").onclick=()=>{
+  const p=readForm();
+  const demo="Dit is Nieuwsradio, "+(p.role||"nieuws")+" in één minuut. Het kabinet presenteert vandaag de hoofdlijnen van de nieuwe woonagenda. En dan nu het weer: vandaag maximaal drieëntwintig graden aan zee.";
+  const synth=window.speechSynthesis;
+  if(!synth){ flash("Geen spraaksynthese beschikbaar in deze browser."); return; }
+  synth.cancel();
+  const u=new SpeechSynthesisUtterance(demo);
+  u.lang="nl-NL";
+  const v=synth.getVoices().find(x=>/^nl/i.test(x.lang)); if(v) u.voice=v;
+  u.rate={rustig:.9,normaal:1.0,vlot:1.1,urgent:1.2}[p.tempo]||1.0;
+  u.pitch=p.pitch==="laag"?0.85:p.pitch==="hoog"?1.15:1.0;
+  synth.speak(u);
+  flash("Voorbeeld met browserstem (placeholder voor Gemini 2.5 Pro).");
+};
+function flash(t){ $("status").textContent=t; setTimeout(()=>{ if($("status").textContent===t) $("status").textContent=""; },4000); }
+
+renderList(); renderForm();
+window.speechSynthesis && window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>
