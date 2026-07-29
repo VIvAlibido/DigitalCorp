@@ -139,6 +139,10 @@ flex-shrink:0;background:#fff}
 .artikel h1{font:600 30px/1.28 var(--serif);margin:10px 0 14px;letter-spacing:-.01em}
 .kruimels{font-size:13px;color:var(--gedempt);margin-bottom:6px}
 .kruimels a{color:var(--gedempt);text-decoration:none}
+.gegevens{border-collapse:collapse;margin:18px 0 8px;font-size:14.5px;width:100%}
+.gegevens td{padding:9px 0;border-bottom:1px solid var(--lijn);color:var(--zacht);vertical-align:top}
+.gegevens .lab{width:190px;color:var(--gedempt);padding-right:16px}
+.artikel h2{font:600 20px/1.3 var(--serif);margin:30px 0 8px}
 .methode{border-top:1px solid var(--lijn);margin-top:34px;padding-top:20px;
 font-size:13px;line-height:1.65;color:var(--gedempt)}
 .strip{display:flex;align-items:center;gap:26px;flex-wrap:wrap;margin-top:34px;
@@ -192,6 +196,8 @@ def _pagina(p: Sitepagina, diepte: int) -> str:
   <span><strong style="color:#4a4437">{MERK}</strong> · aibulletin.nl — {e(BESCHRIJVING)}</span>
   <span>
     <a href="{op}werkwijze/">Werkwijze</a> ·
+    <a href="{op}colofon/">Colofon</a> ·
+    <a href="{op}privacy/">Privacy</a> ·
     <a href="{op}voorkeuren/">Voorkeuren</a> ·
     <a href="{op}archief/">Archief</a>
   </span>
@@ -500,6 +506,159 @@ def _archief(edities: list[Editie]) -> Sitepagina:
     return Sitepagina("archief", f"Archief — {MERK}", "Alle edities van AI Bulletin.", inhoud)
 
 
+# ───────────────────── Uitgeversidentiteit ───────────────────────────
+#
+# Een nieuwssite die op betrouwbaarheid concurreert en anoniem is, is een
+# tegenspraak. Los daarvan verplicht art. 3:15d BW een commerciële site tot
+# naam, adres, e-mail en KvK-nummer, en verplicht de AVG tot een
+# privacyverklaring die de verwerkingsverantwoordelijke noemt.
+#
+# Beide pagina's worden uit config gegenereerd, zodat er nergens een tweede
+# versie van deze gegevens rondslingert die kan verouderen.
+
+VERPLICHTE_UITGEVERSVELDEN = ("naam", "adres", "postcode", "plaats", "kvk", "email")
+
+
+def controleer_publicatiegereed(config: dict) -> list[str]:
+    """Geeft de blokkades die publicatie in de weg staan; leeg = klaar.
+
+    Bedoeld om vóór het deployen aangeroepen te worden, niet tijdens het
+    bouwen: lokaal een site kunnen bouwen zonder KvK-nummer moet gewoon
+    kunnen, hem live zetten niet.
+    """
+    uitgever = config.get("uitgever") or {}
+    ontbreekt = [v for v in VERPLICHTE_UITGEVERSVELDEN if not str(uitgever.get(v, "")).strip()]
+    blokkades = []
+    if ontbreekt:
+        blokkades.append(
+            "uitgeversgegevens ontbreken in config.yaml: " + ", ".join(ontbreekt)
+            + " — wettelijk verplicht (art. 3:15d BW) en nodig voor het colofon"
+        )
+    if not str(uitgever.get("correcties", "") or uitgever.get("email", "")).strip():
+        blokkades.append(
+            "geen correctie-adres: elke editie belooft correcties, dus er moet "
+            "een adres zijn waar die belofte terechtkomt"
+        )
+    return blokkades
+
+
+def _uitgever_regels(config: dict) -> list[tuple[str, str]]:
+    """De uitgeversgegevens als label/waarde-paren, ontbrekende velden gemarkeerd."""
+    u = config.get("uitgever") or {}
+    ontbreekt = "— nog niet ingevuld —"
+
+    def veld(sleutel: str, verplicht: bool = True) -> str:
+        waarde = str(u.get(sleutel, "") or "").strip()
+        if waarde:
+            return waarde
+        return ontbreekt if verplicht else ""
+
+    # Postcode en plaats staan op één regel. Ontbreken ze allebei, dan hoort er
+    # één keer "nog niet ingevuld" te staan en niet twee keer achter elkaar.
+    postcode_plaats = " ".join(
+        w for w in (str(u.get("postcode", "") or "").strip(),
+                    str(u.get("plaats", "") or "").strip()) if w
+    ) or ontbreekt
+
+    regels = [
+        ("Uitgever", veld("naam")),
+        ("Handelsnaam", veld("handelsnaam", verplicht=False)),
+        ("Adres", veld("adres")),
+        ("Postcode en plaats", postcode_plaats),
+        ("Land", veld("land", verplicht=False)),
+        ("KvK-nummer", veld("kvk")),
+        ("Btw-nummer", veld("btw", verplicht=False)),
+        ("E-mail", veld("email")),
+        ("Correcties", str(u.get("correcties") or u.get("email") or "").strip() or ontbreekt),
+        ("Telefoon", veld("telefoon", verplicht=False)),
+    ]
+    return [(label, waarde) for label, waarde in regels if waarde]
+
+
+def _colofon(config: dict) -> Sitepagina:
+    e = html.escape
+    rijen = "".join(
+        f'<tr><td class="lab">{e(label)}</td><td>{e(waarde)}</td></tr>'
+        for label, waarde in _uitgever_regels(config)
+    )
+    waarschuwing = (
+        '<p class="kanttekening"><strong>Let op:</strong> deze pagina is nog niet '
+        "compleet. De site hoort niet live te staan zolang hier gegevens ontbreken.</p>"
+        if controleer_publicatiegereed(config)
+        else ""
+    )
+    inhoud = f"""
+<div class="binnen smal artikel">
+  <h1>Colofon</h1>
+  <p class="kern">Wie {MERK} maakt, en waar je ons kunt bereiken.</p>
+  {waarschuwing}
+  <table class="gegevens">{rijen}</table>
+
+  <h2>Verantwoordelijkheid</h2>
+  <p class="volledig">De selectie en de teksten in {MERK} komen tot stand met behulp
+    van een taalmodel, onder vaste redactieregels en onder verantwoordelijkheid van
+    de hierboven genoemde uitgever. Wij nemen geen teksten van anderen over: elk
+    bericht is een eigen tekst over feiten uit de vermelde bron, met een verwijzing
+    naar die bron.</p>
+
+  <h2>Correcties</h2>
+  <p class="volledig">Een fout is geen ramp, hem laten staan wel. Correcties komen
+    bovenaan de eerstvolgende editie en worden in het archief bij het oorspronkelijke
+    bericht gezet, met de datum van de correctie erbij. Wij verwijderen geen
+    berichten stilletjes.</p>
+</div>"""
+    return Sitepagina("colofon", f"Colofon — {MERK}",
+                      f"Wie {MERK} maakt, en waar je ons kunt bereiken.", inhoud)
+
+
+def _privacy(config: dict) -> Sitepagina:
+    e = html.escape
+    u = config.get("uitgever") or {}
+    naam = str(u.get("naam") or "").strip() or "— nog niet ingevuld —"
+    contact = str(u.get("email") or "").strip() or "— nog niet ingevuld —"
+    inhoud = f"""
+<div class="binnen smal artikel">
+  <h1>Privacyverklaring</h1>
+  <p class="kern">Wat we van je bijhouden als je je op {MERK} abonneert, en wat niet.</p>
+
+  <h2>Wie is verantwoordelijk</h2>
+  <p class="volledig">{e(naam)} is verwerkingsverantwoordelijke in de zin van de
+    AVG. Contact: {e(contact)}. De volledige gegevens staan in het
+    <a href="../colofon/">colofon</a>.</p>
+
+  <h2>Welke gegevens en waarom</h2>
+  <p class="volledig">Als je je aanmeldt bewaren we je e-mailadres, het moment van
+    aanmelden en je bevestiging daarvan, en de frequentie die je hebt gekozen. Dat
+    laatste hebben we nodig om je niet vaker te mailen dan je wilt. De grondslag is
+    je toestemming, die je met één klik weer kunt intrekken.</p>
+  <p class="volledig">Onze verzendpartner registreert of een e-mail is aangekomen en
+    geopend. Dat gebruiken we om te zien of een editie de deur uit is gegaan en welke
+    onderwerpen gelezen worden — niet om profielen op te bouwen.</p>
+
+  <h2>Waar het staat</h2>
+  <p class="volledig">De verzending loopt via een verwerker binnen de Europese Unie,
+    met een verwerkersovereenkomst. Je gegevens worden niet verkocht en niet gedeeld
+    met adverteerders.</p>
+
+  <h2>Hoe lang</h2>
+  <p class="volledig">Tot je je uitschrijft. Daarna bewaren we alleen wat nodig is om
+    te kunnen aantonen dat je ooit toestemming hebt gegeven, en niet langer dan
+    daarvoor nodig is.</p>
+
+  <h2>Je rechten</h2>
+  <p class="volledig">Je kunt inzage vragen, gegevens laten corrigeren of laten
+    wissen, en bezwaar maken. Eén bericht naar {e(contact)} volstaat. Kom je er met
+    ons niet uit, dan kun je klagen bij de Autoriteit Persoonsgegevens.</p>
+
+  <h2>Cookies</h2>
+  <p class="volledig">Deze website plaatst geen tracking-cookies en laadt geen
+    scripts van derden. Er is daarom geen cookiemelding — niet omdat we hem
+    verstoppen, maar omdat er niets te melden valt.</p>
+</div>"""
+    return Sitepagina("privacy", f"Privacyverklaring — {MERK}",
+                      f"Wat {MERK} van je bijhoudt, en wat niet.", inhoud)
+
+
 def _voorkeuren() -> Sitepagina:
     inhoud = """
 <div class="binnen smal artikel">
@@ -579,8 +738,15 @@ def laad_edities(map_: Path) -> list[Editie]:
     return edities
 
 
-def bouw(edities_map: Path, uitvoer: Path, leeg_eerst: bool = True) -> list[Path]:
-    """Bouwt de volledige site. Retourneert de geschreven paden."""
+def bouw(edities_map: Path, uitvoer: Path, config: dict | None = None,
+         leeg_eerst: bool = True) -> list[Path]:
+    """Bouwt de volledige site. Retourneert de geschreven paden.
+
+    `config` levert de uitgeversgegevens voor colofon en privacyverklaring.
+    Ontbreekt hij, dan komen die pagina's er wel maar met lege velden en een
+    zichtbare waarschuwing — bouwen mag altijd, publiceren niet.
+    """
+    config = config or {}
     edities = laad_edities(edities_map)
     if not edities:
         raise ValueError(f"geen edities gevonden in {edities_map}")
@@ -595,6 +761,8 @@ def bouw(edities_map: Path, uitvoer: Path, leeg_eerst: bool = True) -> list[Path
         _archief(edities),
         _voorkeuren(),
         _werkwijze(),
+        _colofon(config),
+        _privacy(config),
     ]
     for ed in edities:
         paginas.append(_editiepagina(ed))

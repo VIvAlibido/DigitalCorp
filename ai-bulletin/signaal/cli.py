@@ -85,7 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     uitvoermap = args.uitvoer or (PROJECT / config.get("output", {}).get("map", "edities"))
 
     if args.site is not None:
-        paden = site.bouw(uitvoermap, args.site)
+        paden = site.bouw(uitvoermap, args.site, config)
         print(f"\nAI Bulletin — website: {len(paden)} bestanden in {args.site}")
         for pad in paden:
             print(f"  {pad.relative_to(args.site)}")

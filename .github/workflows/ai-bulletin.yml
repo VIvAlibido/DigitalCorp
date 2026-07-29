@@ -55,6 +55,20 @@ jobs:
       - name: Bouw de website
         run: python -m signaal.cli --site
 
+      # Een nieuwssite die op betrouwbaarheid concurreert kan niet anoniem zijn,
+      # en art. 3:15d BW verplicht een commerciële site tot naam, adres, e-mail
+      # en KvK-nummer. Liever hier falen dan het ontdekken via een lezer.
+      - name: Controleer of publiceren mag
+        run: |
+          python - <<'PY'
+          import sys
+          from signaal import pipeline, site
+          blokkades = site.controleer_publicatiegereed(pipeline.laad_config("config.yaml"))
+          for regel in blokkades:
+              print(f"::error::{regel}")
+          sys.exit(1 if blokkades else 0)
+          PY
+
       - name: Archiveer de editie
         uses: actions/upload-artifact@v4
         with:

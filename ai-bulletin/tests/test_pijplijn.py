@@ -425,6 +425,74 @@ class TestOndergrens(unittest.TestCase):
         self.assertEqual(schema["properties"]["items"]["minItems"], 3)
 
 
+class TestUitgever(unittest.TestCase):
+    """Een nieuwssite die op betrouwbaarheid concurreert kan niet anoniem zijn."""
+
+    VOLLEDIG = {"uitgever": {
+        "naam": "Testuitgever B.V.", "handelsnaam": "AI Bulletin",
+        "adres": "Teststraat 1", "postcode": "1000 AA", "plaats": "Amsterdam",
+        "land": "Nederland", "kvk": "12345678", "btw": "NL001234567B01",
+        "email": "post@example.nl", "correcties": "correcties@example.nl"}}
+
+    def test_lege_config_blokkeert_publicatie(self):
+        blokkades = site.controleer_publicatiegereed({})
+        self.assertTrue(blokkades)
+        self.assertTrue(any("kvk" in b for b in blokkades))
+
+    def test_de_echte_config_is_nog_niet_publicatiegereed(self):
+        """Bewaakt dat er niet per ongeluk live wordt gegaan zonder KvK-gegevens."""
+        self.assertTrue(site.controleer_publicatiegereed(CONFIG))
+
+    def test_volledige_gegevens_geven_groen_licht(self):
+        self.assertEqual(site.controleer_publicatiegereed(self.VOLLEDIG), [])
+
+    def test_ontbrekend_correctieadres_wordt_apart_gemeld(self):
+        config = {"uitgever": dict(self.VOLLEDIG["uitgever"], correcties="", email="")}
+        self.assertTrue(any("correctie" in b for b in site.controleer_publicatiegereed(config)))
+
+    def test_email_dekt_het_correctieadres_af(self):
+        config = {"uitgever": dict(self.VOLLEDIG["uitgever"], correcties="")}
+        self.assertEqual(site.controleer_publicatiegereed(config), [])
+
+    def test_colofon_toont_de_gegevens_en_geen_waarschuwing(self):
+        html = site._colofon(self.VOLLEDIG).inhoud
+        for verwacht in ("Testuitgever B.V.", "12345678", "NL001234567B01",
+                         "correcties@example.nl", "Teststraat 1", "1000 AA Amsterdam"):
+            self.assertIn(verwacht, html)
+        self.assertNotIn("nog niet ingevuld", html)
+        self.assertNotIn("niet compleet", html)
+
+    def test_onvolledig_colofon_waarschuwt_zichtbaar(self):
+        html = site._colofon({}).inhoud
+        self.assertIn("nog niet ingevuld", html)
+        self.assertIn("niet live", html)
+        # Postcode en plaats delen één regel: samen één keer de melding.
+        self.assertNotIn("— nog niet ingevuld — — nog niet ingevuld —", html)
+
+    def test_deels_ingevulde_woonplaats_toont_wat_er_is(self):
+        config = {"uitgever": {"plaats": "Rotterdam"}}
+        self.assertIn("<td>Rotterdam</td>", site._colofon(config).inhoud)
+
+    def test_privacy_noemt_de_verwerkingsverantwoordelijke(self):
+        html = site._privacy(self.VOLLEDIG).inhoud
+        self.assertIn("Testuitgever B.V.", html)
+        self.assertIn("verwerkingsverantwoordelijke", html)
+        self.assertIn("Autoriteit Persoonsgegevens", html)
+
+    def test_beide_paginas_staan_in_de_gebouwde_site(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            edities, uit = Path(tmp) / "edities", Path(tmp) / "site"
+            edities.mkdir()
+            editie = fixture_editie()
+            (edities / f"{editie.stam}.json").write_text(
+                render.naar_json(editie), encoding="utf-8")
+            site.bouw(edities, uit, self.VOLLEDIG)
+            for pad in ("colofon/index.html", "privacy/index.html"):
+                self.assertTrue((uit / pad).exists(), f"{pad} ontbreekt")
+            # En vanaf elke pagina bereikbaar.
+            self.assertIn('href="../colofon/"', (uit / "archief/index.html").read_text())
+
+
 class TestSite(unittest.TestCase):
     def test_bouwt_alle_paginas(self):
         with tempfile.TemporaryDirectory() as tmp:

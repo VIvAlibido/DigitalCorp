@@ -3,6 +3,29 @@
 # Elke dag: verzamel kandidaten uit alle bronnen, ontdubbel, scoor,
 # laat een LLM de 6 belangrijkste kiezen en in het Nederlands schrijven.
 
+# Wie de uitgever is. Verplicht voordat de site live mag.
+#
+# Art. 3:15d BW verplicht een commerciële website tot een vindbare naam,
+# vestigingsadres, e-mailadres en KvK-nummer; een btw-nummer als je btw-plichtig
+# bent. De AVG verplicht daarnaast tot een privacyverklaring die de
+# verwerkingsverantwoordelijke noemt. Beide worden hieruit gegenereerd —
+# colofon en privacypagina staan nergens los in HTML.
+#
+# Laat een veld nooit met een gok staan: site.controleer_publicatiegereed()
+# blokkeert de publicatie zolang hier iets ontbreekt. Dat is met opzet.
+uitgever:
+  naam: ""              # statutaire naam, bv. "Telemedia B.V."
+  handelsnaam: "AI Bulletin"
+  adres: ""             # straat en huisnummer
+  postcode: ""
+  plaats: ""
+  land: "Nederland"
+  kvk: ""
+  btw: ""               # leeglaten als je niet btw-plichtig bent
+  email: ""             # algemeen contact
+  correcties: ""        # waar "fout gezien?" heen gaat; mag gelijk zijn aan email
+  telefoon: ""          # optioneel
+
 output:
   # Hoogstens dit aantal berichten. Zijn er minder die de toets doorstaan, dan
   # wordt de editie korter — een zwak zesde bericht kost meer lezers dan een

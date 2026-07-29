@@ -87,13 +87,14 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 6 | Feit (`wat`) en duiding (`waarom`) blijven zichtbaar gescheiden | geloofwaardigheid is de enige verdediging tegen "zoveelste AI-nieuwsbrief" |
 | 7 | Weekend krijgt een **ander formaat** dan doordeweeks | za/zo is de dunste invoer van de week; zie plan §6 |
 | 8 | Zondagstuk wordt **niet geautomatiseerd** | het enige deel dat niet te scrapen is, moet mensenwerk zijn |
+| 10 | Colofon en privacyverklaring worden **uit `uitgever:` in config.yaml gegenereerd** | één plek voor deze gegevens, zodat er geen tweede versie kan verouderen; publicatie wordt geblokkeerd zolang ze ontbreken |
 | 9 | Eerst **goedkeuren vóór verzenden**, later omschakelen naar een annuleervenster | opdrachtgever heeft nu veel tijd, straks weinig; de omschakeling moet één regel config zijn, geen verbouwing |
 
 ## Beslissingen die openstaan — deze blokkeren werk
 
 | # | Vraag | Wat het blokkeert |
 |---|---|---|
-| **D** | Is aibulletin.nl geregistreerd? Is er een bedrijf/KvK achter, en welk e-mailadres komt onder "fout gezien?" | Lancering, colofon, privacyverklaring, AVG-verantwoordelijke |
+| **D** | De uitgeversgegevens: statutaire naam, adres, postcode, plaats, KvK-nummer, btw-nummer, e-mail en correctie-adres. Ook: is aibulletin.nl geregistreerd? | **Lancering.** De machinerie staat klaar — `uitgever:` in config.yaml invullen en het is af. `site.controleer_publicatiegereed()` blokkeert de workflow tot dat gebeurd is. Bron nieuwsradio.com was niet bereikbaar vanuit deze omgeving (proxy 403). |
 | **E** | Wat betekent "nummer één" in een getal — abonnees, bezoekers, iets anders? | Kunnen beoordelen of een keuze over zes maanden heeft gewerkt |
 
 *(A, B en C zijn beantwoord op 29 juli — zie "De lezer", "Het ene kenmerk" en
@@ -129,9 +130,9 @@ ontdubbelen, shortlist, LLM-jury met terugval, koptoets/kopscore/kopvarianten,
 render naar JSON/Markdown/mail-HTML, statische sitegenerator, GitHub
 Actions-workflow met Pages-deploy.
 
-**Ontbreekt:** verzendlaag (ESP), abonneebeheer, historie tussen edities,
-ondergrens in plaats van quotum, weekendformaten, SEO-technisch fundament
-(zie hieronder), correctie-e-mailadres, colofon/privacyverklaring.
+**Ontbreekt:** verzendlaag (ESP), abonneebeheer, weekendformaten,
+SEO-technisch fundament (zie hieronder), en de uitgeversgegevens zelf —
+zie openstaand punt D.
 
 **Plannen:** `plan/nieuwsbrief-plan.md` (strategie, marktonderzoek) ·
 `plan/dagelijks-publiceren.md` (automatisering om 06:00)
