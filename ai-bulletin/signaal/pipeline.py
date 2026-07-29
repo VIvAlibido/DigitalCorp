@@ -4,17 +4,21 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
 import yaml
 
 from . import audio as audio_mod
-from . import bronnen, dedupe, historie, koptoets, rank, render, score
+from . import bronnen, dedupe, historie, keuring, rank, render, score
 from .model import Editie, Item
 
 log = logging.getLogger(__name__)
+
+
+class KeuringsFout(RuntimeError):
+    """Een editie die niet gepubliceerd hoort te worden."""
 
 
 @dataclass
@@ -22,6 +26,8 @@ class Resultaat:
     editie: Editie
     na_ontdubbelen: int
     bestanden: list[Path]
+    # Wat de keuring vond. Leeg is goed.
+    bevindingen: list = field(default_factory=list)
 
     # Doorgeefluiken zodat aanroepers niet overal `.editie.` hoeven te typen.
     @property
@@ -92,14 +98,13 @@ def draai(
     editie.kandidaten = kandidaten
     editie.bronnen = len({i.bron for i in items})
 
-    # Het model kan afdwalen van de kopregels; dat willen we zien in de logs
-    # en niet pas als een lezer klaagt. Blokkeren doen we niet — een editie
-    # met een matige kop is beter dan geen editie.
-    for zwakke_kop, bezwaren in koptoets.toets_editie([s.kop for s in editie.items]).items():
-        log.warning("zwakke kop — %s: %r", "; ".join(bezwaren), zwakke_kop)
-
-    for bezwaar in rank.toets_verhouding(editie):
-        log.warning("duiding overheerst — %s", bezwaar)
+    # Eén keuring voor alles. Bij de automatische run blokkeren we niet: de
+    # nieuwsbrief moet elke ochtend de deur uit, en een mindere editie is beter
+    # dan geen editie. Maar hij staat wel in de logs en in het resultaat, zodat
+    # de proefmail laat zien wat eraan schort.
+    bevindingen = keuring.keur(editie)
+    for bevinding in bevindingen:
+        log.warning("keuring: %s", bevinding)
 
     bestanden = _schrijf(editie, uitvoermap)
 
@@ -111,7 +116,8 @@ def draai(
         except audio_mod.AudioFout as exc:
             log.error("audio overgeslagen: %s", exc)
 
-    return Resultaat(editie=editie, na_ontdubbelen=len(items), bestanden=bestanden)
+    return Resultaat(editie=editie, na_ontdubbelen=len(items), bestanden=bestanden,
+                     bevindingen=bevindingen)
 
 
 def render_selectie(pad: Path, uitvoermap: Path) -> Resultaat:
@@ -122,11 +128,25 @@ def render_selectie(pad: Path, uitvoermap: Path) -> Resultaat:
     uitdraaien als het sjabloon verandert.
     """
     editie = Editie.from_dict(json.loads(pad.read_text(encoding="utf-8")))
+
+    # Streng, want dit is de route voor met de hand nagelopen edities. Hier is
+    # geen ochtenddeadline die een halve editie rechtvaardigt, en juist langs
+    # deze weg zijn de redactionele fouten binnengekomen die niemand ving.
+    bevindingen = keuring.keur(editie, streng=True)
+    blokkades = keuring.blokkades(bevindingen)
+    if blokkades:
+        raise KeuringsFout(
+            f"{pad.name} is niet publicatiegereed:\n  "
+            + "\n  ".join(str(x) for x in blokkades))
+    for bevinding in bevindingen:
+        log.warning("keuring: %s", bevinding)
+
     bestanden = _schrijf(editie, uitvoermap)
     return Resultaat(
         editie=editie,
         na_ontdubbelen=editie.kandidaten or len(editie.items),
         bestanden=bestanden,
+        bevindingen=bevindingen,
     )
 
 

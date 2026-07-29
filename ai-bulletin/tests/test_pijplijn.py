@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from signaal import (  # noqa: E402
-    dedupe, historie, koptoets, pipeline, rank, render, score, site,
+    dedupe, historie, keuring, koptoets, pipeline, rank, render, score, site,
 )
 from signaal.bronnen import basis  # noqa: E402
 from signaal.cli import _laad_fixtures  # noqa: E402
@@ -433,6 +433,77 @@ class TestOndergrens(unittest.TestCase):
         # Het origineel mag niet meeveranderen — anders lekt de ene run in de andere.
         self.assertEqual(rank.bouw_schema(1, 2)["properties"]["items"]["minItems"], 1)
         self.assertEqual(schema["properties"]["items"]["minItems"], 3)
+
+
+class TestKeuring(unittest.TestCase):
+    """Eén poort waar alles doorheen moet — beide routes, niet alleen de automatische.
+
+    Elke test hieronder is een fout die deze week daadwerkelijk is gepubliceerd
+    omdat de handgeschreven route geen enkele controle had.
+    """
+
+    def echt(self, naam: str = "2026-07-29") -> Editie:
+        pad = PROJECT / "redactie" / f"{naam}-selectie.json"
+        return Editie.from_dict(json.loads(pad.read_text(encoding="utf-8")))
+
+    def test_te_lange_duiding_wordt_gezien(self):
+        editie = self.echt()
+        editie.items[0].waarom = "woord " * 80
+        self.assertTrue(any("duiding" in b.wat for b in keuring.keur(editie)))
+
+    def test_abstracte_kop_wordt_gezien(self):
+        editie = self.echt()
+        editie.items[0].kop = "De AI-wet is uitgesteld en gaat vandaag gewoon in"
+        self.assertTrue(any("abstract onderwerp" in b.wat for b in keuring.keur(editie)))
+
+    def test_zondagsstuk_zonder_auteur_blokkeert(self):
+        editie = self.echt("2026-08-02")
+        editie.beschouwing.auteur = ""
+        blok = keuring.blokkades(keuring.keur(editie))
+        self.assertTrue(any("geen auteur" in b.wat for b in blok))
+
+    def test_leeg_verplicht_veld_blokkeert(self):
+        editie = self.echt()
+        editie.items[0].bron = ""
+        self.assertTrue(any(b.wat == "leeg veld: bron" for b in keuring.blokkades(keuring.keur(editie))))
+
+    def test_dubbele_bron_blokkeert(self):
+        editie = self.echt()
+        editie.items[1].url = editie.items[0].url
+        self.assertTrue(any("twee keer" in b.wat for b in keuring.blokkades(keuring.keur(editie))))
+
+    def test_placeholders_blokkeren_alleen_streng(self):
+        """De heuristische terugval mag placeholders opleveren; handwerk niet."""
+        items = score.scoor(_laad_fixtures(PROJECT / "fixtures" / "kandidaten.json"), CONFIG)
+        editie = rank.kies_heuristisch(items, CONFIG, DATUM)
+        editie.onderwerp = "Een onderwerpregel van goede lengte"
+        soepel = keuring.blokkades(keuring.keur(editie, streng=False))
+        streng = keuring.blokkades(keuring.keur(editie, streng=True))
+        self.assertGreater(len(streng), len(soepel))
+
+    def test_handgeschreven_route_weigert_te_publiceren(self):
+        """De route waarlangs elke redactionele fout binnenkwam, blokkeert nu."""
+        with tempfile.TemporaryDirectory() as tmp:
+            editie = self.echt("2026-08-02")
+            editie.beschouwing.auteur = ""
+            pad = Path(tmp) / "kapot.json"
+            pad.write_text(render.naar_json(editie), encoding="utf-8")
+            with self.assertRaises(pipeline.KeuringsFout):
+                pipeline.render_selectie(pad, Path(tmp) / "uit")
+
+    def test_automatische_route_blokkeert_niet_maar_rapporteert_wel(self):
+        """De ochtendmail moet de deur uit; de bevindingen gaan mee naar de proefmail."""
+        items = _laad_fixtures(PROJECT / "fixtures" / "kandidaten.json")
+        with tempfile.TemporaryDirectory() as tmp:
+            resultaat = pipeline.draai(CONFIG, uitvoermap=Path(tmp), vandaag=DATUM,
+                                       heuristisch=True, vooraf_verzameld=items)
+            self.assertTrue(resultaat.bestanden, "editie is niet geschreven")
+            self.assertTrue(resultaat.bevindingen, "keuring rapporteerde niets")
+
+    def test_beide_gepubliceerde_edities_zijn_schoon(self):
+        for naam in ("2026-07-29", "2026-08-02"):
+            blok = keuring.blokkades(keuring.keur(self.echt(naam), streng=True))
+            self.assertEqual(blok, [], f"{naam}: {[str(b) for b in blok]}")
 
 
 class TestZondagsstuk(unittest.TestCase):

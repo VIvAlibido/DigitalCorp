@@ -92,7 +92,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.selectie:
-        resultaat = pipeline.render_selectie(args.selectie, uitvoermap)
+        try:
+            resultaat = pipeline.render_selectie(args.selectie, uitvoermap)
+        except pipeline.KeuringsFout as exc:
+            print(f"\nGEBLOKKEERD — {exc}\n", file=sys.stderr)
+            return 1
     else:
         vooraf = _laad_fixtures(args.fixtures) if args.fixtures else None
         resultaat = pipeline.draai(
@@ -110,7 +114,11 @@ def main(argv: list[str] | None = None) -> int:
     for nummer, s in enumerate(resultaat.selecties, 1):
         print(f"  {nummer}. [{s.categorie}] {s.kop}")
         print(f"     {s.bron} — {s.url}")
-    print()
+    if resultaat.bevindingen:
+        print("  Keuring:")
+        for bevinding in resultaat.bevindingen:
+            print(f"    {bevinding}")
+        print()
     for pad in resultaat.bestanden:
         print(f"  geschreven: {pad}")
 
