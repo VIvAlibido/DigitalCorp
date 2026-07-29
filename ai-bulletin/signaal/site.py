@@ -739,7 +739,7 @@ def laad_edities(map_: Path) -> list[Editie]:
 
 
 def bouw(edities_map: Path, uitvoer: Path, config: dict | None = None,
-         leeg_eerst: bool = True) -> list[Path]:
+         leeg_eerst: bool = True, indexeerbaar: bool = True) -> list[Path]:
     """Bouwt de volledige site. Retourneert de geschreven paden.
 
     `config` levert de uitgeversgegevens voor colofon en privacyverklaring.
@@ -779,9 +779,31 @@ def bouw(edities_map: Path, uitvoer: Path, config: dict | None = None,
         doel.write_text(_pagina(p, diepte=len(Path(p.pad).parts)), encoding="utf-8")
         geschreven.append(doel)
 
+    geschreven.append(_robots(uitvoer, indexeerbaar))
     geschreven.append(_sitemap(paginas, uitvoer))
     log.info("site gebouwd: %d pagina's in %s", len(paginas), uitvoer)
     return geschreven
+
+
+def _robots(uitvoer: Path, indexeerbaar: bool) -> Path:
+    """robots.txt — en op een voorvertoning een verbod op indexeren.
+
+    Een preview-URL die wél geïndexeerd wordt, concurreert met de echte site
+    om dezelfde teksten. Dat is precies het soort dubbele inhoud waar je later
+    niet meer vanaf komt.
+    """
+    from .render import SITE
+
+    pad = uitvoer / "robots.txt"
+    if indexeerbaar:
+        pad.write_text(
+            "User-agent: *\nAllow: /\n\n"
+            f"Sitemap: {SITE}/sitemap.xml\n", encoding="utf-8")
+    else:
+        pad.write_text(
+            "# Voorvertoning — niet de echte site.\n"
+            "User-agent: *\nDisallow: /\n", encoding="utf-8")
+    return pad
 
 
 def _sitemap(paginas: list[Sitepagina], uitvoer: Path) -> Path:

@@ -89,6 +89,8 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 8 | Zondagstuk wordt **niet geautomatiseerd** | het enige deel dat niet te scrapen is, moet mensenwerk zijn |
 | 9 | Eerst **goedkeuren vóór verzenden**, later omschakelen naar een annuleervenster | opdrachtgever heeft nu veel tijd, straks weinig; de omschakeling moet één regel config zijn, geen verbouwing |
 | 10 | Colofon en privacyverklaring worden **uit `uitgever:` in config.yaml gegenereerd** | één plek voor deze gegevens, zodat er geen tweede versie kan verouderen; publicatie wordt geblokkeerd zolang ze ontbreken |
+| 11 | Hosting op **Vercel**, gekoppeld aan deze repo. Root directory `ai-bulletin` | opdrachtgever, 29 juli. Let op: de repo-root bevat een ándere website; zonder die instelling publiceert Vercel die |
+| 12 | **Elke editie gaat altijd naar kees@telemedia.es** | opdrachtgever, 29 juli. Vastgelegd in `verzending.altijd_naar`; een test bewaakt dat het niet wegvalt |
 
 ## Beslissingen die openstaan — deze blokkeren werk
 
@@ -104,9 +106,14 @@ beslissing 9.)*
 
 ## Feiten die vaststaan — niet opnieuw uitzoeken
 
-- **Deze omgeving heeft geen uitgaand netwerk.** WebSearch werkt, WebFetch en
-  curl niet. Live bronnen en LLM-aanroepen zijn hier niet te testen. Alles is
-  getest met fixtures.
+- **Deze omgeving heeft nauwelijks uitgaand netwerk.** WebSearch werkt; de
+  proxy weigert vrijwel alle domeinen met een 403 op de CONNECT-tunnel —
+  geverifieerd voor vercel.com, api.vercel.com en nieuwsradio.com. Live bronnen,
+  LLM-aanroepen en deploys zijn hier niet uit te voeren. Alles is getest met
+  fixtures.
+- **Geen credentials in de omgeving.** Geen Vercel-token, geen SMTP, geen ESP.
+  Deployen en mailen moet de opdrachtgever zelf doen of aanleveren; beloof het
+  niet.
 - **De LLM-jury heeft nog nooit echt gedraaid.** De editie van 2026-07-29 op de
   site is met de hand geschreven en zegt niets over wat de automaat produceert.
 - **Een editie mag korter zijn dan zes** — opgelost op 29 juli. De jury krijgt
@@ -127,11 +134,12 @@ beslissing 9.)*
 
 ## Stand van de bouw
 
-**Werkt en is getest** (93 tests): verzamelen uit 8 brontypes, scoren,
+**Werkt en is getest** (96 tests): verzamelen uit 8 brontypes, scoren,
 ontdubbelen, geheugen tussen edities, ondergrens, shortlist, LLM-jury met terugval, koptoets/kopscore/kopvarianten,
 render naar JSON/Markdown/mail-HTML, statische sitegenerator inclusief
-colofon en privacyverklaring, GitHub Actions-workflow met Pages-deploy en een
-publicatieblokkade zolang de uitgeversgegevens ontbreken.
+colofon en privacyverklaring, robots.txt met noindex op voorvertoningen,
+GitHub Actions-workflow met Pages-deploy, en `vercel.json` + `bouw_site.py`
+voor Vercel — met een publicatieblokkade zolang de uitgeversgegevens ontbreken.
 
 **Ontbreekt:** verzendlaag (ESP), abonneebeheer, weekendformaten,
 SEO-technisch fundament (zie hieronder), en de uitgeversgegevens zelf —

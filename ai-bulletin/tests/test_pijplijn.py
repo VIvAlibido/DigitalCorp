@@ -479,6 +479,34 @@ class TestUitgever(unittest.TestCase):
         self.assertIn("verwerkingsverantwoordelijke", html)
         self.assertIn("Autoriteit Persoonsgegevens", html)
 
+    def test_verzendadres_ligt_vast_in_config(self):
+        """De opdrachtgever wil elke editie ontvangen; dat mag niet wegvallen."""
+        self.assertIn("kees@telemedia.es", CONFIG["verzending"]["altijd_naar"])
+
+    def test_voorvertoning_wordt_niet_geindexeerd(self):
+        """Een preview-URL die rankt, concurreert met de echte site."""
+        with tempfile.TemporaryDirectory() as tmp:
+            uit = self._bouw(Path(tmp), indexeerbaar=False)
+            robots = (uit / "robots.txt").read_text(encoding="utf-8")
+            self.assertIn("Disallow: /", robots)
+            self.assertNotIn("Allow: /", robots)
+
+    def test_productie_wordt_wel_geindexeerd_en_wijst_naar_de_sitemap(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            uit = self._bouw(Path(tmp), indexeerbaar=True)
+            robots = (uit / "robots.txt").read_text(encoding="utf-8")
+            self.assertIn("Allow: /", robots)
+            self.assertIn("aibulletin.nl/sitemap.xml", robots)
+
+    def _bouw(self, tmp: Path, indexeerbaar: bool) -> Path:
+        edities, uit = tmp / "edities", tmp / "public"
+        edities.mkdir()
+        editie = fixture_editie()
+        (edities / f"{editie.stam}.json").write_text(
+            render.naar_json(editie), encoding="utf-8")
+        site.bouw(edities, uit, self.VOLLEDIG, indexeerbaar=indexeerbaar)
+        return uit
+
     def test_beide_paginas_staan_in_de_gebouwde_site(self):
         with tempfile.TemporaryDirectory() as tmp:
             edities, uit = Path(tmp) / "edities", Path(tmp) / "site"
