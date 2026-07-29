@@ -1,4 +1,4 @@
-name: NL-AI-Signaal — dagelijkse editie
+name: AI Bulletin — dagelijkse editie
 
 on:
   schedule:
@@ -16,7 +16,7 @@ on:
 
 defaults:
   run:
-    working-directory: nl-ai-signaal
+    working-directory: ai-bulletin
 
 jobs:
   editie:
@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: nl-ai-signaal/requirements.txt
+          cache-dependency-path: ai-bulletin/requirements.txt
 
       - name: Installeer dependencies
         run: pip install -r requirements.txt
@@ -56,5 +56,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: editie-${{ github.run_id }}
-          path: nl-ai-signaal/edities/
+          path: ai-bulletin/edities/
           retention-days: 90

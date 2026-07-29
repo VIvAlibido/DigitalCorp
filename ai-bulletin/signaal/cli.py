@@ -43,7 +43,7 @@ def _laad_fixtures(pad: Path) -> list[Item]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="nl-ai-signaal",
+        prog="ai-bulletin",
         description="Stelt de dagelijkse Nederlandstalige AI-nieuwsbrief samen.",
     )
     parser.add_argument("--config", default=PROJECT / "config.yaml", type=Path)
@@ -88,7 +88,7 @@ def main(argv: list[str] | None = None) -> int:
             vooraf_verzameld=vooraf,
         )
 
-    print(f"\nNL-AI-Signaal — {resultaat.datum.isoformat()}")
+    print(f"\nAI Bulletin — {resultaat.datum.isoformat()}")
     print(f"{resultaat.kandidaten} kandidaten → {resultaat.na_ontdubbelen} uniek "
           f"→ {len(resultaat.selecties)} geplaatst\n")
     for nummer, s in enumerate(resultaat.selecties, 1):

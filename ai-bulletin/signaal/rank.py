@@ -14,7 +14,7 @@ from .model import Item, Selectie
 
 log = logging.getLogger(__name__)
 
-SYSTEEM = """Je bent de eindredacteur van NL-AI-Signaal, een dagelijkse \
+SYSTEEM = """Je bent de eindredacteur van AI Bulletin, een dagelijkse \
 Nederlandstalige nieuwsbrief over kunstmatige intelligentie.
 
 Je lezer is een geïnteresseerde generalist: een ondernemer, manager, jurist, \

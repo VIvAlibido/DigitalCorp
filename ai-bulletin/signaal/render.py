@@ -101,7 +101,7 @@ def naar_markdown(
     onderwerp: str = "",
     preheader: str = "",
 ) -> str:
-    regels = [f"# NL-AI-Signaal — {datum_nl(d)}", ""]
+    regels = [f"# AI Bulletin — {datum_nl(d)}", ""]
     if onderwerp:
         # Zichtbaar in het archief zodat je achteraf kunt zien welke
         # onderwerpregel bij welke editie hoorde — dat is de basis voor
@@ -223,7 +223,7 @@ def naar_html(
     return f"""<!doctype html>
 <html lang="nl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{e(onderwerp or f"NL-AI-Signaal — {datum_nl(d)}")}</title></head>
+<title>{e(onderwerp or f"AI Bulletin — {datum_nl(d)}")}</title></head>
 <body style="margin:0;padding:0;background:#f4f1ea;">{preheader_blok}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
        style="background:#f4f1ea;padding:32px 16px;">
@@ -231,7 +231,7 @@ def naar_html(
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
            style="max-width:620px;background:#fffdf8;border-radius:8px;padding:36px;">
       <tr><td style="padding:0 0 6px 0;">
-        <div style="font:700 22px/1.2 Georgia,serif;color:#1c1a17;">NL-AI-Signaal</div>
+        <div style="font:700 22px/1.2 Georgia,serif;color:#1c1a17;">AI Bulletin</div>
         <div style="font:400 14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#8a7f6d;">
           {e(datum_nl(d))} · {len(selecties)} berichten ·
           {leestijd(selecties, intro)} minuten lezen
@@ -253,7 +253,7 @@ def naar_html(
                   color:#6b6355;">{e(CORRECTIEBELEID)}</p>
         <p style="margin:0;font:400 12px/1.6 -apple-system,Segoe UI,Roboto,sans-serif;
                   color:#8a7f6d;">
-          Je ontvangt deze mail omdat je je hebt aangemeld voor NL-AI-Signaal.<br>
+          Je ontvangt deze mail omdat je je hebt aangemeld voor AI Bulletin.<br>
           <a href="{{{{unsubscribe}}}}" style="color:#8a7f6d;">Uitschrijven</a> ·
           <a href="{{{{preferences}}}}" style="color:#8a7f6d;">Voorkeuren</a>
         </p>

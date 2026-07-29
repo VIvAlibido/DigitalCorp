@@ -15,7 +15,7 @@ import requests
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = "NL-AI-Signaal/1.0 (+https://github.com/VIvAlibido/DigitalCorp)"
+USER_AGENT = "AI Bulletin/1.0 (+https://github.com/VIvAlibido/DigitalCorp)"
 TIMEOUT = 20
 
 _NS = {

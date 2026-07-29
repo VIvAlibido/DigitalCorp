@@ -38,7 +38,7 @@ class AudioFout(RuntimeError):
 def maak_script(selecties: list[Selectie], d: date) -> str:
     """Zet de editie om naar tekst die hardop goed klinkt."""
     delen = [
-        f"NL-AI-Signaal, {datum_nl(d)}.",
+        f"AI Bulletin, {datum_nl(d)}.",
         f"Dit zijn de {len(selecties)} dingen die vandaag in AI gebeurd zijn.",
         "",
     ]

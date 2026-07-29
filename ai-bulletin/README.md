@@ -1,4 +1,4 @@
-# NL-AI-Signaal
+# AI Bulletin
 
 Verzamelt elke werkdag AI-nieuws uit acht bronsoorten, ontdubbelt, en laat
 Claude de **6 items kiezen die er werkelijk toe doen** — geschreven in het
@@ -200,6 +200,6 @@ draaien, niet een goedkoper model.
 
 ## Automatisch draaien
 
-`.github/workflows/nl-ai-signaal.yml` draait op werkdagen om 05:15 UTC. Vereist
+`.github/workflows/ai-bulletin.yml` draait op werkdagen om 05:15 UTC. Vereist
 `ANTHROPIC_API_KEY` als repository secret; `ELEVENLABS_API_KEY` en
 `ELEVENLABS_VOICE_ID` alleen als je audio aanzet.
