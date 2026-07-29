@@ -71,27 +71,38 @@ def naar_json(selecties: list[Selectie], d: date) -> str:
     )
 
 
+def leestijd(selecties: list[Selectie], intro: str = "") -> int:
+    """Geschatte leestijd in minuten, op 200 woorden per minuut."""
+    woorden = len(intro.split()) + sum(
+        len(f"{s.kop} {s.kern} {s.wat} {s.waarom} {s.kanttekening}".split())
+        for s in selecties
+    )
+    return max(round(woorden / 200), 1)
+
+
 def naar_markdown(
     selecties: list[Selectie],
     d: date,
     kandidaten: int | None = None,
     bronnen: int | None = None,
+    intro: str = "",
 ) -> str:
     regels = [
         f"# NL-AI-Signaal — {datum_nl(d)}",
         "",
-        f"De {len(selecties)} dingen die er vandaag in AI toe doen, met wat ze "
-        "betekenen voor wie in Nederland met AI werkt.",
-        "",
-        "---",
+        f"*{len(selecties)} berichten · {leestijd(selecties, intro)} minuten lezen*",
         "",
     ]
+    if intro:
+        regels += [intro, ""]
+    regels += ["---", ""]
+
     for nummer, s in enumerate(selecties, 1):
         herkomst = " · ".join(filter(None, [s.categorie, s.bron, _kort_datum(s.datum)]))
         regels += [
             f"## {nummer}. {s.kop}",
             "",
-            f"*{herkomst}*",
+            f"**{s.kern}**",
             "",
             s.wat,
             "",
@@ -100,7 +111,9 @@ def naar_markdown(
         ]
         if s.kanttekening:
             regels += [f"> **Kanttekening:** {s.kanttekening}", ""]
-        regels += [f"[Naar de bron →]({s.url})", "", "---", ""]
+        # Herkomst onderaan: de lezer wil eerst weten wát er staat, en pas
+        # daarna waar het vandaan komt — maar hij moet het wel kunnen vinden.
+        regels += [f"[Naar de bron →]({s.url}) · *{herkomst}*", "", "---", ""]
 
     regels += [
         "### Hoe deze editie tot stand kwam",
@@ -118,6 +131,7 @@ def naar_html(
     d: date,
     kandidaten: int | None = None,
     bronnen: int | None = None,
+    intro: str = "",
 ) -> str:
     """E-mail-HTML: tabellen en inline styles, want mailclients kunnen weinig."""
     e = html.escape
@@ -137,24 +151,39 @@ def naar_html(
         )
         blokken.append(
             f"""
-      <tr><td style="padding:0 0 30px 0;">
+      <tr><td style="padding:0 0 34px 0;">
         <div style="font:600 11px/1.4 -apple-system,Segoe UI,Roboto,sans-serif;
                     color:#8a7f6d;text-transform:uppercase;letter-spacing:.07em;">
-          {nummer} · {e(herkomst)}
+          {nummer} · {e(s.categorie)}
         </div>
-        <h2 style="margin:7px 0 11px;font:600 19px/1.35 Georgia,serif;color:#1c1a17;">
+        <h2 style="margin:7px 0 12px;font:600 20px/1.32 Georgia,serif;color:#1c1a17;">
           {e(s.kop)}
         </h2>
+        <p style="margin:0 0 14px;font:400 17px/1.55 Georgia,serif;color:#4a4437;">
+          {e(s.kern)}
+        </p>
         <p style="margin:0 0 12px;font:400 15px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;
                   color:#33302b;">{e(s.wat)}</p>
         <p style="margin:0 0 12px;font:400 15px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;
                   color:#33302b;">
           <strong style="color:#1c1a17;">Waarom het ertoe doet</strong> — {e(s.waarom)}
         </p>{kanttekening}
-        <a href="{e(s.url)}" style="font:600 14px/1 -apple-system,Segoe UI,Roboto,sans-serif;
-           color:#a4552b;text-decoration:none;">Naar de bron →</a>
+        <div style="font:400 13px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#8a7f6d;">
+          <a href="{e(s.url)}" style="font-weight:600;color:#a4552b;
+             text-decoration:none;">Naar de bron →</a>
+          &nbsp;{e(s.bron)}{e(f" · {_kort_datum(s.datum)}" if s.datum else "")}
+        </div>
       </td></tr>"""
         )
+
+    intro_blok = (
+        f"""
+      <tr><td style="padding:0 0 26px 0;">
+        <p style="margin:0;font:400 16px/1.65 Georgia,serif;color:#4a4437;">{e(intro)}</p>
+      </td></tr>"""
+        if intro
+        else ""
+    )
 
     return f"""<!doctype html>
 <html lang="nl"><head><meta charset="utf-8">
@@ -169,12 +198,14 @@ def naar_html(
       <tr><td style="padding:0 0 6px 0;">
         <div style="font:700 22px/1.2 Georgia,serif;color:#1c1a17;">NL-AI-Signaal</div>
         <div style="font:400 14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#8a7f6d;">
-          {e(datum_nl(d))} · {len(selecties)} dingen die ertoe doen
+          {e(datum_nl(d))} · {len(selecties)} berichten ·
+          {leestijd(selecties, intro)} minuten lezen
         </div>
       </td></tr>
-      <tr><td style="padding:18px 0 26px 0;">
+      <tr><td style="padding:18px 0 24px 0;">
         <hr style="border:0;border-top:1px solid #e5ded1;margin:0;">
       </td></tr>
+      {intro_blok}
       {"".join(blokken)}
       <tr><td style="padding:6px 0 0 0;border-top:1px solid #e5ded1;">
         <div style="font:600 11px/1.4 -apple-system,Segoe UI,Roboto,sans-serif;color:#8a7f6d;

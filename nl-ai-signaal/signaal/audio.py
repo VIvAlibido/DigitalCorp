@@ -43,8 +43,11 @@ def maak_script(selecties: list[Selectie], d: date) -> str:
         "",
     ]
     for nummer, s in enumerate(selecties, 1):
+        # De kernzin is geschreven om hardop te werken: geen jargon, één
+        # gedachte. Hij opent het item; de details volgen erachteraan.
         delen += [
             f"{nummer}. {_leesbaar(s.kop)}",
+            _leesbaar(s.kern),
             _leesbaar(s.wat),
             f"Waarom dit ertoe doet: {_leesbaar(s.waarom)}",
             "",

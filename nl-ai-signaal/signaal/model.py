@@ -71,6 +71,9 @@ class Selectie:
     """
 
     kop: str
+    # Eén zin zonder jargon die het hele bericht draagt. Wie alleen de kop en
+    # deze zin leest, snapt het. Alles daaronder is verdieping, geen voorwaarde.
+    kern: str
     wat: str
     waarom: str
     url: str

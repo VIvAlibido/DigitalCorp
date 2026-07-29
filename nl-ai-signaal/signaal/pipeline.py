@@ -109,7 +109,10 @@ def render_selectie(pad: Path, uitvoermap: Path) -> Resultaat:
     kandidaten = data.get("kandidaten")
     bronnen = data.get("bronnen")
 
-    bestanden = _schrijf(selecties, d, uitvoermap, kandidaten=kandidaten, bronnen=bronnen)
+    bestanden = _schrijf(
+        selecties, d, uitvoermap,
+        kandidaten=kandidaten, bronnen=bronnen, intro=data.get("intro", ""),
+    )
     return Resultaat(
         datum=d,
         selecties=selecties,
@@ -125,13 +128,14 @@ def _schrijf(
     map_: Path,
     kandidaten: int | None = None,
     bronnen: int | None = None,
+    intro: str = "",
 ) -> list[Path]:
     map_.mkdir(parents=True, exist_ok=True)
     stam = d.isoformat()
     uitvoer = {
         f"{stam}.json": render.naar_json(selecties, d),
-        f"{stam}.md": render.naar_markdown(selecties, d, kandidaten, bronnen),
-        f"{stam}.html": render.naar_html(selecties, d, kandidaten, bronnen),
+        f"{stam}.md": render.naar_markdown(selecties, d, kandidaten, bronnen, intro),
+        f"{stam}.html": render.naar_html(selecties, d, kandidaten, bronnen, intro),
     }
     paden = []
     for naam, inhoud in uitvoer.items():

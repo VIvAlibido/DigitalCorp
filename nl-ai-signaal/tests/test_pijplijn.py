@@ -201,14 +201,41 @@ class TestRender(unittest.TestCase):
     def test_kanttekening_verschijnt_alleen_als_die_er_is(self):
         from signaal.model import Selectie
 
-        met = Selectie(kop="k", wat="w", waarom="d", url="https://a.nl",
+        met = Selectie(kop="k", kern="s", wat="w", waarom="d", url="https://a.nl",
                        bron="b", categorie="model", kanttekening="Eén bron.")
-        zonder = Selectie(kop="k", wat="w", waarom="d", url="https://a.nl",
+        zonder = Selectie(kop="k", kern="s", wat="w", waarom="d", url="https://a.nl",
                           bron="b", categorie="model")
         self.assertIn("Kanttekening", render.naar_markdown([met], self.datum))
         self.assertNotIn("Kanttekening", render.naar_markdown([zonder], self.datum))
         self.assertIn("Kanttekening", render.naar_html([met], self.datum))
         self.assertNotIn("Kanttekening", render.naar_html([zonder], self.datum))
+
+    def test_kernzin_staat_in_beide_formaten(self):
+        from signaal.model import Selectie
+
+        s = Selectie(kop="Kop", kern="Dit is de kernzin zonder jargon.", wat="w",
+                     waarom="d", url="https://a.nl", bron="b", categorie="model")
+        self.assertIn("Dit is de kernzin zonder jargon.",
+                      render.naar_markdown([s], self.datum))
+        self.assertIn("Dit is de kernzin zonder jargon.",
+                      render.naar_html([s], self.datum))
+
+    def test_intro_is_optioneel(self):
+        md_met = render.naar_markdown(self.selecties, self.datum, intro="Vandaag twee thema's.")
+        md_zonder = render.naar_markdown(self.selecties, self.datum)
+        self.assertIn("Vandaag twee thema's.", md_met)
+        self.assertNotIn("Vandaag twee thema's.", md_zonder)
+
+    def test_leestijd_schaalt_mee_en_is_minstens_een_minuut(self):
+        from signaal.model import Selectie
+
+        kort = [Selectie(kop="k", kern="s", wat="w", waarom="d",
+                         url="https://a.nl", bron="b")]
+        lang = [Selectie(kop="k", kern="s", wat="woord " * 400, waarom="d",
+                         url="https://a.nl", bron="b")]
+        self.assertEqual(render.leestijd(kort), 1)
+        self.assertGreater(render.leestijd(lang), render.leestijd(kort))
+        self.assertIn("minuten lezen", render.naar_markdown(lang, self.datum))
 
     def test_methodeverantwoording_staat_in_beide_formaten(self):
         for uitvoer in (render.naar_markdown(self.selecties, self.datum),
@@ -220,7 +247,7 @@ class TestRender(unittest.TestCase):
         from signaal.model import Selectie
 
         gevaarlijk = [Selectie(
-            kop="<script>alert(1)</script>", wat="a", waarom="b",
+            kop="<script>alert(1)</script>", kern="k", wat="a", waarom="b",
             url="https://example.com", bron="x", categorie="model",
         )]
         html = render.naar_html(gevaarlijk, self.datum)
@@ -246,7 +273,8 @@ class TestAudioScript(unittest.TestCase):
         from signaal.model import Selectie
 
         script = audio.maak_script(
-            [Selectie(kop="Nieuw LLM verschenen", wat="Zie https://example.com/x voor details.",
+            [Selectie(kop="Nieuw LLM verschenen", kern="Een nieuw model.",
+                      wat="Zie https://example.com/x voor details.",
                       waarom="Relevant voor de AVG.", url="https://example.com/x",
                       bron="test", categorie="model")],
             date(2026, 7, 29),

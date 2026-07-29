@@ -2,9 +2,10 @@
   "datum": "2026-07-29",
   "items": [
     {
-      "kop": "Digital Omnibus is wet: hoog-risico uitgesteld, artikel 50 niet",
-      "wat": "Verordening (EU) 2026/1744, de Digital Omnibus on AI, is op 24 juli in het Publicatieblad gepubliceerd en op 27 juli in werking getreden. De verplichtingen voor hoog-risicosystemen uit bijlage III schuiven daarmee van 2 augustus 2026 naar 2 december 2027; voor gereguleerde producten uit bijlage I wordt het 2 augustus 2028. De Raad ging op 29 juni akkoord; Parlement en Raad stelden de tekst op 8 juli vast.",
-      "waarom": "Het uitstel geldt niet voor artikel 50, en dat is de bepaling die de meeste organisaties raakt. Vanaf aanstaande zondag moet je gebruikers vertellen dat ze met een AI-systeem praten, moet AI-gegenereerde of gemanipuleerde content herkenbaar zijn, en moeten aanbieders van generatieve systemen hun output machineleesbaar markeren; ook de AI-geletterdheidsplicht uit artikel 4 blijft op datum. Wie het uitstelnieuws las en concludeerde dat er voorlopig niets hoeft, trok de verkeerde conclusie — en heeft nog vier dagen.",
+      "kop": "Zondag moet elke chatbot zeggen dat hij een chatbot is",
+      "kern": "De Europese AI-wet is deels uitgesteld — maar precies het deel dat bijna elk bedrijf raakt, gaat komende zondag gewoon in.",
+      "wat": "Op 27 juli trad de Digital Omnibus in werking, een aanpassing van de Europese AI-wet. Die schuift de zwaarste eisen door naar 2 december 2027: de eisen voor AI die meebeslist over sollicitaties, kredieten of uitkeringen. Eén onderdeel schuift níét op, en dat is artikel 50, de transparantieplicht. Vanaf 2 augustus moet je bezoekers vertellen dat ze met een AI-systeem praten en niet met een mens, moet tekst of beeld dat door AI is gemaakt of bewerkt als zodanig herkenbaar zijn, en moeten leveranciers van AI die content genereert hun output voorzien van een digitaal watermerk dat computers kunnen uitlezen.",
+      "waarom": "Veel organisaties lazen 'AI-wet uitgesteld' en legden het onderwerp terug op de plank. Dat is de verkeerde conclusie. De chatbot op je klantenservicepagina, de AI-teksten in je nieuwsbrief en de gegenereerde beelden in je campagne vallen allemaal onder de regel die zondag ingaat, en in Nederland begint de handhaving diezelfde dag. Het meevallende nieuws: de meeste bedrijven voldoen eraan met één zin en een label. Het tegenvallende: je hebt nog vier dagen om te bedenken welke zin.",
       "url": "https://www.hunton.com/privacy-and-cybersecurity-law-blog/eu-digital-omnibus-on-ai-enters-into-force",
       "bron": "Hunton, analyse Verordening (EU) 2026/1744",
       "categorie": "regelgeving",
@@ -12,29 +13,32 @@
       "kanttekening": "Dat de Autoriteit Persoonsgegevens de centrale AI-toezichthouder wordt volgt uit een kabinetsbesluit van 20 april; de formele aanwijzing in wetgeving hebben wij niet kunnen verifiëren."
     },
     {
-      "kop": "Kimi K3-gewichten vrijgegeven: 2,8 biljoen parameters, 1,56 TB",
-      "wat": "Moonshot AI publiceerde op 27 juli de volledige gewichten van Kimi K3, een mixture-of-experts met 2,8 biljoen parameters waarvan er per token 104 miljard actief zijn. Het model heeft een contextvenster van 1 miljoen tokens en verwerkt tekst, beeld en video. De download bestaat uit 96 shards van samen ongeveer 1,56 terabyte, onder een eigen Kimi K3-licentie in plaats van MIT of Apache.",
-      "waarom": "'Open weights' betekent hier niet 'zelf te draaien'. Moonshot adviseert configuraties vanaf 64 accelerators, wat voor vrijwel elke Nederlandse organisatie buiten bereik ligt, en de eigen licentie vraagt om juridische toetsing vóór productiegebruik — plan dat in bij inkoop en niet erna. De praktische route loopt via hosters, en daarmee ligt de vraag uit item 3 meteen weer op tafel: waar staat die machine.",
+      "kop": "Het grootste open AI-model ooit past bij vrijwel niemand",
+      "kern": "Een Chinees lab gaf zijn nieuwste model helemaal weg. Downloaden kan iedereen, draaien vrijwel niemand.",
+      "wat": "Moonshot AI publiceerde op 27 juli de complete 'gewichten' van zijn model Kimi K3. Gewichten zijn de getallen waarin een AI-model alles heeft opgeslagen wat het geleerd heeft; wie ze krijgt, kan het model zelf draaien in plaats van het per gebruik in te huren bij de maker. Kimi K3 telt 2,8 biljoen van die getallen, verwerkt tekst, beeld en video, en kan ongeveer 750.000 woorden in één keer overzien — een halve meter boekenplank. De download is 1,56 terabyte, verdeeld over 96 bestanden, en valt onder een eigen licentie van Moonshot in plaats van een standaard open-sourcelicentie.",
+      "waarom": "'Open' klinkt als 'voor iedereen beschikbaar', maar Moonshot adviseert minstens 64 gespecialiseerde chips om het model te laten draaien. Dat is een investering waar in Nederland hooguit een handvol partijen aan begint. In de praktijk huur je het dus alsnog, bij een partij die de machines wél heeft — en dan is de vraag niet langer wat het model kost, maar in welk land het staat. Precies daarover gaat het volgende bericht.",
       "url": "https://www.interconnects.ai/p/kimi-k3-the-open-weights-escalation",
       "bron": "Interconnects, Nathan Lambert",
       "categorie": "model",
       "datum": "2026-07-27",
-      "kanttekening": "De claim dat Kimi Delta Attention long-context-inference tot zes keer goedkoper maakt komt van Moonshot zelf en is niet onafhankelijk gereproduceerd."
+      "kanttekening": "Moonshots claim dat de nieuwe techniek het werken met lange teksten tot zes keer goedkoper maakt, komt van het bedrijf zelf en is niet onafhankelijk nagerekend."
     },
     {
-      "kop": "Vier op de tien financiële instellingen eist Europese AI-hosting",
-      "wat": "In onderzoek van Info Support onder 400 IT-beslissers bij organisaties met meer dan vijftig medewerkers stelt 44 procent van de financiële organisaties Europese hosting als harde voorwaarde voor AI. Nog eens 37 procent heeft er een voorkeur voor zonder het doorslaggevend te maken. 79 procent noemt continuïteit een belangrijke of beslissende factor bij selectie en implementatie.",
-      "waarom": "De inkoopvraag verschuift van 'welk model presteert het beste' naar 'wie heeft toegang tot onze data, wat gebeurt er als de leverancier het model aanpast, en hoe snel kunnen we weg'. Verkoop je AI aan Nederlandse banken of verzekeraars, dan is hostinglocatie een kwalificatie-eis geworden en geen onderhandelpunt meer. Koop je in, dan is dit het cijfer waarmee je die eis intern hard maakt.",
+      "kop": "Banken willen weten in welk land hun AI draait",
+      "kern": "Vier op de tien financiële instellingen wijst een AI-leverancier af als de computers buiten Europa staan.",
+      "wat": "Softwarebedrijf Info Support ondervroeg 400 IT-beslissers bij organisaties met meer dan vijftig medewerkers. Van de financiële instellingen stelt 44 procent Europese hosting als harde eis: staan de servers elders, dan valt de leverancier af. Nog eens 37 procent heeft er een sterke voorkeur voor zonder het doorslaggevend te maken. Bijna acht op de tien noemt continuïteit beslissend — kunnen we hier over drie jaar nog mee werken, en komen we weg als het misgaat.",
+      "waarom": "Dit verandert wie een opdracht wint. Tot voor kort ging de discussie over welk model het slimst was; nu strandt een offerte op de vraag waar de servers staan. Verkoop je AI aan een Nederlandse bank of verzekeraar, dan is dat geen technisch detail meer maar een toelatingseis. Koop je in, dan is dit het percentage waarmee je die eis bij je eigen directie onderbouwt.",
       "url": "https://www.accountancyvanmorgen.nl/2026/07/17/vier-op-tien-financiele-organisaties-eisen-europese-hosting-voor-ai",
       "bron": "Accountancy Vanmorgen, onderzoek Info Support",
       "categorie": "bedrijf",
       "datum": "2026-07-17",
-      "kanttekening": "Het veldwerk liep in maart en april 2026 en de financiële sector was circa 16 procent van de steekproef, dus de subgroep is klein en dateert van vóór de Omnibus."
+      "kanttekening": "Het veldwerk liep in maart en april 2026 en de financiële sector was circa 16 procent van de steekproef, dus deze subgroep is klein en dateert van vóór de wetswijziging uit bericht 1."
     },
     {
-      "kop": "Frankrijk: drie aanbieders beheersen 84% van de markt voor agents",
-      "wat": "In advies 26-A-05 concludeert de Franse mededingingsautoriteit dat OpenAI, Google en Anthropic samen meer dan 84 procent van de wereldwijde markt voor AI-agents in handen hebben. Voor het onderzoek bouwde de autoriteit eigen agents, legde die 550 winkelgerelateerde vragen voor en registreerde welke websites ze bezochten en citeerden. Het advies telt met bijlagen ruim 3.700 pagina's en benoemt platformisering, disintermediatie en algoritmische collusie als risico's.",
-      "waarom": "Dit is het eerste Europese onderzoek dat de agent-laag zelf meet in plaats van modeltraining, en het doet dat met een methode die anderen kunnen herhalen. De aanbevelingen — data-toegang, interoperabiliteit, open standaarden — zijn precies de knoppen waar de ACM en de Europese Commissie aan kunnen draaien. Wie nu een agentplatform kiest, kiest ook een lock-in-positie die over een jaar onderwerp van regulering kan zijn.",
+      "kop": "Drie bedrijven bezitten 84% van de markt voor AI-assistenten",
+      "kern": "De Franse mededingingswaakhond bouwde eigen AI-assistenten om te meten wie de markt beheerst, en kwam uit bij OpenAI, Google en Anthropic.",
+      "wat": "De Autorité de la concurrence, de Franse tegenhanger van onze ACM, publiceerde op 17 juli een advies over AI-agents: assistenten die niet alleen antwoord geven, maar zelfstandig taken uitvoeren zoals iets opzoeken, vergelijken en bestellen. De toezichthouder bouwde voor het onderzoek eigen agents, legde die 550 vragen over winkelen voor, en hield bij welke websites ze bezochten en noemden. De conclusie is dat OpenAI, Google en Anthropic samen ruim 84 procent van deze markt in handen hebben. Het rapport telt met bijlagen meer dan 3.700 pagina's.",
+      "waarom": "Als straks een handvol assistenten bepaalt welke webshop een klant überhaupt te zien krijgt, verschuift de macht van de winkel naar de assistent — en gaat vindbaarheid niet meer over je positie in Google maar over je positie in een AI. De Fransen waarschuwen daarvoor en vragen om open standaarden en toegang tot data. Zulke adviezen zijn doorgaans het startsein voor Brussel en de ACM. Wie nu een agentplatform kiest, kiest dus ook een afhankelijkheid die over een jaar onderwerp van regelgeving kan zijn.",
       "url": "https://www.autoritedelaconcurrence.fr/en/press-release/ai-agents-autorite-de-la-concurrence-issues-its-opinion-competitive-functioning-ai",
       "bron": "Autorité de la concurrence",
       "categorie": "regelgeving",
@@ -42,9 +46,10 @@
       "kanttekening": ""
     },
     {
-      "kop": "MCP-specificatie 2026-07-28: stateless kern, drie features vervallen",
-      "wat": "De MCP-specificatie van 28 juli is de grootste herziening sinds de lancering van het protocol. De kern wordt stateless, er komen multi-round-trip-requests, header-gebaseerde routering en cachebare list-resultaten, en Tasks en MCP Apps worden formele extensies in plaats van kernonderdelen. Drie bestaande features worden afgeschaft en de autorisatie is aangescherpt.",
-      "waarom": "Stateless is de verandering die operationeel het meeste oplevert: een remote MCP-server had sticky sessions, een gedeelde sessiestore en packet inspection op de gateway nodig, en kan nu achter een gewone round-robin load balancer draaien met routering op een Mcp-Method-header. Clients mogen tools/list cachen zolang de server dat toestaat. Draai je MCP al in productie, reken dan op een migratie en niet op een upgrade — er vervallen drie features.",
+      "kop": "De stekker waarmee AI je systemen in mag, is herbouwd",
+      "kern": "De standaard waarmee AI-assistenten bij je agenda, klantenbestand en boekhouding kunnen, kreeg zijn grootste verbouwing tot nu toe.",
+      "wat": "Model Context Protocol, kortweg MCP, is de afspraak waarmee AI-assistenten toegang krijgen tot software die je al gebruikt: een agenda, een klantendatabase, een boekhoudpakket. De versie van 28 juli is de grootste herziening sinds de lancering. De belangrijkste wijziging is dat een MCP-server niet langer hoeft te onthouden met wie hij in gesprek is. Daarnaast vervallen drie bestaande onderdelen en zijn de eisen rond toegang en autorisatie aangescherpt.",
+      "waarom": "Dat 'niet meer onthouden' klinkt als een technisch detail, maar is het hele punt. Tot nu toe moest elk gesprek telkens naar exact dezelfde server terug, wat aparte infrastructuur vereiste die veel organisaties niet hebben. Nu kan het achter de gewone verdeelapparatuur die elk bedrijf al draait. Daarmee verdwijnt het belangrijkste technische excuus om AI níét aan je eigen systemen te koppelen, en verschuift het gesprek naar de vraag of je dat wel wilt. Gebruik je MCP al, reken dan op een verbouwing en niet op een update — er vervallen drie onderdelen.",
       "url": "https://blog.modelcontextprotocol.io/posts/2026-07-28/",
       "bron": "Model Context Protocol, officieel blog",
       "categorie": "tooling",
@@ -52,14 +57,15 @@
       "kanttekening": ""
     },
     {
-      "kop": "FSC: 73% van actief misbruikte kwetsbaarheden is nu een zero-day",
-      "wat": "Het Financieel Stabiliteitscomité, waarin DNB, de AFM en het ministerie van Financiën samenwerken, concludeerde in zijn vergadering van 26 juni dat geavanceerde AI-modellen het cyberdreigingsbeeld fundamenteel veranderen. Het aandeel zero-day-exploitatie onder nieuw geregistreerde, actief misbruikte kwetsbaarheden steeg van 47,9 procent in 2024 naar 53,6 procent in 2025 en staat voor 2026 op 73,2 procent. Het comité pleit voor sterkere coördinatie en informatiedeling, nationaal en over sectorgrenzen heen.",
-      "waarom": "Die reeks is het argument waarmee je patchvensters en detectiecapaciteit intern op de agenda krijgt: de tijd tussen ontdekking en misbruik verdwijnt, en dat is een operationele parameter en geen abstract risico. DNB toetst banken en verzekeraars dit jaar nadrukkelijker op IT- en cyberrisico's én op hun AI-inzet, dus dit komt terug in het toezichtgesprek.",
+      "kop": "Bijna driekwart van de aanvallen gebruikt een onbekend lek",
+      "kern": "DNB en AFM waarschuwen dat AI beveiligingslekken zo snel vindt dat er nauwelijks tijd overblijft om ze te dichten.",
+      "wat": "Het Financieel Stabiliteitscomité, waarin De Nederlandsche Bank, de AFM en het ministerie van Financiën samenwerken, concludeerde op 26 juni dat krachtige AI-modellen het beeld van cyberdreiging fundamenteel veranderen. Een zogeheten zero-day is een lek dat wordt misbruikt vóórdat de maker ervan weet heeft en een reparatie kan uitbrengen — je hebt dus nul dagen om je voor te bereiden. Van alle nieuw geregistreerde lekken die actief werden misbruikt, was dat aandeel 47,9 procent in 2024, 53,6 procent in 2025 en 73,2 procent tot nu toe in 2026. Het comité pleit voor betere informatiedeling tussen sectoren en landen.",
+      "waarom": "Die drie percentages naast elkaar zijn het hele verhaal: de tijd tussen 'er is een lek' en 'iemand misbruikt het' verdwijnt, omdat AI het zoekwerk overneemt. Beveiliging die erop leunt dat updates binnen een paar weken netjes worden geïnstalleerd, wordt daarmee steeds minder effectief. DNB kijkt dit jaar bij banken en verzekeraars nadrukkelijk naar precies dit punt, dus in die sector is het geen abstracte zorg maar een agendapunt voor het eerstvolgende toezichtgesprek.",
       "url": "https://www.dnb.nl/algemeen-nieuws/persbericht-2026/fsc-ai-modellen-vergroten-urgentie-cyberweerbaarheid/",
       "bron": "De Nederlandsche Bank, Financieel Stabiliteitscomité",
       "categorie": "infrastructuur",
       "datum": "2026-07",
-      "kanttekening": "Het cijfer voor 2026 is een tussenstand over een lopend jaar en dus niet één-op-één te vergelijken met de volledige jaren ervoor."
+      "kanttekening": "Het cijfer voor 2026 gaat over een lopend jaar en is dus niet één-op-één te vergelijken met de volledige jaren ervoor."
     }
   ]
 }
