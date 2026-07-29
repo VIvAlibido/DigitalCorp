@@ -192,6 +192,30 @@ class TestRender(unittest.TestCase):
         for s in self.selecties:
             self.assertIn(s.kop, md)
 
+    def test_datum_van_de_gebeurtenis_wordt_getoond(self):
+        self.assertEqual(render._kort_datum("2026-07-27"), "27 juli")
+        self.assertEqual(render._kort_datum("2026-07"), "juli")
+        # Onparseerbare invoer mag niet crashen maar blijft zichtbaar.
+        self.assertEqual(render._kort_datum("binnenkort"), "binnenkort")
+
+    def test_kanttekening_verschijnt_alleen_als_die_er_is(self):
+        from signaal.model import Selectie
+
+        met = Selectie(kop="k", wat="w", waarom="d", url="https://a.nl",
+                       bron="b", categorie="model", kanttekening="Eén bron.")
+        zonder = Selectie(kop="k", wat="w", waarom="d", url="https://a.nl",
+                          bron="b", categorie="model")
+        self.assertIn("Kanttekening", render.naar_markdown([met], self.datum))
+        self.assertNotIn("Kanttekening", render.naar_markdown([zonder], self.datum))
+        self.assertIn("Kanttekening", render.naar_html([met], self.datum))
+        self.assertNotIn("Kanttekening", render.naar_html([zonder], self.datum))
+
+    def test_methodeverantwoording_staat_in_beide_formaten(self):
+        for uitvoer in (render.naar_markdown(self.selecties, self.datum),
+                        render.naar_html(self.selecties, self.datum)):
+            self.assertIn("Hoe deze editie tot stand kwam", uitvoer)
+            self.assertIn("correcties", uitvoer.lower())
+
     def test_html_ontsnapt_gebruikersinhoud(self):
         from signaal.model import Selectie
 

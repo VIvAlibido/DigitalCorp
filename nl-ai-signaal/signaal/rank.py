@@ -38,18 +38,35 @@ Selectiecriteria, in deze volgorde:
 
 Schrijfregels:
 - Nederlands. Vaktermen die in het Nederlands niet bestaan blijven Engels \
-  (transformer, fine-tunen, inference), maar vertaal wat wél kan.
+  (transformer, fine-tunen, inference), maar vertaal wat wél kan. Let op valse \
+  vrienden: het Engelse "trillion" is in het Nederlands "biljoen", niet "triljoen".
 - "kop": maximaal 70 tekens, feitelijk, geen clickbait, geen uitroeptekens.
-- "wat": 2 zinnen. Wat is er gebeurd, met de concrete cijfers of namen.
-- "waarom": 1 tot 2 zinnen. Waarom het ertoe doet voor een Nederlandse \
-  professional. Geen holle frasen als "dit is een gamechanger" — schrijf het \
-  gevolg op.
+- "wat": 2 tot 3 zinnen, uitsluitend verifieerbare feiten. Noem cijfers, namen \
+  en datums letterlijk zoals ze in de bron staan. Geen bijvoeglijke \
+  naamwoorden die een oordeel bevatten ("indrukwekkend", "baanbrekend").
+- "waarom": 2 tot 3 zinnen redactionele duiding voor een Nederlandse \
+  professional. Dit is het enige veld waar interpretatie in mag, en de lezer \
+  weet dat. Schrijf het concrete gevolg op — wat moet iemand nu anders doen, \
+  weten of navragen. Geen holle frasen als "dit is een gamechanger".
+- "datum": de dag waarop de gebeurtenis plaatsvond, als JJJJ-MM-DD. Niet de dag \
+  waarop wij erover schrijven. Weet je alleen de maand, gebruik dan JJJJ-MM.
+- "kanttekening": leeg laten tenzij er een reëel voorbehoud is bij het feit — \
+  verouderd veldwerk, één enkele bron, een voorlopig cijfer, een claim van de \
+  leverancier die niet onafhankelijk is getoetst. Eén zin. Dit veld verzwakt \
+  het item niet; het is de reden dat de lezer de rest gelooft.
 - "categorie": één woord uit {{model, onderzoek, tooling, regelgeving, \
   bedrijf, infrastructuur}}.
-- Neem de "url" en "bron" letterlijk over van de gekozen kandidaat.
+- "url" en "bron": verwijs naar de meest primaire bron die je hebt. Een \
+  persbericht van de toezichthouder gaat voor een nieuwsbericht erover; het \
+  eigen blog van een project gaat voor een aggregator.
+
+Zorg voor spreiding over categorieën: niet meer dan twee items uit dezelfde \
+categorie.
 
 Verzin niets. Als een kandidaat te dun is om over te schrijven, kies een \
-andere. Baseer je uitsluitend op de aangeleverde gegevens."""
+andere. Baseer je uitsluitend op de aangeleverde gegevens. Als twee \
+aangeleverde bronnen elkaar tegenspreken, kies het item alleen als je de \
+tegenspraak in "kanttekening" kunt benoemen."""
 
 SCHEMA = {
     "type": "object",
@@ -69,8 +86,11 @@ SCHEMA = {
                         "enum": ["model", "onderzoek", "tooling", "regelgeving",
                                  "bedrijf", "infrastructuur"],
                     },
+                    "datum": {"type": "string"},
+                    "kanttekening": {"type": "string"},
                 },
-                "required": ["kop", "wat", "waarom", "url", "bron", "categorie"],
+                "required": ["kop", "wat", "waarom", "url", "bron", "categorie",
+                             "datum", "kanttekening"],
                 "additionalProperties": False,
             },
         }

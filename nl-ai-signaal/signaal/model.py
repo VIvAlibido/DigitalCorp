@@ -62,7 +62,13 @@ class Item:
 
 @dataclass
 class Selectie:
-    """Eén door de LLM gekozen en geschreven item in de dagelijkse editie."""
+    """Eén door de LLM gekozen en geschreven item in de dagelijkse editie.
+
+    De scheiding tussen `wat` (feit) en `waarom` (duiding) is bewust: de lezer
+    moet kunnen zien waar de verifieerbare bewering ophoudt en de redactionele
+    interpretatie begint. `datum` en `bron` staan erbij zodat elk item op zijn
+    eigen merites te controleren is.
+    """
 
     kop: str
     wat: str
@@ -70,6 +76,10 @@ class Selectie:
     url: str
     bron: str
     categorie: str = ""
+    # Wanneer de gebeurtenis plaatsvond — niet wanneer wij erover schrijven.
+    datum: str = ""
+    # Voorbehoud bij het feit zelf: oud veldwerk, één bron, voorlopig cijfer.
+    kanttekening: str = ""
 
     def as_dict(self) -> dict:
         return asdict(self)

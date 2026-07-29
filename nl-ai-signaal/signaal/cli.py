@@ -60,6 +60,11 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         help="lees kandidaten uit een JSON-bestand in plaats van live bronnen",
     )
+    parser.add_argument(
+        "--selectie",
+        type=Path,
+        help="render een bestaande selectie opnieuw; slaat verzamelen en jury over",
+    )
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)
 
@@ -70,16 +75,18 @@ def main(argv: list[str] | None = None) -> int:
 
     config = pipeline.laad_config(args.config)
     uitvoermap = args.uitvoer or (PROJECT / config.get("output", {}).get("map", "edities"))
-    vooraf = _laad_fixtures(args.fixtures) if args.fixtures else None
-
-    resultaat = pipeline.draai(
-        config,
-        uitvoermap=uitvoermap,
-        vandaag=args.datum,
-        heuristisch=args.heuristisch,
-        met_audio=args.audio,
-        vooraf_verzameld=vooraf,
-    )
+    if args.selectie:
+        resultaat = pipeline.render_selectie(args.selectie, uitvoermap)
+    else:
+        vooraf = _laad_fixtures(args.fixtures) if args.fixtures else None
+        resultaat = pipeline.draai(
+            config,
+            uitvoermap=uitvoermap,
+            vandaag=args.datum,
+            heuristisch=args.heuristisch,
+            met_audio=args.audio,
+            vooraf_verzameld=vooraf,
+        )
 
     print(f"\nNL-AI-Signaal — {resultaat.datum.isoformat()}")
     print(f"{resultaat.kandidaten} kandidaten → {resultaat.na_ontdubbelen} uniek "

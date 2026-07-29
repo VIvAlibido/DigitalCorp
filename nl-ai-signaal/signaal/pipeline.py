@@ -71,7 +71,11 @@ def draai(
             log.error("jury faalde (%s) — val terug op heuristische selectie", exc)
             selecties = rank.kies_heuristisch(lijst, config)
 
-    bestanden = _schrijf(selecties, vandaag, uitvoermap)
+    bestanden = _schrijf(
+        selecties, vandaag, uitvoermap,
+        kandidaten=kandidaten,
+        bronnen=len({i.bron for i in items}),
+    )
 
     if met_audio:
         try:
@@ -90,13 +94,44 @@ def draai(
     )
 
 
-def _schrijf(selecties: list[Selectie], d: date, map_: Path) -> list[Path]:
+def render_selectie(pad: Path, uitvoermap: Path) -> Resultaat:
+    """Render een bestaande selectie opnieuw naar alle formaten.
+
+    Nodig voor twee dingen: een redactioneel nagelopen editie publiceren via
+    dezelfde code als een automatische run, en het hele archief opnieuw
+    uitdraaien als het sjabloon verandert.
+    """
+    import json
+
+    data = json.loads(pad.read_text(encoding="utf-8"))
+    selecties = [Selectie(**rij) for rij in data["items"]]
+    d = date.fromisoformat(data["datum"])
+    kandidaten = data.get("kandidaten")
+    bronnen = data.get("bronnen")
+
+    bestanden = _schrijf(selecties, d, uitvoermap, kandidaten=kandidaten, bronnen=bronnen)
+    return Resultaat(
+        datum=d,
+        selecties=selecties,
+        kandidaten=kandidaten or 0,
+        na_ontdubbelen=kandidaten or 0,
+        bestanden=bestanden,
+    )
+
+
+def _schrijf(
+    selecties: list[Selectie],
+    d: date,
+    map_: Path,
+    kandidaten: int | None = None,
+    bronnen: int | None = None,
+) -> list[Path]:
     map_.mkdir(parents=True, exist_ok=True)
     stam = d.isoformat()
     uitvoer = {
         f"{stam}.json": render.naar_json(selecties, d),
-        f"{stam}.md": render.naar_markdown(selecties, d),
-        f"{stam}.html": render.naar_html(selecties, d),
+        f"{stam}.md": render.naar_markdown(selecties, d, kandidaten, bronnen),
+        f"{stam}.html": render.naar_html(selecties, d, kandidaten, bronnen),
     }
     paden = []
     for naam, inhoud in uitvoer.items():
