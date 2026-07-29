@@ -1,0 +1,65 @@
+{
+  "datum": "2026-07-30",
+  "onderwerp": "Brussel zegt wat je wel en niet moet labelen",
+  "preheader": "Plus: het record op de moeilijkste AI-test ging in drie weken maal vier.",
+  "intro": "Correctie op de editie van 29 juli: wij schreven dat de aanwijzing van de Autoriteit Persoonsgegevens als AI-toezichthouder niet te verifiëren was. Dat klopt niet meer. Het kabinet koos op 20 april voor tien bestaande toezichthouders, met de AP en de Rijksinspectie Digitale Infrastructuur als coördinatoren. Vandaag vier berichten in plaats van zes — er was niet meer dat de moeite waard was.",
+  "items": [
+    {
+      "kop": "Brussel zegt eindelijk welke AI-tekst je moet labelen — en welke niet",
+      "kern": "De Europese Commissie heeft opgeschreven wat artikel 50 precies eist. Minder dan veel bedrijven vreesden, en met een boete die niet mals is.",
+      "wat": "Op 20 juli publiceerde de Europese Commissie de definitieve richtlijnen bij artikel 50 van de AI-verordening, dat op 2 augustus 2026 ingaat. Systemen die rechtstreeks met mensen praten, zoals chatbots, moeten zo zijn gebouwd dat de gebruiker meteen doorheeft dat hij met een machine te maken heeft. Leveranciers van systemen die tekst, beeld of audio genereren of bewerken, moeten die output voorzien van onzichtbare, machineleesbare kenmerken. De maximale boete bij overtreding is 15 miljoen euro of 3 procent van de wereldwijde jaaromzet.",
+      "waarom": "Het onderscheid dat hier gemaakt wordt, scheelt je werk: het machineleesbare kenmerk is een verplichting van de leverancier van het systeem, niet van jou als je zijn output plaatst. Wat jij zelf moet regelen is de zichtbare melding in je chatvenster — en die telt vanaf zondag.",
+      "url": "https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force",
+      "bron": "Europese Commissie, richtlijnen bij artikel 50",
+      "categorie": "regelgeving",
+      "datum": "2026-07-20",
+      "kanttekening": "Wij hebben de richtlijnen zelf niet kunnen openen; deze samenvatting berust op berichtgeving erover en op de tekst van artikel 50 zelf."
+    },
+    {
+      "kop": "De moeilijkste AI-test ging van 7,8 naar 30,2 procent in drie weken",
+      "kern": "Een test waarop AI drie maanden geleden nog vrijwel nul scoorde, is nu voor bijna een derde gekraakt. Mensen halen er ruim negentig procent.",
+      "wat": "ARC-AGI-3 legt een AI in een spelomgeving zonder uitleg: geen regels, geen doel, alleen een scherm. In maart scoorde het beste model 0,37 procent. Begin juli zette GPT-5.6 Sol het record op 7,8 procent; op 24 juli verifieerde de ARC Prize Foundation een score van 30,2 procent voor Claude Opus 5. ARC Prize draaide de test zelf, legde de volledige redeneringen vast en publiceerde het resultaat zonder dat de maker de opzet in handen had.",
+      "waarom": "Het cijfer zegt minder dan de manier waarop het tot stand kwam: de winst zit in het verkennen van een omgeving die het model nooit heeft gezien, niet in het sneller uitvoeren van iets bekends. Dat is precies de eigenschap die je nodig hebt voordat je een AI zelfstandig een taak laat afmaken.",
+      "url": "https://arcprize.org/results/anthropic-claude-opus-5",
+      "bron": "ARC Prize Foundation",
+      "categorie": "onderzoek",
+      "datum": "2026-07-24",
+      "kanttekening": "Openheid over onszelf: de berichten in dit bulletin worden geschreven met een model uit dezelfde familie als het model in dit bericht. Wij hebben de test niet onafhankelijk nagerekend."
+    },
+    {
+      "kop": "82% van de Nederlandse bestuurders ziet AI nu geld opleveren",
+      "kern": "Nederland liep een half jaar geleden nog achter en staat nu boven het wereldwijde gemiddelde.",
+      "wat": "KPMG ondervroeg voor de tweede editie van zijn Global Quarterly AI Pulse ruim 2.100 bestuurders en topmanagers in twintig landen. Van de Nederlandse respondenten zegt 82 procent dat AI leidt tot omzetgroei, hogere productiviteit, kostenbesparing of betere besluitvorming. In het eerste kwartaal van 2026 was dat nog 58 procent. Het wereldwijde gemiddelde ligt op 76 procent.",
+      "waarom": "Een sprong van 58 naar 82 procent in twee kwartalen betekent dat de vraag in bestuurskamers verschuift van 'gaan we hier iets mee doen' naar 'waarom doen wij het nog niet'. Wie nu met een AI-voorstel komt, hoeft het nut niet meer te verdedigen — wel de uitvoering.",
+      "url": "https://kpmg.com/nl/nl/over-ons/pers-en-media/persberichten/2026/07/steeds-meer-nederlandse-organisaties-verzilveren-de-waarde-van-a.html",
+      "bron": "KPMG, Global Quarterly AI Pulse",
+      "categorie": "bedrijf",
+      "datum": "2026-07",
+      "kanttekening": "Dit is wat bestuurders zelf rapporteren, geen gemeten resultaat. Het onderzoek komt van een adviesbureau dat AI-implementaties verkoopt."
+    },
+    {
+      "kop": "51% draait AI-agents, 60% kan een ontspoorde agent niet stoppen",
+      "kern": "De helft van de organisaties heeft AI aan het werk die zelfstandig taken uitvoert. Zes op de tien kan hem niet uitzetten als het misgaat.",
+      "wat": "Softwarebedrijf Kiteworks publiceerde op 29 juli onderzoek naar het beheer van AI-agents — programma's die zelfstandig taken uitvoeren in plaats van alleen antwoord geven. Van de ondervraagde organisaties heeft 51 procent zulke agents in productie. Daarvan kan 63 procent niet afdwingen waarvoor een agent wel en niet mag worden gebruikt, en 60 procent kan een agent die zich misdraagt niet stoppen. Verder zegt 33 procent geen bruikbaar logboek te hebben van wat de agents doen.",
+      "waarom": "Dit is het gat tussen kijken en ingrijpen: organisaties hebben geïnvesteerd in toezicht en niet in een noodknop. Vraag bij je eigen AI-koppelingen wie hem kan uitzetten en hoe lang dat duurt — als niemand het antwoord weet, is dat het antwoord.",
+      "url": "https://www.kiteworks.com/cybersecurity-risk-management/ai-agent-data-governance-why-organizations-cant-stop-their-own-ai/",
+      "bron": "Kiteworks",
+      "categorie": "infrastructuur",
+      "datum": "2026-07-29",
+      "kanttekening": "Kiteworks verkoopt software voor precies het probleem dat dit onderzoek beschrijft. De steekproefomvang en de vraagstelling hebben wij niet kunnen controleren."
+    }
+  ],
+  "toepassing": {
+    "titel": "Zoek uit welk AI-label bij jou hoort en welk niet",
+    "intro": "De richtlijnen van 20 juli maken het smaller dan je denkt. Dit is hoe je in een kwartier weet wat er van jou wordt verwacht.",
+    "stappen": [
+      "Splits je AI-uitingen in twee stapels: dingen waarmee iemand een gesprek voert (chatvenster, telefoonbot, assistent op je site), en dingen die je publiceert (teksten, beelden, video, ingesproken audio).",
+      "Regel de eerste stapel zelf, vandaag. In het gesprek zelf, niet in de voorwaarden. Letterlijk bruikbaar: 'Je chat met de AI-assistent van [bedrijf]. Wil je een medewerker spreken, typ dan medewerker.'",
+      "Mail voor de tweede stapel je leverancier één vraag: 'Voorziet uw systeem de output van machineleesbare kenmerken zoals artikel 50 lid 2 vereist?' Bewaar het antwoord — dat is de verplichting van de leverancier, en zijn antwoord is jouw bewijs."
+    ],
+    "niet_doen": "Je hoeft niet elke AI-bewerkte foto in je nieuwsbrief van een sticker te voorzien. De zichtbare vermeldplicht richt zich op materiaal dat voor echt kan doorgaan en op publicaties over zaken van algemeen belang — niet op elke marketinguiting.",
+    "tijd": "15 minuten",
+    "categorie": "regelgeving"
+  },
+  "voor_bedrijven": "Twee cijfers van vandaag horen bij elkaar. 82 procent van de Nederlandse bestuurders ziet AI geld opleveren, en 60 procent van de organisaties met AI-agents kan er geen stoppen als hij ontspoort. De eerste groep zet door, de tweede kan niet remmen. Zet daarom in je volgende AI-voorstel één regel die er nu waarschijnlijk niet in staat: wie zet dit uit, met welke knop, en hoe lang duurt dat?"
+}
