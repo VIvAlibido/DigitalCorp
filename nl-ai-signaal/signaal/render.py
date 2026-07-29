@@ -63,9 +63,21 @@ def methodeverantwoording(kandidaten: int | None = None, bronnen: int | None = N
     )
 
 
-def naar_json(selecties: list[Selectie], d: date) -> str:
+def naar_json(
+    selecties: list[Selectie],
+    d: date,
+    onderwerp: str = "",
+    preheader: str = "",
+    intro: str = "",
+) -> str:
     return json.dumps(
-        {"datum": d.isoformat(), "items": [s.as_dict() for s in selecties]},
+        {
+            "datum": d.isoformat(),
+            "onderwerp": onderwerp,
+            "preheader": preheader,
+            "intro": intro,
+            "items": [s.as_dict() for s in selecties],
+        },
         ensure_ascii=False,
         indent=2,
     )
@@ -86,10 +98,20 @@ def naar_markdown(
     kandidaten: int | None = None,
     bronnen: int | None = None,
     intro: str = "",
+    onderwerp: str = "",
+    preheader: str = "",
 ) -> str:
-    regels = [
-        f"# NL-AI-Signaal — {datum_nl(d)}",
-        "",
+    regels = [f"# NL-AI-Signaal — {datum_nl(d)}", ""]
+    if onderwerp:
+        # Zichtbaar in het archief zodat je achteraf kunt zien welke
+        # onderwerpregel bij welke editie hoorde — dat is de basis voor
+        # elke uitspraak over wat wel en niet opent.
+        regels += [
+            f"*Onderwerpregel: “{onderwerp}” ({len(onderwerp)} tekens)*",
+            f"*Preheader: “{preheader}”*" if preheader else "",
+            "",
+        ]
+    regels += [
         f"*{len(selecties)} berichten · {leestijd(selecties, intro)} minuten lezen*",
         "",
     ]
@@ -132,6 +154,8 @@ def naar_html(
     kandidaten: int | None = None,
     bronnen: int | None = None,
     intro: str = "",
+    onderwerp: str = "",
+    preheader: str = "",
 ) -> str:
     """E-mail-HTML: tabellen en inline styles, want mailclients kunnen weinig."""
     e = html.escape
@@ -185,11 +209,22 @@ def naar_html(
         else ""
     )
 
+    # De preheader is de grijze regel naast het onderwerp in de inbox. Zonder
+    # deze truc vult de mailclient hem met de eerste tekst uit de mail — vaak
+    # "Bekijk in browser". De spaties duwen die standaardtekst weg.
+    preheader_blok = (
+        f"""
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">{e(preheader)}
+{"&nbsp;&zwnj;" * 60}</div>"""
+        if preheader
+        else ""
+    )
+
     return f"""<!doctype html>
 <html lang="nl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NL-AI-Signaal — {e(datum_nl(d))}</title></head>
-<body style="margin:0;padding:0;background:#f4f1ea;">
+<title>{e(onderwerp or f"NL-AI-Signaal — {datum_nl(d)}")}</title></head>
+<body style="margin:0;padding:0;background:#f4f1ea;">{preheader_blok}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
        style="background:#f4f1ea;padding:32px 16px;">
   <tr><td align="center">

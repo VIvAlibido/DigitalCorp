@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from signaal import dedupe, pipeline, rank, render, score  # noqa: E402
+from signaal import dedupe, koptoets, pipeline, rank, render, score  # noqa: E402
 from signaal.bronnen import basis  # noqa: E402
 from signaal.cli import _laad_fixtures  # noqa: E402
 from signaal.model import Item, canonicaliseer_url  # noqa: E402
@@ -173,7 +173,7 @@ class TestDedupe(unittest.TestCase):
 
 class TestRender(unittest.TestCase):
     def setUp(self):
-        self.selecties = rank.kies_heuristisch(
+        self.selecties, _ = rank.kies_heuristisch(
             score.scoor(_laad_fixtures(PROJECT / "fixtures" / "kandidaten.json"), CONFIG),
             CONFIG,
         )
@@ -258,12 +258,12 @@ class TestRender(unittest.TestCase):
 class TestHeuristischeSelectie(unittest.TestCase):
     def test_levert_gevraagd_aantal(self):
         items = score.scoor(_laad_fixtures(PROJECT / "fixtures" / "kandidaten.json"), CONFIG)
-        selecties = rank.kies_heuristisch(items, CONFIG)
+        selecties, _ = rank.kies_heuristisch(items, CONFIG)
         self.assertEqual(len(selecties), 6)
 
     def test_geen_dubbele_urls(self):
         items = score.scoor(_laad_fixtures(PROJECT / "fixtures" / "kandidaten.json"), CONFIG)
-        urls = [s.url for s in rank.kies_heuristisch(items, CONFIG)]
+        urls = [s.url for s in rank.kies_heuristisch(items, CONFIG)[0]]
         self.assertEqual(len(urls), len(set(urls)))
 
 
@@ -282,6 +282,60 @@ class TestAudioScript(unittest.TestCase):
         self.assertNotIn("https://", script)
         self.assertIn("el-el-em", script)
         self.assertIn("aa-vee-gee", script)
+
+
+class TestKoptoets(unittest.TestCase):
+    def test_vage_hoeveelheid_wordt_afgekeurd(self):
+        # De kop die deze hele controle heeft uitgelokt.
+        bezwaren = koptoets.controleer_kop(
+            "Bijna driekwart van de aanvallen gebruikt een onbekend lek")
+        self.assertTrue(any("vage hoeveelheid" in b for b in bezwaren))
+
+    def test_specifieke_variant_komt_erdoor(self):
+        self.assertEqual(
+            koptoets.controleer_kop("DNB: bij 73% van de aanvallen bestond de update nog niet"),
+            [],
+        )
+
+    def test_naamwoordstijl_en_uitroepteken(self):
+        bezwaren = koptoets.controleer_kop("De invoering van de AI-wet begint!")
+        self.assertTrue(any("naamwoordstijl" in b for b in bezwaren))
+        self.assertIn("uitroepteken", bezwaren)
+
+    def test_kop_zonder_houvast(self):
+        bezwaren = koptoets.controleer_kop("het protocol werd opnieuw ontworpen")
+        self.assertTrue(any("niets specifieks" in b for b in bezwaren))
+
+    def test_tijdstip_telt_als_houvast(self):
+        self.assertEqual(
+            koptoets.controleer_kop("Zondag moet je chatbot zeggen dat hij een chatbot is"),
+            [],
+        )
+
+    def test_te_lange_kop(self):
+        bezwaren = koptoets.controleer_kop("DNB " + "woord " * 20)
+        self.assertTrue(any("te lang" in b for b in bezwaren))
+
+    def test_gepubliceerde_edities_voldoen_aan_de_kopregels(self):
+        """Elke editie in redactie/ moet door de eigen toets komen."""
+        mappen = sorted((PROJECT / "redactie").glob("*-selectie.json"))
+        self.assertTrue(mappen, "geen edities gevonden om te toetsen")
+        for pad in mappen:
+            data = json.loads(pad.read_text(encoding="utf-8"))
+            fouten = koptoets.toets_editie([i["kop"] for i in data["items"]])
+            self.assertEqual(fouten, {}, f"{pad.name} bevat zwakke koppen: {fouten}")
+
+    def test_onderwerpregel_blijft_binnen_de_inboxbreedte(self):
+        for pad in sorted((PROJECT / "redactie").glob("*-selectie.json")):
+            data = json.loads(pad.read_text(encoding="utf-8"))
+            onderwerp = data.get("onderwerp", "")
+            if not onderwerp:
+                continue
+            # Op mobiel — goed voor het merendeel van de opens — wordt een
+            # onderwerpregel na ongeveer 50 tekens afgekapt.
+            self.assertLessEqual(len(onderwerp), 50, f"{pad.name}: onderwerp te lang")
+            self.assertGreaterEqual(len(onderwerp), 20, f"{pad.name}: onderwerp te kort")
+            self.assertNotIn("nieuwsbrief", onderwerp.lower())
 
 
 class TestVolledigeRun(unittest.TestCase):

@@ -10,7 +10,7 @@ from pathlib import Path
 import yaml
 
 from . import audio as audio_mod
-from . import bronnen, dedupe, rank, render, score
+from . import bronnen, dedupe, koptoets, rank, render, score
 from .model import Item, Selectie
 
 log = logging.getLogger(__name__)
@@ -61,20 +61,29 @@ def draai(
     lijst = score.shortlist(items, config.get("shortlist", 40))
 
     if heuristisch:
-        selecties = rank.kies_heuristisch(lijst, config)
+        selecties, kop = rank.kies_heuristisch(lijst, config)
     else:
         try:
-            selecties = rank.kies_en_schrijf(lijst, config)
+            selecties, kop = rank.kies_en_schrijf(lijst, config)
         except rank.RankFout as exc:
             # Liever een mindere editie dan geen editie: de nieuwsbrief moet
             # elke ochtend de deur uit.
             log.error("jury faalde (%s) — val terug op heuristische selectie", exc)
-            selecties = rank.kies_heuristisch(lijst, config)
+            selecties, kop = rank.kies_heuristisch(lijst, config)
+
+    # Het model kan afdwalen van de kopregels; dat willen we zien in de logs
+    # en niet pas als een lezer klaagt. Blokkeren doen we niet — een editie
+    # met een matige kop is beter dan geen editie.
+    for kop, bezwaren in koptoets.toets_editie([s.kop for s in selecties]).items():
+        log.warning("zwakke kop — %s: %r", "; ".join(bezwaren), kop)
 
     bestanden = _schrijf(
         selecties, vandaag, uitvoermap,
         kandidaten=kandidaten,
         bronnen=len({i.bron for i in items}),
+        intro=kop.get("intro", ""),
+        onderwerp=kop.get("onderwerp", ""),
+        preheader=kop.get("preheader", ""),
     )
 
     if met_audio:
@@ -111,7 +120,11 @@ def render_selectie(pad: Path, uitvoermap: Path) -> Resultaat:
 
     bestanden = _schrijf(
         selecties, d, uitvoermap,
-        kandidaten=kandidaten, bronnen=bronnen, intro=data.get("intro", ""),
+        kandidaten=kandidaten,
+        bronnen=bronnen,
+        intro=data.get("intro", ""),
+        onderwerp=data.get("onderwerp", ""),
+        preheader=data.get("preheader", ""),
     )
     return Resultaat(
         datum=d,
@@ -129,13 +142,17 @@ def _schrijf(
     kandidaten: int | None = None,
     bronnen: int | None = None,
     intro: str = "",
+    onderwerp: str = "",
+    preheader: str = "",
 ) -> list[Path]:
     map_.mkdir(parents=True, exist_ok=True)
     stam = d.isoformat()
     uitvoer = {
-        f"{stam}.json": render.naar_json(selecties, d),
-        f"{stam}.md": render.naar_markdown(selecties, d, kandidaten, bronnen, intro),
-        f"{stam}.html": render.naar_html(selecties, d, kandidaten, bronnen, intro),
+        f"{stam}.json": render.naar_json(selecties, d, onderwerp, preheader, intro),
+        f"{stam}.md": render.naar_markdown(
+            selecties, d, kandidaten, bronnen, intro, onderwerp, preheader),
+        f"{stam}.html": render.naar_html(
+            selecties, d, kandidaten, bronnen, intro, onderwerp, preheader),
     }
     paden = []
     for naam, inhoud in uitvoer.items():

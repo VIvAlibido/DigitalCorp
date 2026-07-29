@@ -63,10 +63,25 @@ Schrijfregels:
 - Nederlands. Vaktermen die in het Nederlands niet bestaan blijven Engels \
   (transformer, fine-tunen, inference), maar vertaal wat wél kan. Let op valse \
   vrienden: het Engelse "trillion" is in het Nederlands "biljoen", niet "triljoen".
-- "kop": maximaal 70 tekens. Feitelijk en concreet, geen clickbait, geen \
-  uitroeptekens, geen vraagteken. Liever het gevolg dan de gebeurtenis: \
-  "Zondag moet elke chatbot zeggen dat hij een chatbot is" leest beter dan \
-  "Transparantieverplichting treedt in werking".
+- "kop": maximaal 70 tekens. Dit is het veld dat bepaalt of iemand het bericht \
+  leest, en de meeste koppen mislukken op hetzelfde punt: ze zijn wel waar, \
+  maar zeggen niets. Elke kop bevat daarom drie dingen:
+    (a) een concreet onderwerp — wie of wat, bij naam als het kan;
+    (b) een actief werkwoord — iets gebeurt, iemand doet iets;
+    (c) iets specifieks — een getal, een naam, een datum of een bedrag.
+  Verboden: vage hoeveelheden ("bijna driekwart", "veel", "steeds meer", \
+  "een aantal"), naamwoordstijl ("de invoering van", "het gebruik van"), en \
+  de lijdende vorm zonder handelende partij. Getallen schrijf je in cijfers: \
+  "73%", niet "bijna driekwart" — een precies getal draagt zijn eigen bewijs, \
+  een vaag getal roept twijfel op.
+  Spreek de lezer aan met "je" waar dat natuurlijk valt. Liever het gevolg dan \
+  de gebeurtenis: "Zondag moet je chatbot zeggen dat hij een chatbot is" \
+  verslaat "Transparantieverplichting treedt in werking".
+  De toets: knip de kop los van de rest. Kan iemand die het bericht niet kent \
+  daaruit opmaken wie dit raakt en wat er verandert? Zo niet, herschrijf.
+  Nieuwsgierig maken mag; die nieuwsgierigheid niet inlossen niet. Elke belofte \
+  in de kop wordt in het bericht waargemaakt — clickbait kost op termijn meer \
+  lezers dan het oplevert.
 - "kern": precies één zin, maximaal 200 tekens, volledig zonder jargon. Dit is \
   het belangrijkste veld van de nieuwsbrief. Wie alleen de koppen en deze \
   zinnen leest, moet de dag begrepen hebben. Geen cijfers tenzij één cijfer \
@@ -92,6 +107,20 @@ Schrijfregels:
   persbericht van de toezichthouder gaat voor een nieuwsbericht erover; het \
   eigen blog van een project gaat voor een aggregator.
 
+Naast de zes berichten lever je drie velden voor de editie als geheel:
+
+- "onderwerp": de onderwerpregel van de e-mail, 28 tot 50 tekens. Dit is de \
+  enige zin die bepaalt of de mail geopend wordt, en op een telefoon zie je \
+  vaak niet meer dan de eerste veertig tekens — zet het belangrijkste dus \
+  vooraan. Kies het scherpste, meest concrete gegeven uit de hele editie, \
+  meestal uit het eerste bericht. Gebruik het woord "nieuwsbrief" niet.
+- "preheader": de voorbeeldregel die in de inbox naast het onderwerp \
+  verschijnt, 40 tot 90 tekens. Herhaal het onderwerp niet maar vul het aan, \
+  bijvoorbeeld met het tweede onderwerp van de dag. Begin met "Plus:" als je \
+  een tweede haakje aanreikt.
+- "intro": twee tot drie zinnen die de dag samenvatten en de rode draad \
+  benoemen als die er is. Geen opsomming van wat volgt — de lezer scrolt zelf.
+
 Zorg voor spreiding over categorieën: niet meer dan twee items uit dezelfde \
 categorie.
 
@@ -103,6 +132,9 @@ tegenspraak in "kanttekening" kunt benoemen."""
 SCHEMA = {
     "type": "object",
     "properties": {
+        "onderwerp": {"type": "string"},
+        "preheader": {"type": "string"},
+        "intro": {"type": "string"},
         "items": {
             "type": "array",
             "items": {
@@ -126,9 +158,9 @@ SCHEMA = {
                              "categorie", "datum", "kanttekening"],
                 "additionalProperties": False,
             },
-        }
+        },
     },
-    "required": ["items"],
+    "required": ["onderwerp", "preheader", "intro", "items"],
     "additionalProperties": False,
 }
 
@@ -221,7 +253,12 @@ def kies_en_schrijf(items: list[Item], config: dict) -> list[Selectie]:
         response.usage.input_tokens,
         response.usage.output_tokens,
     )
-    return selecties[:aantal]
+    kop_editie = {
+        "onderwerp": data.get("onderwerp", ""),
+        "preheader": data.get("preheader", ""),
+        "intro": data.get("intro", ""),
+    }
+    return selecties[:aantal], kop_editie
 
 
 def kies_heuristisch(items: list[Item], config: dict) -> list[Selectie]:
@@ -256,7 +293,7 @@ def kies_heuristisch(items: list[Item], config: dict) -> list[Selectie]:
                 )
             )
 
-    return gekozen
+    return gekozen, {"onderwerp": "", "preheader": "", "intro": ""}
 
 
 def _categorie_uit_brontype(brontype: str) -> str:
