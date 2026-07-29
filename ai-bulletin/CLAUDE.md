@@ -82,7 +82,8 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 1 | Naam **AI Bulletin**, domein aibulletin.nl | gekozen na afwijzen van "Het Kwartje" (leek op satire) |
 | 2 | 6 berichten per editie, 7 dagen per week | opdrachtgever, 29 juli |
 | 3 | Verzending om **06:00** via ingeplande ESP-campagne, niet via cron | GitHub Actions-cron loopt 15 min tot 2+ uur uit; zie plan/dagelijks-publiceren.md §1 |
-| 4 | ESP wordt **Laposta** | NL, EU-hosting, en heeft een apart schedule-endpoint — noodzakelijk voor #3 |
+| 4 | ESP wordt **Laposta**, maar pas vanaf de tweede lezer | NL, EU-hosting, apart schedule-endpoint (nodig voor #3). Een ESP dient lijstbeheer, opt-in en afleverbaarheid; bij één lezer is dat overhead |
+| 13 | Tot de tweede abonnee gaat de editie **via de Gmail-connector** naar kees@telemedia.es | scheelt een dag bouwwerk en een abonnement; de AVG gaat pas spelen zodra iemand anders zich moet kunnen uitschrijven |
 | 5 | Eigen tekst, nooit tekst van anderen overnemen | feiten zijn vrij, formulering niet; art. 15/15a Aw |
 | 6 | Feit (`wat`) en duiding (`waarom`) blijven zichtbaar gescheiden | geloofwaardigheid is de enige verdediging tegen "zoveelste AI-nieuwsbrief" |
 | 7 | Weekend krijgt een **ander formaat** dan doordeweeks | za/zo is de dunste invoer van de week; zie plan §6 |
@@ -112,8 +113,13 @@ beslissing 9.)*
   LLM-aanroepen en deploys zijn hier niet uit te voeren. Alles is getest met
   fixtures.
 - **Geen credentials in de omgeving.** Geen Vercel-token, geen SMTP, geen ESP.
-  Deployen en mailen moet de opdrachtgever zelf doen of aanleveren; beloof het
-  niet.
+  Deployen moet de opdrachtgever zelf doen; beloof het niet.
+- **Er is géén Vercel-connector**, ook al heeft de opdrachtgever een
+  Vercel-account (met o.a. nexradio erop). Gecontroleerd via ListConnectors op
+  29 juli: beschikbaar zijn Canva, Gmail, Google Calendar en Google Drive.
+  Niet opnieuw gaan zoeken.
+- **Gmail is wél gekoppeld** maar stond op 29 juli uit voor de chat. Zodra dat
+  aanstaat is dat het verzendkanaal — zie beslissing 13.
 - **De LLM-jury heeft nog nooit echt gedraaid.** De editie van 2026-07-29 op de
   site is met de hand geschreven en zegt niets over wat de automaat produceert.
 - **Een editie mag korter zijn dan zes** — opgelost op 29 juli. De jury krijgt
