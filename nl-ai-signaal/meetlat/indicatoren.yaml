@@ -1,0 +1,130 @@
+# De Meetlat — welke cijfers we meten, waar ze vandaan komen, hoe vaak.
+#
+# Dit bestand is het product. Een nieuwsbrief die elke dag iets anders meet,
+# meet niets; de waarde ontstaat pas als dezelfde definitie maanden achtereen
+# op dezelfde bron wordt losgelaten. Wijzig een definitie daarom nooit stil:
+# noteer de wijziging bij de indicator en laat de oude reeks intact.
+#
+# Regel: een indicator komt hier alleen in als (a) de bron openbaar is,
+# (b) de meting herhaalbaar is zonder oordeel, en (c) de uitkomst kan
+# tegenvallen. Een cijfer dat alleen maar kan meevallen is marketing.
+
+versie: 1
+eenheid: "Nederland, publieke sector en aanbestedingen"
+
+bronnen:
+  algoritmeregister:
+    naam: Algoritmeregister van de Nederlandse overheid
+    url: https://algoritmes.overheid.nl/nl/algoritme
+    open_data: https://data.overheid.nl/dataset/algoritme-register
+    frequentie: dagelijks
+    # Geverifieerd bij aanvang: 1.403 registraties, gegroeid vanaf 109 in
+    # december 2022 en 291 in februari 2024. Nulmeting vastleggen bij start.
+    let_op: >
+      Het register is zelfrapportage. Een stijging betekent meer registraties,
+      niet per se meer algoritmes. Dat onderscheid moet in elke publicatie
+      staan, anders meten we transparantie en noemen we het adoptie.
+
+  tenderned:
+    naam: TenderNed — aankondigingen en gunningen
+    url: https://www.tenderned.nl/
+    open_data: https://data.overheid.nl/dataset/aankondigingen-van-overheidsopdrachten---tenderned
+    formaat: XML via API
+    frequentie: dagelijks
+    let_op: >
+      Selectie op AI-trefwoorden levert vals-positieven (elk bestek noemt
+      tegenwoordig 'artificial intelligence' in de eisen). Handmatige
+      bevestiging voor publicatie; het aantal afgekeurde treffers publiceren
+      we mee als maat voor de ruis.
+
+indicatoren:
+
+  - id: register_totaal
+    naam: Aantal registraties in het Algoritmeregister
+    bron: algoritmeregister
+    meting: telling van alle gepubliceerde algoritmebeschrijvingen
+    frequentie: dagelijks
+    toon: absoluut getal plus verschil met vorige week
+    waarom: >
+      Het absolute getal is oninteressant. Het weekverschil is het nieuws, en
+      de samenstelling van dat verschil is het verhaal.
+
+  - id: register_nieuwkomers
+    naam: Organisaties die voor het eerst registreren
+    bron: algoritmeregister
+    meting: organisaties die deze week hun eerste beschrijving publiceerden
+    frequentie: wekelijks
+    toon: lijst met namen
+    waarom: >
+      Dit is het enige cijfer dat een individuele gemeente over zichzelf leest.
+      Genoemd worden werkt; dat is precies de bedoeling.
+
+  - id: register_stilte
+    naam: Gemeenten zonder enige registratie
+    bron: algoritmeregister
+    meting: >
+      aantal gemeenten dat nul beschrijvingen publiceerde, als percentage van
+      alle 342 gemeenten
+    frequentie: wekelijks
+    toon: percentage plus verandering
+    # Geverifieerd bij aanvang: meer dan de helft registreert niets.
+    waarom: >
+      De belangrijkste indicator van de hele meetlat, omdat hij ongemakkelijk
+      is en omdat niemand anders hem bijhoudt. Verwacht weerwoord; dat is een
+      teken dat hij werkt, geen reden om hem te verzachten.
+
+  - id: register_koplopers
+    naam: Meeste registraties per organisatie
+    bron: algoritmeregister
+    meting: top tien organisaties op aantal beschrijvingen
+    frequentie: maandelijks
+    # Geverifieerd bij aanvang: Amsterdam 40, Utrecht 38, Den Haag 29,
+    # Rotterdam 11. Gemeenten samen 365.
+    waarom: >
+      Tegenwicht tegen register_stilte. Wie het goed doet moet dat ook lezen,
+      anders wordt de meetlat een strafblad en stopt iedereen met meewerken.
+
+  - id: aanbesteding_nieuw
+    naam: Nieuwe AI-gerelateerde aanbestedingen
+    bron: tenderned
+    meting: >
+      aankondigingen met AI-trefwoorden in scope of gunningscriteria, na
+      handmatige bevestiging
+    frequentie: dagelijks
+    toon: aantal, gezamenlijke waarde, aanbestedende diensten
+    waarom: >
+      Een aanbesteding is een voornemen met een prijskaartje en een datum.
+      Dat is harder bewijs van adoptie dan elke enquête.
+
+  - id: aanbesteding_gunning
+    naam: Gegunde AI-opdrachten
+    bron: tenderned
+    meting: gunningen op eerder gemeten aanbestedingen, met winnende partij
+    frequentie: wekelijks
+    toon: opdracht, bedrag, winnaar
+    waarom: >
+      Hier wordt zichtbaar welke leveranciers de Nederlandse publieke sector
+      binnenkomen. Dat is de vraag die iedere inkoper en concurrent heeft en
+      die niemand systematisch beantwoordt.
+
+  - id: aanbesteding_ruis
+    naam: Afgekeurde treffers
+    bron: tenderned
+    meting: aantal trefwoordtreffers dat bij controle geen AI-opdracht bleek
+    frequentie: wekelijks
+    waarom: >
+      Publiceren hoeveel we weggooien maakt de rest geloofwaardig. Een
+      meetlat die zijn eigen foutmarge verzwijgt is een marketinginstrument.
+
+kalender:
+  dagelijks: >
+    Eén meting bovenaan de nieuwsbrief, met het verschil ten opzichte van
+    gisteren. Daarna hooguit twee internationale berichten.
+  wekelijks: >
+    De volledige meetlat: alle indicatoren, met weekverschillen en de lijst
+    nieuwkomers. Dit is de editie die geciteerd wordt.
+  maandelijks: >
+    Ranglijsten en een langere reeks. Onder embargo vooruit te sturen naar
+    vakmedia — de maand dat de NOS ons citeert is de maand dat dit werkt.
+
+herzieningen: []
