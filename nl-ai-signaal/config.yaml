@@ -1,0 +1,121 @@
+# NL-AI-Signaal — configuratie
+#
+# Elke dag: verzamel kandidaten uit alle bronnen, ontdubbel, scoor,
+# laat een LLM de 6 belangrijkste kiezen en in het Nederlands schrijven.
+
+output:
+  aantal_items: 6
+  taal: nl
+  # Waar de dagelijkse editie terechtkomt (relatief aan projectmap).
+  map: edities
+
+llm:
+  model: claude-opus-5
+  effort: high
+  # Max tokens voor de rank+schrijf-stap. Denken telt hierin mee.
+  max_tokens: 16000
+
+# Hoeveel kandidaten gaan er naar de LLM-jury. Hoger = beter maar duurder.
+shortlist: 40
+
+# Alles ouder dan dit valt af (uren).
+max_leeftijd_uren: 36
+
+scoring:
+  # Gewicht per brontype in de voorselectie.
+  brontype_gewicht:
+    arxiv: 1.0
+    github: 1.1
+    huggingface: 0.9
+    hackernews: 1.0
+    rss: 0.8
+    rss_nl: 1.4          # Nederlandstalige bronnen wegen zwaarder
+  # Bonus als een item expliciet raakt aan de Nederlandse/EU-context.
+  nl_relevantie_bonus: 2.5
+  # Halveringstijd van de recency-score in uren.
+  recency_halfwaardetijd_uren: 18
+
+bronnen:
+  arxiv:
+    actief: true
+    categorieen: [cs.AI, cs.LG, cs.CL, cs.CV]
+    max: 60
+
+  github:
+    actief: true
+    # Repos die in de laatste dagen zijn aangemaakt én snel sterren winnen.
+    query: "created:>{sinds} stars:>25"
+    max: 30
+
+  huggingface:
+    actief: true
+    max: 25
+
+  hackernews:
+    actief: true
+    min_punten: 60
+    max: 30
+
+  # Internationale RSS-bronnen.
+  rss:
+    actief: true
+    feeds:
+      - https://openai.com/blog/rss.xml
+      - https://www.anthropic.com/rss.xml
+      - https://deepmind.google/blog/rss.xml
+      - https://huggingface.co/blog/feed.xml
+      - https://blog.google/technology/ai/rss/
+      - https://engineering.fb.com/feed/
+
+  # Nederlandstalige bronnen — dit is wat de kloon onderscheidt.
+  rss_nl:
+    actief: true
+    feeds:
+      - https://tweakers.net/feeds/mixed.xml
+      - https://www.bnr.nl/rss/podcast/onbeperkt-houdbaar
+      - https://www.emerce.nl/nieuws/rss
+      - https://www.agconnect.nl/rss.xml
+      - https://www.computable.nl/rss.xml
+      - https://autoriteitpersoonsgegevens.nl/rss.xml
+
+  # Zie README: Instagram heeft geen officiële API voor accounts van derden.
+  instagram:
+    actief: false
+    provider: null        # "apify" | "brightdata" | null
+    accounts: []
+
+# Termen die een item als relevant voor de Nederlandse markt markeren.
+nl_signaalwoorden:
+  - nederland
+  - nederlandse
+  - dutch
+  - amsterdam
+  - eindhoven
+  - delft
+  - asml
+  - adyen
+  - booking.com
+  - picnic
+  - nxp
+  - tno
+  - surf
+  - cwi
+  - "ai act"
+  - "eu ai act"
+  - avg
+  - gdpr
+  - "europese commissie"
+  - "european commission"
+  - eurhpc
+  - mistral
+  - aleph alpha
+  - "digital services act"
+  - autoriteit persoonsgegevens
+
+audio:
+  actief: false
+  # "elevenlabs" | "azure" | "google"
+  provider: elevenlabs
+  stem: null
+  # Nederlandse TTS: houd zinnen kort, spel afkortingen voluit.
+  map: audio

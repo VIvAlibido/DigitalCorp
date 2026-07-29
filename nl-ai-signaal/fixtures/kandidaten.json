@@ -1,0 +1,182 @@
+[
+  {
+    "titel": "Autoriteit Persoonsgegevens publiceert leidraad voor AI-systemen met hoog risico",
+    "url": "https://autoriteitpersoonsgegevens.nl/actueel/leidraad-hoog-risico-ai",
+    "bron": "autoriteitpersoonsgegevens.nl",
+    "brontype": "rss_nl",
+    "gepubliceerd": 5,
+    "samenvatting": "De AP legt uit welke verplichtingen uit de EU AI Act per augustus gelden voor Nederlandse organisaties die AI inzetten bij werving, kredietverlening en fraudedetectie. Inclusief een checklist voor de verplichte risicobeoordeling.",
+    "metriek": {}
+  },
+  {
+    "titel": "Mistral brengt Mistral-Large-3 uit onder Apache 2.0",
+    "url": "https://huggingface.co/mistralai/Mistral-Large-3",
+    "bron": "Hugging Face",
+    "brontype": "huggingface",
+    "gepubliceerd": 9,
+    "samenvatting": "Model voor text-generation. Tags: transformers, apache-2.0, multilingual, function-calling, european",
+    "metriek": {"downloads": 184000, "likes": 2100, "trending": 980}
+  },
+  {
+    "titel": "Show HN: vLLM-fork die 3x sneller draait op consumer-GPU's",
+    "url": "https://github.com/example/fastserve",
+    "bron": "Hacker News",
+    "brontype": "hackernews",
+    "gepubliceerd": 14,
+    "samenvatting": "Paged attention plus speculative decoding, getest op RTX 4090 en 3090. Werkt met bestaande vLLM-configs.",
+    "metriek": {"punten": 812, "reacties": 240, "discussie": "https://news.ycombinator.com/item?id=1"}
+  },
+  {
+    "titel": "Anthropic introduceert langere contextvensters voor agentische workloads",
+    "url": "https://www.anthropic.com/news/langere-context",
+    "bron": "anthropic.com",
+    "brontype": "rss",
+    "gepubliceerd": 11,
+    "samenvatting": "Uitbreiding van het contextvenster met server-side compaction, gericht op agents die uren achtereen draaien.",
+    "metriek": {}
+  },
+  {
+    "titel": "Anthropic verlengt contextvenster voor agents",
+    "url": "https://tweakers.net/nieuws/999/anthropic-verlengt-contextvenster.html",
+    "bron": "tweakers.net",
+    "brontype": "rss_nl",
+    "gepubliceerd": 8,
+    "samenvatting": "Anthropic heeft het contextvenster voor agentische workloads uitgebreid met server-side compaction.",
+    "metriek": {}
+  },
+  {
+    "titel": "Sparse Attention Routing Cuts Inference Cost by 41% at Equal Quality",
+    "url": "https://arxiv.org/abs/2507.10001",
+    "bron": "arXiv",
+    "brontype": "arxiv",
+    "gepubliceerd": 19,
+    "samenvatting": "We introduce a routing scheme that selects attention heads per token, reducing FLOPs by 41 percent on a 70B model without measurable quality loss on MMLU, GSM8K and HumanEval. Code and weights released.",
+    "metriek": {"categorieen": ["cs.LG", "cs.CL"]}
+  },
+  {
+    "titel": "openai/agents-runtime — Reference runtime for tool-calling agents",
+    "url": "https://github.com/openai/agents-runtime",
+    "bron": "GitHub",
+    "brontype": "github",
+    "gepubliceerd": 22,
+    "samenvatting": "Reference runtime for tool-calling agents with sandboxed execution and MCP support.",
+    "metriek": {"sterren": 9400, "sterren_per_dag": 1340.0, "taal": "TypeScript"}
+  },
+  {
+    "titel": "ASML en TNO starten gezamenlijk AI-lab voor lithografie-optimalisatie",
+    "url": "https://www.agconnect.nl/artikel/asml-tno-ai-lab",
+    "bron": "agconnect.nl",
+    "brontype": "rss_nl",
+    "gepubliceerd": 16,
+    "samenvatting": "Het lab in Eindhoven krijgt 40 miljoen euro en richt zich op machine learning voor procescontrole in chipproductie. Er komen 60 onderzoeksplaatsen.",
+    "metriek": {}
+  },
+  {
+    "titel": "Google DeepMind publiceert benchmark voor lange-horizon planning",
+    "url": "https://deepmind.google/blog/planbench-2",
+    "bron": "deepmind.google",
+    "brontype": "rss",
+    "gepubliceerd": 26,
+    "samenvatting": "PlanBench-2 test modellen op taken van 200 tot 2000 stappen. Beste model haalt 34 procent.",
+    "metriek": {}
+  },
+  {
+    "titel": "Retrieval-Augmented Generation Fails Silently on Contradictory Corpora",
+    "url": "https://arxiv.org/abs/2507.10044",
+    "bron": "arXiv",
+    "brontype": "arxiv",
+    "gepubliceerd": 30,
+    "samenvatting": "Empirical study across five production RAG deployments showing that contradictory source documents produce confident wrong answers in 23 percent of cases, with no signal in retrieval scores.",
+    "metriek": {"categorieen": ["cs.CL"]}
+  },
+  {
+    "titel": "langchain-ai/langgraph-studio — Visual debugger for agent graphs",
+    "url": "https://github.com/langchain-ai/langgraph-studio",
+    "bron": "GitHub",
+    "brontype": "github",
+    "gepubliceerd": 33,
+    "samenvatting": "Visual debugger for LLM agent graphs with step-through execution.",
+    "metriek": {"sterren": 3100, "sterren_per_dag": 220.0, "taal": "Python"}
+  },
+  {
+    "titel": "Europese Commissie stelt handhaving AI Act voor foundation models zes maanden uit",
+    "url": "https://www.emerce.nl/nieuws/ec-stelt-handhaving-ai-act-uit",
+    "bron": "emerce.nl",
+    "brontype": "rss_nl",
+    "gepubliceerd": 20,
+    "samenvatting": "Aanbieders van foundation models krijgen tot februari extra tijd om aan de transparantieverplichtingen te voldoen. De verplichtingen voor hoog-risicotoepassingen blijven ongewijzigd.",
+    "metriek": {}
+  },
+  {
+    "titel": "Ask HN: hoe test je een RAG-pipeline in productie?",
+    "url": "https://news.ycombinator.com/item?id=2",
+    "bron": "Hacker News",
+    "brontype": "hackernews",
+    "gepubliceerd": 12,
+    "samenvatting": "Discussie over evaluatiestrategieen voor retrieval in productie.",
+    "metriek": {"punten": 145, "reacties": 98, "discussie": "https://news.ycombinator.com/item?id=2"}
+  },
+  {
+    "titel": "meta-llama/Llama-4-Scout-17B",
+    "url": "https://huggingface.co/meta-llama/Llama-4-Scout-17B",
+    "bron": "Hugging Face",
+    "brontype": "huggingface",
+    "gepubliceerd": 28,
+    "samenvatting": "Model voor text-generation. Tags: transformers, llama, mixture-of-experts, long-context",
+    "metriek": {"downloads": 92000, "likes": 740, "trending": 410}
+  },
+  {
+    "titel": "Distillation at Scale: Student Models Retain 94% of Teacher Performance",
+    "url": "https://arxiv.org/abs/2507.10099",
+    "bron": "arXiv",
+    "brontype": "arxiv",
+    "gepubliceerd": 24,
+    "samenvatting": "Systematic study of distillation across 12 model pairs, showing consistent retention with a 7x reduction in serving cost.",
+    "metriek": {"categorieen": ["cs.LG"]}
+  },
+  {
+    "titel": "Picnic zet taalmodellen in voor routeplanning, bespaart 8 procent kilometers",
+    "url": "https://www.computable.nl/artikel/picnic-llm-routeplanning",
+    "bron": "computable.nl",
+    "brontype": "rss_nl",
+    "gepubliceerd": 34,
+    "samenvatting": "De Nederlandse boodschappenbezorger combineert een klassiek optimalisatiemodel met een taalmodel dat bezorgnotities interpreteert.",
+    "metriek": {}
+  },
+  {
+    "titel": "OpenAI kondigt prijsverlaging aan voor batch-verwerking",
+    "url": "https://openai.com/blog/batch-pricing",
+    "bron": "openai.com",
+    "brontype": "rss",
+    "gepubliceerd": 31,
+    "samenvatting": "Batch-verwerking wordt 60 procent goedkoper voor aanvragen die binnen 24 uur mogen worden afgehandeld.",
+    "metriek": {}
+  },
+  {
+    "titel": "huggingface/lighteval — Evaluation harness with reproducible seeds",
+    "url": "https://github.com/huggingface/lighteval",
+    "bron": "GitHub",
+    "brontype": "github",
+    "gepubliceerd": 35,
+    "samenvatting": "LLM evaluation harness with reproducible seeds and leaderboard export.",
+    "metriek": {"sterren": 1800, "sterren_per_dag": 95.0, "taal": "Python"}
+  },
+  {
+    "titel": "Adyen bouwt fraudedetectie om naar transformer-architectuur",
+    "url": "https://www.emerce.nl/nieuws/adyen-transformer-fraudedetectie",
+    "bron": "emerce.nl",
+    "brontype": "rss_nl",
+    "gepubliceerd": 29,
+    "samenvatting": "Het Amsterdamse betaalbedrijf vervangt zijn gradient-boosting-modellen door een transformer die transactiesequenties leest. False positives dalen met 19 procent.",
+    "metriek": {}
+  },
+  {
+    "titel": "Why We Moved Off Vector Databases",
+    "url": "https://news.ycombinator.com/item?id=3",
+    "bron": "Hacker News",
+    "brontype": "hackernews",
+    "gepubliceerd": 17,
+    "samenvatting": "Engineering blogpost over het vervangen van een vector-database door Postgres met pgvector.",
+    "metriek": {"punten": 396, "reacties": 187, "discussie": "https://news.ycombinator.com/item?id=3"}
+  }
+]

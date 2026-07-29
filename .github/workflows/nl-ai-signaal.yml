@@ -1,0 +1,60 @@
+name: NL-AI-Signaal — dagelijkse editie
+
+on:
+  schedule:
+    # 05:15 UTC = 07:15 in de zomer, 06:15 in de winter.
+    # GitHub Actions kent alleen UTC; de wintertijd-afwijking is bewust
+    # geaccepteerd. Wil je exact 07:00 lokaal, plan dan twee cron-regels
+    # en laat het script zelf de Europe/Amsterdam-tijd controleren.
+    - cron: "15 5 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      heuristisch:
+        description: "Sla de LLM-jury over (goedkope testrun)"
+        type: boolean
+        default: false
+
+defaults:
+  run:
+    working-directory: nl-ai-signaal
+
+jobs:
+  editie:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: nl-ai-signaal/requirements.txt
+
+      - name: Installeer dependencies
+        run: pip install -r requirements.txt
+
+      - name: Draai tests
+        run: python -m unittest discover -s tests
+
+      - name: Stel de editie samen
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Optioneel: verhoogt de GitHub-zoeklimiet van 10 naar 30 req/min.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+        run: |
+          python -m signaal.cli \
+            ${{ inputs.heuristisch && '--heuristisch' || '' }} \
+            --verbose
+
+      - name: Archiveer de editie
+        uses: actions/upload-artifact@v4
+        with:
+          name: editie-${{ github.run_id }}
+          path: nl-ai-signaal/edities/
+          retention-days: 90
