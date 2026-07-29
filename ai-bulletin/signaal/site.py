@@ -27,6 +27,7 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
+from . import keuring
 from .model import Editie
 from .render import MERK, datum_nl, kort_datum
 
@@ -801,8 +802,13 @@ def laad_edities(map_: Path) -> list[Editie]:
     return edities
 
 
+class OngekeurdeEditie(ValueError):
+    """Een editie in de uitvoermap die niet gepubliceerd hoort te worden."""
+
+
 def bouw(edities_map: Path, uitvoer: Path, config: dict | None = None,
-         leeg_eerst: bool = True, indexeerbaar: bool = True) -> list[Path]:
+         leeg_eerst: bool = True, indexeerbaar: bool = True,
+         keuren: bool = True) -> list[Path]:
     """Bouwt de volledige site. Retourneert de geschreven paden.
 
     `config` levert de uitgeversgegevens voor colofon en privacyverklaring.
@@ -813,6 +819,23 @@ def bouw(edities_map: Path, uitvoer: Path, config: dict | None = None,
     edities = laad_edities(edities_map)
     if not edities:
         raise ValueError(f"geen edities gevonden in {edities_map}")
+
+    # Dit is de route die de lezer werkelijk bereikt. Blokkeren in
+    # render_selectie() helpt niet als het JSON-bestand daarna nog met de hand
+    # wordt bijgewerkt — en dat is precies wat er in deze repo is gebeurd.
+    if keuren:
+        kapot = {
+            ed.stam: keuring.blokkades(keuring.keur(ed, streng=True))
+            for ed in edities
+        }
+        kapot = {stam: b for stam, b in kapot.items() if b}
+        if kapot:
+            regels = "\n".join(
+                f"  {stam}: " + "; ".join(str(x) for x in b)
+                for stam, b in sorted(kapot.items()))
+            raise OngekeurdeEditie(
+                f"{len(kapot)} editie(s) in {edities_map} zijn niet "
+                f"publicatiegereed:\n{regels}")
 
     if leeg_eerst and uitvoer.exists():
         shutil.rmtree(uitvoer)

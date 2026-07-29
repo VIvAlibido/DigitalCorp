@@ -61,7 +61,11 @@ Wat dit afdwong in de bouw — uitgevoerd op 29 juli:
 Vastgelegd op verzoek van de opdrachtgever, na terechte kritiek dat ik elke
 opmerking omzette in werk zonder tegen te spreken.
 
-0. **Elke controle sluit aan op álle routes.** De fouten in dit project kwamen
+0. **Elke controle sluit aan op álle routes — vraag welk bestand de lezer ziet.**
+   Bij de eerste poging zat de keuring op twee van de drie routes, en niet op
+   `site.bouw()` — juist de route die de site opbouwt uit `edities/`. De
+   tegenspreker vond dat binnen drie minuten met de vraag: *welk bestand ziet
+   de lezer werkelijk, en welke code heeft dát bestand gekeurd?* De fouten in dit project kwamen
    niet doordat er regels ontbraken, maar doordat de controles alleen op de
    automatische run zaten en niet op `render_selectie()` — de route waarlangs
    handgeschreven edities binnenkomen. Bouw je een nieuwe controle, sluit hem
@@ -98,7 +102,7 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 7 | Weekend krijgt een **ander formaat** dan doordeweeks | za/zo is de dunste invoer van de week; zie plan §6 |
 | 8 | Zondagstuk wordt **niet geautomatiseerd** en verschijnt onder de naam **Kees Cornelius** | het enige deel dat niet te scrapen is, moet mensenwerk zijn; een mening zonder naam is het slechtste van twee werelden |
 | 16 | De dagelijkse editie leent **vier technieken** van essayisten als Alberto Romero: spanning boven mededeling, scène boven definitie, een cijfer dat blijft hangen, duiding die oordeelt | de vorm schaalt niet naar 180 woorden, het gereedschap wel |
-| 18 | **Alle redactionele controles staan in `keuring.py`** en draaien op beide routes; handgeschreven edities worden hard geblokkeerd, de automatische run alleen gerapporteerd | de ochtendmail moet de deur uit, een handmatige editie heeft geen deadline en dus geen excuus |
+| 18 | **Alle redactionele controles staan in `keuring.py`** en draaien op drie routes: `render_selectie()`, `draai()` en **`site.bouw()`**. De laatste is de route die de lezer bereikt en werd bij de eerste poging vergeten | blokkeren in render_selectie() helpt niet als het JSON-bestand daarna nog met de hand wordt bijgewerkt. `site.bouw(keuren=False)` bestaat alleen voor structuurtests |
 | 17 | De dagelijkse editie gebruikt **géén ik-vorm, geen uitweidingen, geen gespeelde oneerbiedigheid** | 6 berichten × 7 dagen = 42 meningen per week; die heeft niemand. Nagedane branietaal is binnen twee edities doorzichtig |
 | 9 | Eerst **goedkeuren vóór verzenden**, later omschakelen naar een annuleervenster | opdrachtgever heeft nu veel tijd, straks weinig; de omschakeling moet één regel config zijn, geen verbouwing |
 | 10 | Colofon en privacyverklaring worden **uit `uitgever:` in config.yaml gegenereerd** | één plek voor deze gegevens, zodat er geen tweede versie kan verouderen; publicatie wordt geblokkeerd zolang ze ontbreken |

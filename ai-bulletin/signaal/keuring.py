@@ -61,6 +61,7 @@ def keur(editie: Editie, streng: bool = False) -> list[Bevinding]:
     b += _keur_opbouw(editie)
     b += _keur_koppen(editie)
     b += _keur_items(editie, streng)
+    b += _keur_toepassing(editie)
     b += _keur_beschouwing(editie)
     b += _keur_onderwerpregel(editie)
     return b
@@ -122,6 +123,33 @@ def _keur_items(editie: Editie, streng: bool) -> list[Bevinding]:
         nummer = bezwaar.split(".", 1)[0]
         b.append(Bevinding("waarschuwing", f"bericht {nummer}",
                            bezwaar.split(": ", 1)[-1]))
+    return b
+
+
+def _keur_toepassing(editie: Editie) -> list[Bevinding]:
+    """'Vandaag toepassen' is het ene kenmerk van dit product (CLAUDE.md).
+
+    Een dagelijkse editie zonder toepassing is geen mindere editie maar een
+    ander product. Op een zondag met alleen een beschouwing mag hij ontbreken.
+    """
+    if not editie.toepassing:
+        if editie.items:
+            return [Bevinding("blokkade", "toepassing",
+                              "ontbreekt — dit is het kenmerk van de nieuwsbrief")]
+        return [Bevinding("waarschuwing", "toepassing", "ontbreekt")]
+
+    b, t = [], editie.toepassing
+    for veld in ("titel", "intro"):
+        if not str(getattr(t, veld, "")).strip():
+            b.append(Bevinding("blokkade", "toepassing", f"leeg veld: {veld}"))
+    if len(t.stappen) != 3:
+        b.append(Bevinding("waarschuwing", "toepassing",
+                           f"{len(t.stappen)} stappen — twee is te dun, vier leest als huiswerk"))
+    for n, stap in enumerate(t.stappen, 1):
+        eerste = stap.split()[0].lower() if stap.split() else ""
+        if eerste in ("overweeg", "denk", "bedenk", "probeer", "kijk"):
+            b.append(Bevinding("waarschuwing", "toepassing",
+                               f"stap {n} begint met '{eerste}' — dat is geen handeling"))
     return b
 
 

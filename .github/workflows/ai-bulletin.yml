@@ -2,11 +2,12 @@ name: AI Bulletin — dagelijkse editie
 
 on:
   schedule:
+    # Elke dag — beslissing 2 legt zeven dagen per week vast.
     # 05:15 UTC = 07:15 in de zomer, 06:15 in de winter.
     # GitHub Actions kent alleen UTC; de wintertijd-afwijking is bewust
     # geaccepteerd. Wil je exact 07:00 lokaal, plan dan twee cron-regels
     # en laat het script zelf de Europe/Amsterdam-tijd controleren.
-    - cron: "15 5 * * 1-5"
+    - cron: "15 5 * * *"
   workflow_dispatch:
     inputs:
       heuristisch:

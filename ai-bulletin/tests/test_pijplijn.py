@@ -500,10 +500,36 @@ class TestKeuring(unittest.TestCase):
             self.assertTrue(resultaat.bestanden, "editie is niet geschreven")
             self.assertTrue(resultaat.bevindingen, "keuring rapporteerde niets")
 
-    def test_beide_gepubliceerde_edities_zijn_schoon(self):
-        for naam in ("2026-07-29", "2026-08-02"):
-            blok = keuring.blokkades(keuring.keur(self.echt(naam), streng=True))
-            self.assertEqual(blok, [], f"{naam}: {[str(b) for b in blok]}")
+    def test_wat_gepubliceerd_wordt_is_schoon(self):
+        """Bewaakt edities/ — dát is wat de site bouwt, niet redactie/.
+
+        En met een kanarie erbij: een test die alleen op een lege lijst
+        controleert, slaagt ook als de keuring helemaal stuk is.
+        """
+        gepubliceerd = sorted((PROJECT / "edities").glob("*.json"))
+        self.assertTrue(gepubliceerd, "geen gepubliceerde edities gevonden")
+        for pad in gepubliceerd:
+            editie = Editie.from_dict(json.loads(pad.read_text(encoding="utf-8")))
+            blok = keuring.blokkades(keuring.keur(editie, streng=True))
+            self.assertEqual(blok, [], f"{pad.name}: {[str(b) for b in blok]}")
+
+            kapot = Editie.from_dict(json.loads(pad.read_text(encoding="utf-8")))
+            kapot.items and setattr(kapot.items[0], "bron", "")
+            kapot.onderwerp = ""
+            self.assertTrue(keuring.blokkades(keuring.keur(kapot, streng=True)),
+                            "de keuring vindt niets op een kapotte editie — hij is dood")
+
+    def test_de_site_publiceert_geen_afgekeurde_editie(self):
+        """De route naar de lezer. Zonder deze controle helpt blokkeren elders niet."""
+        with tempfile.TemporaryDirectory() as tmp:
+            edities, uit = Path(tmp) / "edities", Path(tmp) / "site"
+            edities.mkdir()
+            editie = self.echt()
+            editie.items[0].bron = ""
+            (edities / f"{editie.stam}.json").write_text(
+                render.naar_json(editie), encoding="utf-8")
+            with self.assertRaises(site.OngekeurdeEditie):
+                site.bouw(edities, uit, {})
 
 
 class TestZondagsstuk(unittest.TestCase):
@@ -643,7 +669,7 @@ class TestUitgever(unittest.TestCase):
         editie = fixture_editie()
         (edities / f"{editie.stam}.json").write_text(
             render.naar_json(editie), encoding="utf-8")
-        site.bouw(edities, uit, self.VOLLEDIG, indexeerbaar=indexeerbaar)
+        site.bouw(edities, uit, self.VOLLEDIG, indexeerbaar=indexeerbaar, keuren=False)
         return uit
 
     def test_beide_paginas_staan_in_de_gebouwde_site(self):
@@ -653,7 +679,7 @@ class TestUitgever(unittest.TestCase):
             editie = fixture_editie()
             (edities / f"{editie.stam}.json").write_text(
                 render.naar_json(editie), encoding="utf-8")
-            site.bouw(edities, uit, self.VOLLEDIG)
+            site.bouw(edities, uit, self.VOLLEDIG, keuren=False)
             for pad in ("colofon/index.html", "privacy/index.html"):
                 self.assertTrue((uit / pad).exists(), f"{pad} ontbreekt")
             # En vanaf elke pagina bereikbaar.
@@ -672,7 +698,7 @@ class TestSite(unittest.TestCase):
             (edities / f"{editie.stam}.json").write_text(
                 render.naar_json(editie), encoding="utf-8")
 
-            paden = site.bouw(edities, uit)
+            paden = site.bouw(edities, uit, keuren=False)
             self.assertTrue(paden)
             for verwacht in ("index.html", "stijl.css", "sitemap.xml",
                              "archief/index.html", "werkwijze/index.html",
@@ -688,7 +714,7 @@ class TestSite(unittest.TestCase):
             edities, uit = Path(tmp) / "edities", Path(tmp) / "site"
             edities.mkdir()
             with self.assertRaises(ValueError):
-                site.bouw(edities, uit)
+                site.bouw(edities, uit, keuren=False)
 
     def test_toepassing_staat_boven_de_zes_op_de_site(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -700,7 +726,7 @@ class TestSite(unittest.TestCase):
                 stappen=["Een", "Twee", "Drie"], tijd="5 min")
             (edities / f"{editie.stam}.json").write_text(
                 render.naar_json(editie), encoding="utf-8")
-            site.bouw(edities, uit)
+            site.bouw(edities, uit, keuren=False)
 
             for pad in ("index.html", f"{editie.stam}/index.html"):
                 html = (uit / pad).read_text(encoding="utf-8")
