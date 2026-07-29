@@ -164,6 +164,11 @@ voor Vercel — met een publicatieblokkade zolang de uitgeversgegevens ontbreken
 SEO-technisch fundament (zie hieronder), en de uitgeversgegevens zelf —
 zie openstaand punt D.
 
+**Agenten:** `.claude/agents/` — eindredacteur en feitenchecker vóór elke
+verzending, zondagslezer vóór elke zondag, tegenspreker bij elk plan van de
+assistent. Volgorde die geldt: **code → agent → mens**. Vangt een agent iets dat
+in een regel te vatten is, verplaats het dan naar `keuring.py`.
+
 **Plannen:** `plan/nieuwsbrief-plan.md` (strategie, marktonderzoek) ·
 `plan/dagelijks-publiceren.md` (automatisering om 06:00)
 
