@@ -108,6 +108,18 @@ def naar_markdown(editie: Editie) -> str:
         r += [f"> {editie.intro}", ""]
     r += ["---", ""]
 
+    # De toepassing staat vóór de zes. Dit is het onderdeel waar AI Bulletin om
+    # bekend staat; onder zes nieuwsberichten is het een voetnoot.
+    if editie.toepassing:
+        t = editie.toepassing
+        titel = f"{t.titel} — {t.tijd}" if t.tijd else t.titel
+        r += [f"## Vandaag toepassen: {titel}", "", t.intro, ""]
+        r += [f"{n}. {stap}" for n, stap in enumerate(t.stappen, 1)]
+        r.append("")
+        if t.niet_doen:
+            r += [f"**Wat je níét hoeft te doen:** {t.niet_doen}", ""]
+        r += ["---", ""]
+
     for nummer, s in enumerate(editie.items, 1):
         r += [
             f"## {nummer}. {s.kop}", "",
@@ -119,16 +131,6 @@ def naar_markdown(editie: Editie) -> str:
             r += [f"> **Kanttekening:** {s.kanttekening}", ""]
         herkomst = " · ".join(filter(None, [s.categorie, s.bron, kort_datum(s.datum)]))
         r += [f"[Naar de bron →]({s.url}) · *{herkomst}*", "", "---", ""]
-
-    if editie.toepassing:
-        t = editie.toepassing
-        titel = f"{t.titel} — {t.tijd}" if t.tijd else t.titel
-        r += [f"## Vandaag toepassen: {titel}", "", t.intro, ""]
-        r += [f"{n}. {stap}" for n, stap in enumerate(t.stappen, 1)]
-        r.append("")
-        if t.niet_doen:
-            r += [f"**Wat je níét hoeft te doen:** {t.niet_doen}", ""]
-        r += ["---", ""]
 
     if editie.voor_bedrijven:
         r += ["### Voor jouw bedrijf", "", editie.voor_bedrijven, "", "---", ""]
@@ -261,14 +263,14 @@ def naar_html(editie: Editie) -> str:
       {e(datum_nl(editie.datum).capitalize())} · AI-nieuws voor Nederland</div>
   </td></tr>
 {intro}
-  <tr><td style="padding:24px 34px 0;">
+{_toepassing_html(editie)}
+  <tr><td style="padding:26px 34px 0;">
     <div style="font:600 11px/1.4 {_SANS};color:#8a7f6d;text-transform:uppercase;
                 letter-spacing:.08em;">De zes</div>
     <div style="font:400 12.5px/1.5 {_SANS};color:#a09684;margin-top:4px;">
       Eerst het feit. Wat ingesprongen staat, is onze duiding.</div>
   </td></tr>
 {berichten}
-{_toepassing_html(editie)}
 {bedrijven}
 
   <tr><td style="padding:26px 34px 30px;">

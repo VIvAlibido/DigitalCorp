@@ -32,7 +32,7 @@ from .render import MERK, datum_nl, kort_datum
 
 log = logging.getLogger(__name__)
 
-BESCHRIJVING = "Elke werkdag het AI-nieuws dat er in Nederland toe doet, in vier minuten."
+BESCHRIJVING = ("Elke dag één ding dat je met AI kunt doen. Plus het nieuws dat je\n                moet weten, in vier minuten.")
 
 
 @dataclass
@@ -214,9 +214,9 @@ def _aanmeldblok() -> str:
     return f"""
 <section class="hero"><div class="binnen">
   <h1>{html.escape(BESCHRIJVING)}</h1>
-  <p class="hero-sub">Zes berichten, Nederlandse duiding, en elke dag één ding dat je
-    meteen kunt gebruiken. Jij bepaalt of je ons dagelijks, wekelijks of alleen bij
-    groot nieuws hoort.</p>
+  <p class="hero-sub">Geen cursus, geen abonnement: één stap die je vandaag afmaakt,
+    met het Nederlandse AI-nieuws eronder. Jij bepaalt of je ons dagelijks, wekelijks
+    of alleen bij groot nieuws hoort.</p>
   <form class="aanmelden" id="aanmelden" method="post" action="#">
     <input type="email" name="email" placeholder="jouw@e-mailadres.nl"
            aria-label="E-mailadres" required>
@@ -322,6 +322,7 @@ def _homepage(edities: list[Editie]) -> Sitepagina:
 {_aanmeldblok()}
 <div class="binnen kolommen">
   <main>
+    {_toepassingblok(laatste, als_link=True, diepte=0)}
     <section>
       <div class="sectiekop">
         <h2>{e(datum_nl(laatste.datum).capitalize())}</h2>
@@ -330,7 +331,6 @@ def _homepage(edities: list[Editie]) -> Sitepagina:
       {f'<p class="ene-zin">{e(laatste.intro)}</p>' if laatste.intro else ""}
       {berichten}
     </section>
-    {_toepassingblok(laatste, als_link=True, diepte=0)}
     <section>
       <div class="sectiekop"><h2>Eerdere toepassingen</h2>
         <a class="meer" href="./toepassingen/">alle →</a></div>
@@ -364,8 +364,8 @@ def _editiepagina(editie: Editie) -> Sitepagina:
       <span class="tijd">{len(editie.items)} berichten</span>
     </div>
     {f'<p class="ene-zin">{e(editie.intro)}</p>' if editie.intro else ""}
-    {berichten}
     {_toepassingblok(editie, als_link=True, diepte=1)}
+    {berichten}
     {bedrijven}
   </main>
   {_zijkolom(1)}

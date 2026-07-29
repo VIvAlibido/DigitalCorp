@@ -47,10 +47,12 @@ verdediging is niet het format maar de stapel — een doorzoekbare bibliotheek v
 250 toepassingen na een jaar is niet in te halen. **Daarom is de bibliotheek geen
 bijproduct maar het hoofdbezit.**
 
-Wat dit afdwingt en nog niet klopt in de bouw:
-- De toepassing staat nu ónder de zes berichten. Dat is de omgekeerde volgorde.
-- De homepagebelofte gaat nu over nieuws in vier minuten, niet over doen.
-- De bibliotheek is nu een zijpagina, geen hoofdingang.
+Wat dit afdwong in de bouw — uitgevoerd op 29 juli:
+- De toepassing staat bóven de zes berichten, in de mail, op de homepage en op
+  de editiepagina. Tests bewaken die volgorde.
+- De homepagebelofte gaat over doen: "Elke dag één ding dat je met AI kunt doen.
+  Plus het nieuws dat je moet weten, in vier minuten."
+- De bibliotheek staat in de navigatie en met een rooster op de homepage.
 
 ---
 
@@ -142,7 +144,7 @@ beslissing 9.)*
 
 ## Stand van de bouw
 
-**Werkt en is getest** (96 tests): verzamelen uit 8 brontypes, scoren,
+**Werkt en is getest** (99 tests): verzamelen uit 8 brontypes, scoren,
 ontdubbelen, geheugen tussen edities, ondergrens, shortlist, LLM-jury met terugval, koptoets/kopscore/kopvarianten,
 render naar JSON/Markdown/mail-HTML, statische sitegenerator inclusief
 colofon en privacyverklaring, robots.txt met noindex op voorvertoningen,

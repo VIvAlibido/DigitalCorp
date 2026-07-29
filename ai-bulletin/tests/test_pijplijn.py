@@ -271,6 +271,16 @@ class TestRender(unittest.TestCase):
             self.assertIn("Noteer het antwoord", uitvoer)
             self.assertIn("níét hoeft te doen", uitvoer)
 
+    def test_toepassing_staat_boven_de_zes(self):
+        """Het kenmerk van dit product hoort niet onder zes nieuwsberichten."""
+        editie = maak_editie(self.editie.items, toepassing=Toepassing(
+            titel="Controleer je eigen chatbot", intro="Vijf minuten.",
+            stappen=["Een", "Twee", "Drie"], tijd="5 min"))
+        for uitvoer in (render.naar_markdown(editie), render.naar_html(editie)):
+            self.assertLess(uitvoer.index("Vandaag toepassen"),
+                            uitvoer.index(editie.items[0].kop),
+                            "de toepassing staat ónder het eerste bericht")
+
     def test_methodeverantwoording_staat_in_beide_formaten(self):
         for uitvoer in (render.naar_markdown(self.editie), render.naar_html(self.editie)):
             self.assertIn("Hoe deze editie tot stand kwam".lower(), uitvoer.lower())
@@ -550,6 +560,28 @@ class TestSite(unittest.TestCase):
             edities.mkdir()
             with self.assertRaises(ValueError):
                 site.bouw(edities, uit)
+
+    def test_toepassing_staat_boven_de_zes_op_de_site(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            edities, uit = Path(tmp) / "edities", Path(tmp) / "site"
+            edities.mkdir()
+            editie = fixture_editie()
+            editie.toepassing = Toepassing(
+                titel="Doe deze test", intro="Vijf minuten.",
+                stappen=["Een", "Twee", "Drie"], tijd="5 min")
+            (edities / f"{editie.stam}.json").write_text(
+                render.naar_json(editie), encoding="utf-8")
+            site.bouw(edities, uit)
+
+            for pad in ("index.html", f"{editie.stam}/index.html"):
+                html = (uit / pad).read_text(encoding="utf-8")
+                self.assertLess(html.index("Vandaag toepassen"),
+                                html.index(editie.items[0].kop),
+                                f"{pad}: de toepassing staat ónder de berichten")
+
+    def test_de_belofte_gaat_over_doen_niet_over_nieuws(self):
+        """Het ene kenmerk is 'toepasbaar'; de homepage moet dat zeggen."""
+        self.assertIn("doen", site.BESCHRIJVING)
 
     def test_slug_is_stabiel_en_url_veilig(self):
         s = Selectie(kop="ACM: 40% méér meldingen — “fors” gestegen", kern="k", wat="w",
