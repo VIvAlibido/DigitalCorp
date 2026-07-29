@@ -4,8 +4,8 @@ De opmaak volgt twee onderzoeksresultaten. Uit onderzoek naar
 nieuwsbriefgeloofwaardigheid (Trust Project, American Press Institute, IPTC):
 zichtbare scheiding tussen feit en duiding, herkomst per bericht, een
 methodeverantwoording en een vindbaar correctiebeleid. Uit de Smart
-Brevity-opbouw: elk bericht in onder de minuut te begrijpen, "waarom" als vast
-gelabeld onderdeel, één kolom, vetgedrukte ankerpunten.
+Brevity-opbouw: elk bericht in onder de minuut te begrijpen, "wat het betekent" als vast
+gelabeld en ingesprongen onderdeel, één kolom, vetgedrukte ankerpunten.
 
 De mail is bewust korter dan de website. Het volledige feitenrelaas staat
 online; hier staat wat je moet weten om te beslissen of je doorklikt. Dat houdt
@@ -80,7 +80,7 @@ def methodeverantwoording(editie: Editie) -> str:
     return (
         f"{omvang}Selectie en tekst komen tot stand met een taalmodel onder vaste "
         "redactieregels: alleen verifieerbare feiten in de berichten, duiding "
-        "uitsluitend onder 'waarom', en een kanttekening bij elk cijfer dat niet "
+        "herkenbaar apart gezet, en een kanttekening bij elk cijfer dat niet "
         "onafhankelijk is getoetst. We verwijzen naar de meest primaire bron — een "
         "persbericht van de toezichthouder gaat voor een nieuwsbericht daarover — "
         "en nemen geen teksten van anderen over."
@@ -113,7 +113,7 @@ def naar_markdown(editie: Editie) -> str:
             f"## {nummer}. {s.kop}", "",
             f"**{s.kern}**", "",
             s.wat, "",
-            f"**Waarom het ertoe doet** — {s.waarom}", "",
+            f"**Wat het betekent** — {s.waarom}", "",
         ]
         if s.kanttekening:
             r += [f"> **Kanttekening:** {s.kanttekening}", ""]
@@ -151,8 +151,10 @@ def _bericht_html(nummer: int, s: Selectie, editie: Editie) -> str:
     <h2 style="margin:0 0 5px;font:600 17px/1.35 Georgia,serif;color:#1c1a17;">
       {nummer}. {e(s.kop)}</h2>
     <p style="margin:0 0 6px;font:400 15px/1.6 {_SANS};color:#33302b;">{e(s.kern)}</p>
-    <p style="margin:0 0 7px;font:400 14px/1.6 {_SANS};color:#4a4437;">
-      <strong style="color:#1c1a17;">Waarom</strong> — {e(s.waarom)}</p>
+    <p style="margin:0 0 7px;font:400 14px/1.6 {_SANS};color:#4a4437;
+              border-left:2px solid #e5ded1;padding-left:11px;">
+      <span style="font:600 10px/1 {_SANS};color:#a08a72;text-transform:uppercase;
+                   letter-spacing:.09em;">Wat het betekent</span><br>{e(s.waarom)}</p>
     <a href="{e(bericht_url(editie, s))}"
        style="font:600 13px/1 {_SANS};color:#a4552b;text-decoration:none;">Het hele verhaal →</a>
     <span style="font:400 12px/1 {_SANS};color:#8a7f6d;">&nbsp;{e(herkomst)}</span>
@@ -262,6 +264,8 @@ def naar_html(editie: Editie) -> str:
   <tr><td style="padding:24px 34px 0;">
     <div style="font:600 11px/1.4 {_SANS};color:#8a7f6d;text-transform:uppercase;
                 letter-spacing:.08em;">De zes</div>
+    <div style="font:400 12.5px/1.5 {_SANS};color:#a09684;margin-top:4px;">
+      Eerst het feit. Wat ingesprongen staat, is onze duiding.</div>
   </td></tr>
 {berichten}
 {_toepassing_html(editie)}

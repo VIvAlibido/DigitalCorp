@@ -86,6 +86,8 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 13 | Tot de tweede abonnee gaat de editie **via de Gmail-connector** naar kees@telemedia.es | scheelt een dag bouwwerk en een abonnement; de AVG gaat pas spelen zodra iemand anders zich moet kunnen uitschrijven |
 | 5 | Eigen tekst, nooit tekst van anderen overnemen | feiten zijn vrij, formulering niet; art. 15/15a Aw |
 | 6 | Feit (`wat`) en duiding (`waarom`) blijven zichtbaar gescheiden | geloofwaardigheid is de enige verdediging tegen "zoveelste AI-nieuwsbrief" |
+| 14 | `waarom` is **hoogstens twee zinnen / 60 woorden**, bewaakt door `rank.toets_verhouding()` | de mail toont alleen `kern` en `waarom`; bij langere duiding bestaat de nieuwsbrief voor 80% uit onze mening. Gemeten op de editie van 29 juli: 79–84% |
+| 15 | Het duidingslabel heet **"Wat het betekent"**, klein en ingesprongen, met één uitleg boven De zes | zes keer een vetgedrukt "Waarom" leest als geschreeuw; de scheiding moet zichtbaar zijn, niet luid |
 | 7 | Weekend krijgt een **ander formaat** dan doordeweeks | za/zo is de dunste invoer van de week; zie plan §6 |
 | 8 | Zondagstuk wordt **niet geautomatiseerd** | het enige deel dat niet te scrapen is, moet mensenwerk zijn |
 | 9 | Eerst **goedkeuren vóór verzenden**, later omschakelen naar een annuleervenster | opdrachtgever heeft nu veel tijd, straks weinig; de omschakeling moet één regel config zijn, geen verbouwing |

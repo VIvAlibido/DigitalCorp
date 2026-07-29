@@ -19,6 +19,8 @@ log = logging.getLogger(__name__)
 # Standaardgrenzen aan de omvang van een editie. Zie bouw_schema().
 MIN_ITEMS = 3
 MAX_ITEMS = 6
+# Bovengrens voor het duidingsveld. Zie toets_verhouding().
+MAX_WOORDEN_WAAROM = 60
 
 SYSTEEM = """Je bent de eindredacteur van AI Bulletin, een dagelijkse \
 Nederlandstalige nieuwsbrief over kunstmatige intelligentie.
@@ -106,11 +108,17 @@ Schrijfregels:
   vaktermen erin verweven. Noem cijfers, namen en datums letterlijk zoals ze \
   in de bron staan. Geen bijvoeglijke naamwoorden die een oordeel bevatten \
   ("indrukwekkend", "baanbrekend").
-- "waarom": 3 tot 4 zinnen redactionele duiding. Dit is het enige veld waar \
-  interpretatie in mag, en de lezer weet dat. Schrijf het concrete gevolg op — \
-  wat moet iemand nu anders doen, weten of navragen. Geen holle frasen als \
-  "dit is een gamechanger". Eén droge observatie per editie mag; meer wordt \
-  vermoeiend.
+- "waarom": precies twee zinnen, samen hoogstens 55 woorden. Dit is het enige \
+  veld waar interpretatie in mag, en de lezer weet dat. Schrijf het concrete \
+  gevolg op — wat moet iemand nu anders doen, weten of navragen. Geen holle \
+  frasen als "dit is een gamechanger". Eén droge observatie per editie mag; \
+  meer wordt vermoeiend.
+  De lengte is een harde eis, geen richtlijn. In de e-mail staat alleen "kern" \
+  en "waarom"; wordt "waarom" langer, dan bestaat de nieuwsbrief voor het \
+  grootste deel uit onze mening en voor een klein deel uit feiten. Dat is \
+  precies omgekeerd aan wat dit product belooft. Krijg je het niet in twee \
+  zinnen, dan heb je geen duiding maar een samenvatting geschreven — die hoort \
+  in "wat".
 - "datum": de dag waarop de gebeurtenis plaatsvond, als JJJJ-MM-DD. Niet de dag \
   waarop wij erover schrijven. Weet je alleen de maand, gebruik dan JJJJ-MM.
 - "kanttekening": leeg laten tenzij er een reëel voorbehoud is bij het feit — \
@@ -214,6 +222,27 @@ SCHEMA = {
                  "toepassing", "items"],
     "additionalProperties": False,
 }
+
+
+def toets_verhouding(editie) -> list[str]:
+    """Waarschuw als de duiding het feitenrelaas overvleugelt.
+
+    De e-mail toont alleen "kern" en "waarom". Loopt "waarom" uit de hand, dan
+    leest de abonnee vooral onze mening — terwijl de belofte van dit product
+    juist is dat je kunt zien waar het feit ophoudt. Blokkeren doen we niet;
+    dit is een redactioneel oordeel, geen fout.
+    """
+    bezwaren = []
+    for nummer, s in enumerate(editie.items, 1):
+        duiding, feit = len(s.waarom.split()), len(s.wat.split())
+        if duiding > MAX_WOORDEN_WAAROM:
+            bezwaren.append(
+                f"{nummer}. {s.kop[:45]}: duiding is {duiding} woorden "
+                f"(hoogstens {MAX_WOORDEN_WAAROM})")
+        elif feit and duiding > feit:
+            bezwaren.append(
+                f"{nummer}. {s.kop[:45]}: meer duiding ({duiding}) dan feiten ({feit})")
+    return bezwaren
 
 
 def bouw_schema(minimaal: int = MIN_ITEMS, maximaal: int = MAX_ITEMS) -> dict:

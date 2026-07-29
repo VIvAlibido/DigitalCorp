@@ -100,7 +100,7 @@ def genereer(selectie: Selectie, config: dict, aantal: int = AANTAL_VARIANTEN) -
                     f"Bron: {selectie.bron} ({selectie.datum})\n"
                     f"Kern: {selectie.kern}\n"
                     f"Wat er gebeurd is: {selectie.wat}\n"
-                    f"Waarom het ertoe doet: {selectie.waarom}\n\n"
+                    f"Wat het betekent: {selectie.waarom}\n\n"
                     f"Huidige kop: {selectie.kop}"
                 ),
             }],

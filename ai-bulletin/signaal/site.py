@@ -89,7 +89,9 @@ font:400 18px/1.55 var(--serif)}
 .bericht h3 a:hover{color:var(--accent)}
 .kern{font-size:16px;color:var(--zacht);margin:0 0 10px}
 .volledig,.waarom{font-size:15px;color:var(--zacht);margin:0 0 10px}
-.waarom strong{color:var(--inkt)}
+.waarom{border-left:2px solid var(--lijn);padding-left:13px}
+.wijzer{display:block;font:600 10px/1.4 var(--sans);color:#a08a72;
+text-transform:uppercase;letter-spacing:.09em;margin-bottom:2px}
 .kanttekening{font-size:13.5px;color:#6b6355;border-left:3px solid #d9cdb8;
 padding:6px 0 6px 12px;margin:0 0 10px}
 .herkomst{font-size:13px;color:var(--gedempt);margin:0}
@@ -233,7 +235,7 @@ def _bericht_kaart(editie: Editie, item, diepte: int) -> str:
   <span class="tag {e(item.categorie)}">{e(item.categorie)}</span>
   <h3><a href="{op}{editie.stam}/{item.slug}/">{e(item.kop)}</a></h3>
   <p class="kern">{e(item.kern)}</p>
-  <p class="waarom"><strong>Waarom het ertoe doet</strong> — {e(item.waarom)}</p>
+  <p class="waarom"><span class="wijzer">Wat het betekent</span>{e(item.waarom)}</p>
   <p class="herkomst">Bron: {e(herkomst)} · <a href="{op}{editie.stam}/{item.slug}/">het hele verhaal</a></p>
 </article>"""
 
@@ -430,7 +432,7 @@ def _berichtpagina(editie: Editie, item) -> Sitepagina:
   <h1>{e(item.kop)}</h1>
   <p class="kern">{e(item.kern)}</p>
   <p class="volledig">{e(item.wat)}</p>
-  <p class="waarom"><strong>Waarom het ertoe doet</strong> — {e(item.waarom)}</p>
+  <p class="waarom"><span class="wijzer">Wat het betekent</span>{e(item.waarom)}</p>
   {kanttekening}
   <p class="herkomst">Bron: {e(herkomst)} —
     <a href="{e(item.url)}" rel="noopener nofollow">naar de oorspronkelijke publicatie</a></p>

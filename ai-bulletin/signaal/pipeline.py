@@ -98,6 +98,9 @@ def draai(
     for zwakke_kop, bezwaren in koptoets.toets_editie([s.kop for s in editie.items]).items():
         log.warning("zwakke kop — %s: %r", "; ".join(bezwaren), zwakke_kop)
 
+    for bezwaar in rank.toets_verhouding(editie):
+        log.warning("duiding overheerst — %s", bezwaar)
+
     bestanden = _schrijf(editie, uitvoermap)
 
     if met_audio:
