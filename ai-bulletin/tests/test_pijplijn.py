@@ -11,7 +11,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from signaal import dedupe, koptoets, pipeline, rank, render, score, site  # noqa: E402
+from signaal import (  # noqa: E402
+    dedupe, historie, koptoets, pipeline, rank, render, score, site,
+)
 from signaal.bronnen import basis  # noqa: E402
 from signaal.cli import _laad_fixtures  # noqa: E402
 from signaal.model import (  # noqa: E402
@@ -298,6 +300,129 @@ class TestHeuristischeSelectie(unittest.TestCase):
         samenvattingen = {i.samenvatting for i in items if i.samenvatting}
         for s in rank.kies_heuristisch(items, CONFIG, DATUM).items:
             self.assertNotIn(s.wat, samenvattingen)
+
+
+class TestHistorie(unittest.TestCase):
+    """Het geheugen tussen edities — zonder dit stuur je dagen achtereen hetzelfde."""
+
+    def _archief(self, tmp: Path, datum: date, items: list[dict]) -> Path:
+        map_ = tmp / "edities"
+        map_.mkdir(exist_ok=True)
+        (map_ / f"{datum.isoformat()}.json").write_text(
+            json.dumps({"datum": datum.isoformat(), "items": items}), encoding="utf-8")
+        return map_
+
+    def test_zelfde_url_wordt_geweerd(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = self._archief(Path(tmp), date(2026, 7, 28), [
+                {"kop": "Mistral brengt nieuw model uit", "url": "https://a.nl/mistral"}])
+            h = historie.laad(map_, vandaag=DATUM)
+            item = maak_item("Heel andere titel", "https://a.nl/mistral")
+            self.assertEqual(historie.oordeel(item, h)[0], "blokkeer")
+
+    def test_url_varianten_tellen_als_dezelfde(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = self._archief(Path(tmp), date(2026, 7, 28), [
+                {"kop": "K", "url": "https://www.a.nl/mistral/?utm_source=mail"}])
+            h = historie.laad(map_, vandaag=DATUM)
+            item = maak_item("K", "https://a.nl/mistral")
+            self.assertEqual(historie.oordeel(item, h)[0], "blokkeer")
+
+    def test_gelijkende_kop_via_andere_bron_wordt_gestraft(self):
+        """Het scenario waarvoor dit bestaat: maandag Tweakers, woensdag Emerce."""
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = self._archief(Path(tmp), date(2026, 7, 28), [{
+                "kop": "Autoriteit Persoonsgegevens publiceert leidraad voor gezichtsherkenning",
+                "url": "https://tweakers.net/1"}])
+            h = historie.laad(map_, vandaag=DATUM)
+            item = maak_item(
+                "Autoriteit Persoonsgegevens publiceert een leidraad voor gezichtsherkenning",
+                "https://emerce.nl/2")
+            self.assertEqual(historie.oordeel(item, h)[0], "straf")
+
+    def test_ander_onderwerp_blijft_ongemoeid(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = self._archief(Path(tmp), date(2026, 7, 28), [
+                {"kop": "Mistral brengt nieuw model uit", "url": "https://a.nl/1"}])
+            h = historie.laad(map_, vandaag=DATUM)
+            item = maak_item("DNB waarschuwt banken voor cyberdreiging", "https://b.nl/2")
+            self.assertIsNone(historie.oordeel(item, h))
+
+    def test_editie_van_vandaag_blokkeert_zichzelf_niet(self):
+        """Anders levert een herdraai van dezelfde dag een lege editie op."""
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = self._archief(Path(tmp), DATUM, [
+                {"kop": "Mistral brengt nieuw model uit", "url": "https://a.nl/1"}])
+            h = historie.laad(map_, vandaag=DATUM)
+            self.assertEqual(len(h), 0)
+
+    def test_te_oude_editie_telt_niet_meer_mee(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = self._archief(Path(tmp), date(2026, 1, 1), [
+                {"kop": "Oud bericht", "url": "https://a.nl/oud"}])
+            self.assertEqual(len(historie.laad(map_, dagen=30, vandaag=DATUM)), 0)
+
+    def test_kapot_archiefbestand_stopt_de_editie_niet(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = Path(tmp) / "edities"
+            map_.mkdir()
+            (map_ / "2026-07-28.json").write_text("{kapot", encoding="utf-8")
+            self.assertEqual(len(historie.laad(map_, vandaag=DATUM)), 0)
+
+    def test_ontbrekende_map_geeft_lege_historie(self):
+        self.assertEqual(len(historie.laad(Path("/bestaat/niet"))), 0)
+
+    def test_pas_toe_weert_en_straft(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = self._archief(Path(tmp), date(2026, 7, 28), [
+                {"kop": "Mistral brengt nieuw model uit", "url": "https://a.nl/1"}])
+            h = historie.laad(map_, vandaag=DATUM)
+
+            geweerd = maak_item("Wat dan ook", "https://a.nl/1")
+            gestraft = maak_item("Mistral brengt een nieuw model uit", "https://b.nl/2")
+            vrij = maak_item("DNB waarschuwt banken", "https://c.nl/3")
+            for i in (geweerd, gestraft, vrij):
+                i.voorscore = 10.0
+
+            over = historie.pas_toe([geweerd, gestraft, vrij], h, CONFIG)
+            self.assertEqual({i.url for i in over}, {gestraft.url, vrij.url})
+            self.assertLess(gestraft.voorscore, vrij.voorscore)
+            self.assertEqual(gestraft.metriek["eerder_gepubliceerd"], "2026-07-28")
+
+
+class TestOndergrens(unittest.TestCase):
+    """Een editie mag korter zijn dan zes. Vulling is duurder dan stilte."""
+
+    def _items(self, scores: list[float]) -> list[Item]:
+        items = []
+        for n, s in enumerate(scores):
+            item = maak_item(f"Bericht {n} over een onderwerp", f"https://x.nl/{n}",
+                             bron=f"bron{n}")
+            item.voorscore = s
+            items.append(item)
+        return items
+
+    def test_zwakke_staart_valt_af(self):
+        # Drie sterke items, drie die ver onder de kop van het veld zitten.
+        editie = rank.kies_heuristisch(self._items([10, 9, 8, 1, 0.5, 0.2]), CONFIG, DATUM)
+        self.assertEqual(len(editie.items), 3)
+
+    def test_sterke_dag_levert_gewoon_zes(self):
+        editie = rank.kies_heuristisch(self._items([10, 9, 9, 8, 8, 7, 7]), CONFIG, DATUM)
+        self.assertEqual(len(editie.items), 6)
+
+    def test_minimum_wordt_gehaald_ook_als_alles_zwak_is(self):
+        """Eén uitschieter met een zwakke rest mag geen editie van één opleveren."""
+        editie = rank.kies_heuristisch(self._items([10, 0.1, 0.1, 0.1]), CONFIG, DATUM)
+        self.assertGreaterEqual(len(editie.items), 3)
+
+    def test_schema_staat_een_kortere_editie_toe(self):
+        schema = rank.bouw_schema(3, 6)
+        self.assertEqual(schema["properties"]["items"]["minItems"], 3)
+        self.assertEqual(schema["properties"]["items"]["maxItems"], 6)
+        # Het origineel mag niet meeveranderen — anders lekt de ene run in de andere.
+        self.assertEqual(rank.bouw_schema(1, 2)["properties"]["items"]["minItems"], 1)
+        self.assertEqual(schema["properties"]["items"]["minItems"], 3)
 
 
 class TestSite(unittest.TestCase):

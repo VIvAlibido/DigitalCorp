@@ -11,7 +11,7 @@ from pathlib import Path
 import yaml
 
 from . import audio as audio_mod
-from . import bronnen, dedupe, koptoets, rank, render, score
+from . import bronnen, dedupe, historie, koptoets, rank, render, score
 from .model import Editie, Item
 
 log = logging.getLogger(__name__)
@@ -69,6 +69,12 @@ def draai(
     items = dedupe.ontdubbel(items)
     items = score.scoor(items, config)
     log.info("%d over na ontdubbelen", len(items))
+
+    # Geheugen: wat gisteren in de editie stond, komt vandaag niet terug.
+    # Ná het scoren, want de herhaalstraf werkt op de voorscore.
+    verleden = historie.laad(
+        uitvoermap, config.get("historie", {}).get("dagen", 30), vandaag)
+    items = historie.pas_toe(items, verleden, config)
 
     lijst = score.shortlist(items, config.get("shortlist", 40))
 

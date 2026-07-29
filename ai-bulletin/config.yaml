@@ -4,7 +4,12 @@
 # laat een LLM de 6 belangrijkste kiezen en in het Nederlands schrijven.
 
 output:
+  # Hoogstens dit aantal berichten. Zijn er minder die de toets doorstaan, dan
+  # wordt de editie korter — een zwak zesde bericht kost meer lezers dan een
+  # korte editie. Zie rank.py.
   aantal_items: 6
+  # Hieronder komt er geen editie; dat is een storing, geen rustige dag.
+  minimaal_items: 3
   taal: nl
   # Waar de dagelijkse editie terechtkomt (relatief aan projectmap).
   map: edities
@@ -20,6 +25,22 @@ shortlist: 40
 
 # Alles ouder dan dit valt af (uren).
 max_leeftijd_uren: 36
+
+selectie:
+  # Alleen voor de heuristische terugval: een item moet minstens deze fractie
+  # van de hoogste voorscore van die dag halen. Schaalvrij, want de voorscore
+  # zelf heeft geen betekenisvolle absolute schaal.
+  min_verhouding: 0.35
+
+# Geheugen tussen edities — voorkomt dat hetzelfde verhaal dagen achtereen
+# terugkomt omdat verschillende media het op verschillende dagen oppikken.
+historie:
+  dagen: 30
+  # Gelijkenis waarboven een kop als mogelijke herhaling geldt.
+  drempel: 0.72
+  # Vermenigvuldiger op de voorscore bij een mogelijke herhaling. Geen blokkade:
+  # een vervolgstap in een lopend verhaal is legitiem nieuws.
+  herhaalstraf: 0.45
 
 scoring:
   # Gewicht per brontype in de voorselectie.

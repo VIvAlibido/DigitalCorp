@@ -6,6 +6,7 @@ het oordeel — wat betekent dit, voor wie, en waarom vandaag.
 
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import os
@@ -14,6 +15,10 @@ from datetime import date
 from .model import Editie, Item, Selectie, Toepassing
 
 log = logging.getLogger(__name__)
+
+# Standaardgrenzen aan de omvang van een editie. Zie bouw_schema().
+MIN_ITEMS = 3
+MAX_ITEMS = 6
 
 SYSTEEM = """Je bent de eindredacteur van AI Bulletin, een dagelijkse \
 Nederlandstalige nieuwsbrief over kunstmatige intelligentie.
@@ -29,8 +34,18 @@ belerend of simpel wordt. De toets: zou een slimme collega uit een andere \
 discipline dit begrijpen én interessant vinden? Zo niet, herschrijf.
 
 Je krijgt een lijst kandidaten uit arXiv, GitHub, Hugging Face, Hacker News, \
-internationale labs en Nederlandse vakmedia. Je kiest er exact {aantal} en \
+internationale labs en Nederlandse vakmedia. Je kiest er hoogstens {aantal} en \
 schrijft die op.
+
+Hoeveel er precies in de editie komen, bepaal jij:
+- Zijn er {aantal} berichten die de lezer echt moet weten, dan neem je er {aantal}.
+- Zijn er maar vier of vijf die die toets doorstaan, dan lever je er vier of \
+  vijf. Een zwak zesde bericht kost meer lezers dan een korte editie.
+- Minder dan {minimaal} lever je nooit; kom je daaronder uit, kies dan de \
+  sterkste kandidaten die er zijn en vermeld in "intro" dat het een rustige dag was.
+Dit is geen ontsnappingsroute voor moeilijk werk. Het is bedoeld voor dagen \
+waarop er domweg weinig is gebeurd — weekends, feestdagen, komkommertijd. \
+Vul een editie nooit op met een bericht dat je zelf zou overslaan.
 
 Selectiecriteria, in deze volgorde:
 1. Verschuift dit het vakgebied of het werk van de lezer? Een modelrelease die \
@@ -108,7 +123,7 @@ Schrijfregels:
   persbericht van de toezichthouder gaat voor een nieuwsbericht erover; het \
   eigen blog van een project gaat voor een aggregator.
 
-Naast de zes berichten lever je drie velden voor de editie als geheel:
+Naast de berichten lever je nog een aantal velden voor de editie als geheel:
 
 - "onderwerp": de onderwerpregel van de e-mail, 28 tot 50 tekens. Dit is de \
   enige zin die bepaalt of de mail geopend wordt, en op een telefoon zie je \
@@ -170,6 +185,8 @@ SCHEMA = {
         },
         "items": {
             "type": "array",
+            "minItems": MIN_ITEMS,
+            "maxItems": MAX_ITEMS,
             "items": {
                 "type": "object",
                 "properties": {
@@ -197,6 +214,19 @@ SCHEMA = {
                  "toepassing", "items"],
     "additionalProperties": False,
 }
+
+
+def bouw_schema(minimaal: int = MIN_ITEMS, maximaal: int = MAX_ITEMS) -> dict:
+    """SCHEMA met de grenzen van deze run erin.
+
+    Het aantal items is geen vast getal maar een bereik: op een rustige dag
+    levert de jury er vier, en dat moet het schema toestaan. Zie de
+    systeemprompt voor wanneer dat mag.
+    """
+    schema = copy.deepcopy(SCHEMA)
+    schema["properties"]["items"]["minItems"] = minimaal
+    schema["properties"]["items"]["maxItems"] = maximaal
+    return schema
 
 
 class RankFout(RuntimeError):
@@ -233,7 +263,9 @@ def kies_en_schrijf(items: list[Item], config: dict, datum: date) -> Editie:
         raise RankFout("geen kandidaten om uit te kiezen")
 
     llm_cfg = config.get("llm", {})
-    aantal = config.get("output", {}).get("aantal_items", 6)
+    uitvoer_cfg = config.get("output", {})
+    aantal = uitvoer_cfg.get("aantal_items", MAX_ITEMS)
+    minimaal = min(uitvoer_cfg.get("minimaal_items", MIN_ITEMS), aantal)
 
     client = anthropic.Anthropic()
     try:
@@ -245,17 +277,19 @@ def kies_en_schrijf(items: list[Item], config: dict, datum: date) -> Editie:
             # stoppen met een lege editie.
             betas=["server-side-fallback-2026-07-01"],
             fallbacks="default",
-            system=SYSTEEM.format(aantal=aantal),
+            system=SYSTEEM.format(aantal=aantal, minimaal=minimaal),
             output_config={
                 "effort": llm_cfg.get("effort", "high"),
-                "format": {"type": "json_schema", "schema": SCHEMA},
+                "format": {"type": "json_schema",
+                           "schema": bouw_schema(minimaal, aantal)},
             },
             messages=[
                 {
                     "role": "user",
                     "content": (
                         f"Hier zijn {len(items)} kandidaten van vandaag. "
-                        f"Kies er {aantal} en schrijf ze op.\n\n"
+                        f"Kies er hoogstens {aantal} (minimaal {minimaal}) "
+                        f"en schrijf ze op.\n\n"
                         f"{_kandidaten_blok(items)}"
                     ),
                 }
@@ -304,8 +338,26 @@ def kies_heuristisch(items: list[Item], config: dict, datum: date) -> Editie:
 
     Levert een bruikbare maar duidelijk mindere editie: de voorscore bepaalt
     alles en de teksten zijn de ruwe brongegevens.
+
+    Ook hier geldt de ondergrens uit `kies_en_schrijf`, maar dan zonder oordeel.
+    Een absolute drempel op de voorscore kan niet: die score is een optelsom van
+    recency, engagement en brontypegewicht zonder betekenisvolle schaal, en is
+    nooit tegen echte data geijkt. Wat wél schaalvrij werkt is de verhouding tot
+    de sterkste kandidaat van die dag — valt een item ver onder de kop van het
+    veld, dan is het vulling.
+
+    De beperking daarvan is eerlijk te benoemen: dit vangt "de staart is veel
+    zwakker dan de kop", niet "vandaag is alles middelmatig". Dat laatste kan
+    alleen de jury zien.
     """
-    aantal = config.get("output", {}).get("aantal_items", 6)
+    uitvoer_cfg = config.get("output", {})
+    aantal = uitvoer_cfg.get("aantal_items", MAX_ITEMS)
+    minimaal = min(uitvoer_cfg.get("minimaal_items", MIN_ITEMS), aantal)
+    verhouding = config.get("selectie", {}).get("min_verhouding", 0.35)
+
+    top = max((i.voorscore for i in items), default=0.0)
+    ondergrens = top * verhouding if top > 0 else 0.0
+
     gekozen: list[Selectie] = []
     gebruikte_bronnen: set[str] = set()
 
@@ -314,6 +366,9 @@ def kies_heuristisch(items: list[Item], config: dict, datum: date) -> Editie:
         for item in sorted(items, key=lambda i: i.voorscore, reverse=True):
             if len(gekozen) >= aantal:
                 break
+            # Onder de ondergrens alleen nog aanvullen tot het minimum gehaald is.
+            if item.voorscore < ondergrens and len(gekozen) >= minimaal:
+                continue
             if any(s.url == item.url for s in gekozen):
                 continue
             if ronde == 1 and item.bron in gebruikte_bronnen:
@@ -335,6 +390,9 @@ def kies_heuristisch(items: list[Item], config: dict, datum: date) -> Editie:
                 )
             )
 
+    if len(gekozen) < aantal:
+        log.info("editie telt %d items in plaats van %d — de rest haalde de "
+                 "ondergrens niet", len(gekozen), aantal)
     return Editie(datum=datum, items=gekozen)
 
 

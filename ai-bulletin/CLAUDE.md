@@ -19,6 +19,39 @@ podcast.
 
 **Domein:** aibulletin.nl · **Merknaam:** AI Bulletin
 
+### De lezer
+
+**De geïnteresseerde professional.** Werkt niet in AI maar moet er wel iets mee:
+ondernemer, marketeer, HR, jurist, zorgmanager. Snapt zijn eigen vak, niet de
+techniek.
+
+Praktische gevolgen: geen jargon zonder uitleg, geen benchmarks, geen
+modelvergelijkingen om het vergelijken. Elk bericht beantwoordt impliciet
+"raakt dit mijn werk?". De toepassing is werkgerelateerd, nooit een hobbytoepassing.
+
+### Het ene kenmerk
+
+**Toepasbaar — elke dag één ding dat je kunt dóén.**
+
+Gekozen boven "begrijpelijk", "controleerbaar" en "kort". Begrijpelijkheid en
+controleerbaarheid blijven volledige eisen aan het werk, maar zijn niet wat we
+zéggen.
+
+Waarom dit werkt: het is het enige kenmerk waarbij datgene waar je om bekend
+staat ook datgene is dat zoekverkeer oplevert. Mensen zoeken op *"hoe gebruik ik
+AI voor offertes"*, niet op *"AI-nieuws 12 maart"*. Positionering en SEO wijzen
+dezelfde kant op.
+
+Het risico: het format komt van The Rundown en is in een week te kopiëren. De
+verdediging is niet het format maar de stapel — een doorzoekbare bibliotheek van
+250 toepassingen na een jaar is niet in te halen. **Daarom is de bibliotheek geen
+bijproduct maar het hoofdbezit.**
+
+Wat dit afdwingt en nog niet klopt in de bouw:
+- De toepassing staat nu ónder de zes berichten. Dat is de omgekeerde volgorde.
+- De homepagebelofte gaat nu over nieuws in vier minuten, niet over doen.
+- De bibliotheek is nu een zijpagina, geen hoofdingang.
+
 ---
 
 ## Werkafspraken
@@ -54,15 +87,17 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 6 | Feit (`wat`) en duiding (`waarom`) blijven zichtbaar gescheiden | geloofwaardigheid is de enige verdediging tegen "zoveelste AI-nieuwsbrief" |
 | 7 | Weekend krijgt een **ander formaat** dan doordeweeks | za/zo is de dunste invoer van de week; zie plan §6 |
 | 8 | Zondagstuk wordt **niet geautomatiseerd** | het enige deel dat niet te scrapen is, moet mensenwerk zijn |
+| 9 | Eerst **goedkeuren vóór verzenden**, later omschakelen naar een annuleervenster | opdrachtgever heeft nu veel tijd, straks weinig; de omschakeling moet één regel config zijn, geen verbouwing |
 
 ## Beslissingen die openstaan — deze blokkeren werk
 
 | # | Vraag | Wat het blokkeert |
 |---|---|---|
-| **A** | **Wie is de lezer?** "Consumenten en bedrijven" is geen doelgroep. | Toon, welke 6 items, wat de toepassing is, elke kop |
-| **B** | **Welk één kenmerk?** Nu zijn het er vijf, het onderzoek zegt één. | Homepage, onderwerpregels, SEO-focus, waar de zondag over gaat |
-| **C** | Hoeveel tijd per dag is er echt beschikbaar? | Of het annuleervenster echt is of theater |
-| **D** | Is aibulletin.nl geregistreerd? Is er een bedrijf/KvK achter? | Lancering, colofon, privacyverklaring, AVG-verantwoordelijke |
+| **D** | Is aibulletin.nl geregistreerd? Is er een bedrijf/KvK achter, en welk e-mailadres komt onder "fout gezien?" | Lancering, colofon, privacyverklaring, AVG-verantwoordelijke |
+| **E** | Wat betekent "nummer één" in een getal — abonnees, bezoekers, iets anders? | Kunnen beoordelen of een keuze over zes maanden heeft gewerkt |
+
+*(A, B en C zijn beantwoord op 29 juli — zie "De lezer", "Het ene kenmerk" en
+beslissing 9.)*
 
 ---
 

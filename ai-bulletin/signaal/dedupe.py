@@ -26,7 +26,7 @@ def _tokens(titel: str) -> list[str]:
     return [w for w in zonder_leestekens.split() if w not in _STOPWOORDEN and len(w) > 2]
 
 
-def _normaliseer(titel: str) -> str:
+def normaliseer(titel: str) -> str:
     return " ".join(_tokens(titel))
 
 
@@ -60,7 +60,7 @@ def _token_overlap(a: list[str], b: list[str]) -> float:
     return treffers / min(len(a), len(b))
 
 
-def _gelijkenis(a: str, b: str) -> float:
+def gelijkenis(a: str, b: str) -> float:
     """Maximum van tekengelijkenis en woordoverlap.
 
     Tekenniveau vangt herformuleringen van dezelfde kop; woordniveau vangt
@@ -89,10 +89,10 @@ def ontdubbel(items: list[Item], drempel: float = 0.72) -> list[Item]:
         if item.url in gezien_urls:
             continue
 
-        norm = _normaliseer(item.titel)
+        norm = normaliseer(item.titel)
         dubbel_van = None
         for index, bestaande_norm in enumerate(genormaliseerd):
-            if _gelijkenis(norm, bestaande_norm) >= drempel:
+            if gelijkenis(norm, bestaande_norm) >= drempel:
                 dubbel_van = index
                 break
 
