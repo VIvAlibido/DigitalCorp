@@ -71,6 +71,70 @@ accent uit en is onbruikbaar. Azure Neural (`nl-NL-FennaNeural`,
 `nl-NL-MaartenNeural`) is het voor de hand liggende alternatief, maar is nog
 niet geïmplementeerd — `genereer()` weigert nu netjes met een uitleg.
 
+## Koppen: het driestapsplan
+
+Een script kan geen hoge conversie garanderen. Onderzoek naar kop-analysetools
+is daarover eensluidend: de correlatie tussen hun scores en werkelijke
+prestaties is zwak, omdat ze structuur meten en niet of de kop de juiste lezer
+op het juiste moment raakt. Voor een publiek dat honderden vergelijkbare koppen
+heeft gezien, zijn de "bewezen patronen" die zulke tools belonen juist de
+patronen die genegeerd worden.
+
+Wat wél kan, in aflopende volgorde van betrouwbaarheid:
+
+### Stap 1 — Afkeuren wat aantoonbaar slecht is (`koptoets.py`)
+
+Blokkeert vage hoeveelheden, naamwoordstijl, lijdende vorm zonder handelende
+partij, uitroeptekens, overlengte, en koppen zonder enig concreet houvast.
+Hoog vertrouwen, want dit gaat over de afwezigheid van gebreken en niet over de
+aanwezigheid van magie. Draait automatisch in de pijplijn en in de tests.
+
+```bash
+python -m signaal.koppen --editie redactie/2026-07-29-selectie.json
+```
+
+### Stap 2 — Kiezen uit varianten (`kopvarianten.py`, `kopscore.py`)
+
+Eén kop schrijven is een gok; acht koppen schrijven en de beste kiezen is een
+selectie. De score is een zwakke absolute voorspeller maar een bruikbare
+*vergelijker*: bij varianten van hetzelfde bericht blijven onderwerp, bron en
+belang gelijk en verschilt alleen de formulering. Zes dimensies, waarvan
+specificiteit het zwaarst weegt omdat daarvoor het bewijs het sterkst is.
+
+De bestaande kop doet mee als kandidaat — is die al de sterkste, dan verandert
+er niets. De runner-up wordt bewaard als B-variant.
+
+```bash
+python -m signaal.koppen --editie redactie/... --varianten --schrijf
+```
+
+### Stap 3 — Meten (`abtest.py`)
+
+Het enige dat conversie echt vaststelt. En meteen het ongemakkelijke deel:
+
+```bash
+python -m signaal.koppen --steekproef 800 --baseline 0.35
+```
+
+Bij 800 ontvangers en 35% opens kun je alleen een verschil van 10 procentpunt
+aantonen. Voor 2 procentpunt heb je ruim 18.000 ontvangers nodig. **Onder de
+paar duizend abonnees is A/B-toetsen op onderwerpregels geen meting maar een
+muntworp met extra stappen** — laat stap 1 en 2 dan het werk doen en toets
+alleen grote, structurele keuzes.
+
+De rekenwijze is tweezijdig met 95% betrouwbaarheid en 80% onderscheidend
+vermogen. Online rekenmachines geven vaak lagere aantallen omdat ze eenzijdig
+toetsen of een andere variantieschatting gebruiken; dit is bewust de
+conservatieve variant.
+
+### Wat dit plan niet doet
+
+Er zit geen lijst met "power words" in. Die scoren goed in tools die op
+contentmarketing zijn geijkt en vallen bij een technisch of zakelijk publiek
+juist door de mand. Er is ook geen absoluut oordeel: `kopscore` geeft geen
+"83 van de 100, dus goed", omdat dat cijfer alleen betekenis heeft ten opzichte
+van een alternatief.
+
 ## Instagram-accounts volgen
 
 Kort antwoord: **niet via een officiële API, voor willekeurige accounts.**

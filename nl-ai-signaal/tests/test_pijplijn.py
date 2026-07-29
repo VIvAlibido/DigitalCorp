@@ -147,14 +147,14 @@ class TestDedupe(unittest.TestCase):
         self.assertEqual(len(dedupe.ontdubbel(items)), 2)
 
     def test_verbuigingen_tellen_als_hetzelfde_woord(self):
-        self.assertTrue(dedupe._zelfde_woord("contextvenster", "contextvensters"))
-        self.assertTrue(dedupe._zelfde_woord("agent", "agents"))
-        self.assertTrue(dedupe._zelfde_woord("model", "modellen"))
+        self.assertTrue(dedupe.zelfde_woord("contextvenster", "contextvensters"))
+        self.assertTrue(dedupe.zelfde_woord("agent", "agents"))
+        self.assertTrue(dedupe.zelfde_woord("model", "modellen"))
 
     def test_toevallig_gedeelde_prefix_telt_niet(self):
         # Beide beginnen met "trans", maar het zijn andere woorden.
-        self.assertFalse(dedupe._zelfde_woord("transformer", "transparant"))
-        self.assertFalse(dedupe._zelfde_woord("productie", "producent"))
+        self.assertFalse(dedupe.zelfde_woord("transformer", "transparant"))
+        self.assertFalse(dedupe.zelfde_woord("productie", "producent"))
 
     def test_een_gedeeld_woord_clustert_niet(self):
         # Twee losse OpenAI-berichten mogen niet samengevoegd worden.

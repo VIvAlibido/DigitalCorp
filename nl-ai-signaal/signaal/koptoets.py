@@ -29,6 +29,19 @@ NAAMWOORDSTIJL = (
     "de implementatie van", "de ontwikkeling van", "de introductie van",
 )
 
+# Lijdende vorm: hulpwerkwoord gevolgd door iets dat op een voltooid deelwoord
+# lijkt. Nederlandse deelwoorden zijn niet aan hun uitgang te herkennen — 'wet'
+# en 'herbouwd' eindigen allebei op een medeklinker — dus toetsen we op de
+# voorvoegsels waarmee deelwoorden vrijwel altijd beginnen.
+# 'is' en 'zijn' staan er bewust niet bij: "is bekend" en "is beter" zijn geen
+# lijdende vorm, en dit is een blokkerende controle. Liever een enkele gemiste
+# dan een goede kop die ten onrechte wordt tegengehouden.
+_LIJDEND = re.compile(
+    r"\b(wordt|worden|werd|werden)\s+"
+    r"(ge|her|ver|be|ont|aan|af|uit|in|op|over|onder|door)\w{2,}\b",
+    re.IGNORECASE,
+)
+
 _TIJDWOORDEN = re.compile(
     r"\b(zondag|maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|"
     r"gisteren|vandaag|morgen|overmorgen|volgende week|"
@@ -59,6 +72,11 @@ def controleer_kop(kop: str) -> list[str]:
 
     if "!" in kop:
         bezwaren.append("uitroepteken")
+
+    # Lijdende vorm zonder handelende partij: "wordt herbouwd" verzwijgt wie.
+    # Mét "door ..." is het geen bezwaar, dan staat de actor er alsnog.
+    if _LIJDEND.search(kop) and " door " not in laag:
+        bezwaren.append("lijdende vorm zonder handelende partij")
 
     # Minstens één concreet houvast: een getal, een eigennaam of een tijdstip.
     heeft_getal = bool(re.search(r"\d", kop))

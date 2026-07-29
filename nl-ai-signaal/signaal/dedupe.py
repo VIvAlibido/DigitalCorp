@@ -30,7 +30,7 @@ def _normaliseer(titel: str) -> str:
     return " ".join(_tokens(titel))
 
 
-def _zelfde_woord(a: str, b: str) -> bool:
+def zelfde_woord(a: str, b: str) -> bool:
     """Tolerant vergelijken van Nederlandse verbuigingen.
 
     'contextvenster' en 'contextvensters' zijn hetzelfde woord; 'transformer' en
@@ -53,7 +53,7 @@ def _token_overlap(a: list[str], b: list[str]) -> float:
     """Aandeel van de kortste titel dat in de langste terugkomt."""
     if len(a) < 3 or len(b) < 3:
         return 0.0
-    treffers = sum(1 for woord in a if any(_zelfde_woord(woord, ander) for ander in b))
+    treffers = sum(1 for woord in a if any(zelfde_woord(woord, ander) for ander in b))
     # Eén gedeeld woord ('OpenAI', 'model') zegt niets over hetzelfde onderwerp.
     if treffers < 2:
         return 0.0
