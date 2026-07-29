@@ -133,18 +133,20 @@ def _keur_toepassing(editie: Editie) -> list[Bevinding]:
     ander product. Op een zondag met alleen een beschouwing mag hij ontbreken.
     """
     if not editie.toepassing:
-        if editie.items:
-            return [Bevinding("blokkade", "toepassing",
-                              "ontbreekt — dit is het kenmerk van de nieuwsbrief")]
-        return [Bevinding("waarschuwing", "toepassing", "ontbreekt")]
+        # Waarschuwing, geen blokkade. Als blokkade dwong deze regel een toepassing
+        # af op dagen waarop er niets te doen viel, en dan wordt "zet één zin onder
+        # je chatvenster" opgeblazen tot drie stappen en twintig minuten. Geen echte
+        # handeling betekent geen rubriek.
+        return [Bevinding("waarschuwing", "toepassing",
+                          "ontbreekt — alleen aanvaardbaar als er echt niets te doen valt")]
 
     b, t = [], editie.toepassing
     for veld in ("titel", "intro"):
         if not str(getattr(t, veld, "")).strip():
             b.append(Bevinding("blokkade", "toepassing", f"leeg veld: {veld}"))
-    if len(t.stappen) != 3:
+    if len(t.stappen) > 3:
         b.append(Bevinding("waarschuwing", "toepassing",
-                           f"{len(t.stappen)} stappen — twee is te dun, vier leest als huiswerk"))
+                           f"{len(t.stappen)} stappen — vier leest als huiswerk"))
     for n, stap in enumerate(t.stappen, 1):
         eerste = stap.split()[0].lower() if stap.split() else ""
         if eerste in ("overweeg", "denk", "bedenk", "probeer", "kijk"):

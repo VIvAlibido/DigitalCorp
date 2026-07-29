@@ -17,7 +17,10 @@ from .model import Editie, Item, Selectie, Toepassing
 log = logging.getLogger(__name__)
 
 # Standaardgrenzen aan de omvang van een editie. Zie bouw_schema().
-MIN_ITEMS = 3
+# MIN_ITEMS stond op 3 en dwong daarmee opvulling af: op een dag met één
+# werkelijk bericht verbood de eigen keuring om dat ene bericht te sturen.
+# Eén bericht dat iets verandert verslaat vier die dat niet doen.
+MIN_ITEMS = 1
 MAX_ITEMS = 6
 # Bovengrens voor het duidingsveld. Zie toets_verhouding().
 MAX_WOORDEN_WAAROM = 60
@@ -43,8 +46,10 @@ Hoeveel er precies in de editie komen, bepaal jij:
 - Zijn er {aantal} berichten die de lezer echt moet weten, dan neem je er {aantal}.
 - Zijn er maar vier of vijf die die toets doorstaan, dan lever je er vier of \
   vijf. Een zwak zesde bericht kost meer lezers dan een korte editie.
-- Minder dan {minimaal} lever je nooit; kom je daaronder uit, kies dan de \
-  sterkste kandidaten die er zijn en vermeld in "intro" dat het een rustige dag was.
+- Is er vandaag één ding dat de lezer werkelijk moet weten, lever dan dat ene \
+  ding. Een korte editie die ergens over gaat, verslaat een volle editie die \
+  nergens over gaat. Vermeld het in "intro" en verzin geen verantwoording die \
+  je niet kunt onderbouwen.
 Dit is geen ontsnappingsroute voor moeilijk werk. Het is bedoeld voor dagen \
 waarop er domweg weinig is gebeurd — weekends, feestdagen, komkommertijd. \
 Vul een editie nooit op met een bericht dat je zelf zou overslaan.
