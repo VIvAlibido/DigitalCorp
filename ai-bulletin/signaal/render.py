@@ -1,11 +1,15 @@
-"""Output: JSON (archief/API), Markdown (web) en HTML (e-mail).
+"""E-mailuitvoer: JSON (archief), Markdown (leesbaar) en HTML (de mail zelf).
 
-De vormgeving volgt wat onderzoek naar nieuwsbriefgeloofwaardigheid consistent
-aanwijst (Trust Project, American Press Institute, IPTC): herkenbare scheiding
-tussen feit en duiding, zichtbare herkomst per item, een expliciete
-methodeverantwoording, en een vindbaar correctiebeleid. Elk van die vier heeft
-hier een eigen plek in het sjabloon in plaats van een belofte in de kleine
-lettertjes.
+De opmaak volgt twee onderzoeksresultaten. Uit onderzoek naar
+nieuwsbriefgeloofwaardigheid (Trust Project, American Press Institute, IPTC):
+zichtbare scheiding tussen feit en duiding, herkomst per bericht, een
+methodeverantwoording en een vindbaar correctiebeleid. Uit de Smart
+Brevity-opbouw: elk bericht in onder de minuut te begrijpen, "waarom" als vast
+gelabeld onderdeel, één kolom, vetgedrukte ankerpunten.
+
+De mail is bewust korter dan de website. Het volledige feitenrelaas staat
+online; hier staat wat je moet weten om te beslissen of je doorklikt. Dat houdt
+de belofte van vier minuten haalbaar én geeft de site bestaansrecht.
 """
 
 from __future__ import annotations
@@ -14,7 +18,10 @@ import html
 import json
 from datetime import date
 
-from .model import Selectie
+from .model import Editie, Selectie
+
+MERK = "AI Bulletin"
+SITE = "https://aibulletin.nl"
 
 _MAANDEN = [
     "januari", "februari", "maart", "april", "mei", "juni",
@@ -27,12 +34,14 @@ CORRECTIEBELEID = (
     "editie en worden in het online archief bij het oorspronkelijke item gezet."
 )
 
+_SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
+
 
 def datum_nl(d: date) -> str:
     return f"{_DAGEN[d.weekday()]} {d.day} {_MAANDEN[d.month - 1]} {d.year}"
 
 
-def _kort_datum(iso: str) -> str:
+def kort_datum(iso: str) -> str:
     """'2026-07-27' → '27 juli'. Onvolledige datums blijven staan zoals ze zijn."""
     delen = iso.split("-")
     try:
@@ -45,220 +54,241 @@ def _kort_datum(iso: str) -> str:
     return iso
 
 
-def methodeverantwoording(kandidaten: int | None = None, bronnen: int | None = None) -> str:
-    """Hoe deze editie tot stand kwam — in gewone taal, niet als disclaimer."""
-    omvang = (
-        f"Vandaag zijn {kandidaten} berichten uit {bronnen} bronnen bekeken. "
-        if kandidaten and bronnen
-        else ""
-    )
-    return (
-        f"{omvang}Selectie en tekst zijn door een taalmodel gemaakt onder vaste "
-        "redactieregels: alleen verifieerbare feiten in 'wat', duiding uitsluitend "
-        "in 'waarom', en een verplichte kanttekening bij elk cijfer dat niet "
-        "onafhankelijk is getoetst. Er wordt altijd naar de meest primaire bron "
-        "verwezen — een persbericht van de toezichthouder gaat voor een "
-        "nieuwsbericht daarover. We schrijven niet over onderwerpen waarvoor we "
-        "maar één bron hebben zonder dat erbij te zeggen."
-    )
+def bericht_url(editie: Editie, item: Selectie) -> str:
+    return f"{SITE}/{editie.stam}/{item.slug}"
 
 
-def naar_json(
-    selecties: list[Selectie],
-    d: date,
-    onderwerp: str = "",
-    preheader: str = "",
-    intro: str = "",
-) -> str:
-    return json.dumps(
-        {
-            "datum": d.isoformat(),
-            "onderwerp": onderwerp,
-            "preheader": preheader,
-            "intro": intro,
-            "items": [s.as_dict() for s in selecties],
-        },
-        ensure_ascii=False,
-        indent=2,
-    )
-
-
-def leestijd(selecties: list[Selectie], intro: str = "") -> int:
+def leestijd(editie: Editie) -> int:
     """Geschatte leestijd in minuten, op 200 woorden per minuut."""
-    woorden = len(intro.split()) + sum(
-        len(f"{s.kop} {s.kern} {s.wat} {s.waarom} {s.kanttekening}".split())
-        for s in selecties
-    )
+    delen = [editie.intro, editie.voor_bedrijven]
+    delen += [f"{i.kop} {i.kern} {i.waarom}" for i in editie.items]
+    if editie.toepassing:
+        t = editie.toepassing
+        delen.append(f"{t.titel} {t.intro} {' '.join(t.stappen)} {t.niet_doen}")
+    woorden = sum(len(d.split()) for d in delen)
     return max(round(woorden / 200), 1)
 
 
-def naar_markdown(
-    selecties: list[Selectie],
-    d: date,
-    kandidaten: int | None = None,
-    bronnen: int | None = None,
-    intro: str = "",
-    onderwerp: str = "",
-    preheader: str = "",
-) -> str:
-    regels = [f"# AI Bulletin — {datum_nl(d)}", ""]
-    if onderwerp:
-        # Zichtbaar in het archief zodat je achteraf kunt zien welke
-        # onderwerpregel bij welke editie hoorde — dat is de basis voor
-        # elke uitspraak over wat wel en niet opent.
-        regels += [
-            f"*Onderwerpregel: “{onderwerp}” ({len(onderwerp)} tekens)*",
-            f"*Preheader: “{preheader}”*" if preheader else "",
-            "",
-        ]
-    regels += [
-        f"*{len(selecties)} berichten · {leestijd(selecties, intro)} minuten lezen*",
-        "",
-    ]
-    if intro:
-        regels += [intro, ""]
-    regels += ["---", ""]
+def methodeverantwoording(editie: Editie) -> str:
+    """Hoe deze editie tot stand kwam — in gewone taal, niet als disclaimer."""
+    omvang = (
+        f"Vandaag zijn {editie.kandidaten} berichten uit {editie.bronnen} bronnen "
+        "bekeken. "
+        if editie.kandidaten and editie.bronnen
+        else ""
+    )
+    return (
+        f"{omvang}Selectie en tekst komen tot stand met een taalmodel onder vaste "
+        "redactieregels: alleen verifieerbare feiten in de berichten, duiding "
+        "uitsluitend onder 'waarom', en een kanttekening bij elk cijfer dat niet "
+        "onafhankelijk is getoetst. We verwijzen naar de meest primaire bron — een "
+        "persbericht van de toezichthouder gaat voor een nieuwsbericht daarover — "
+        "en nemen geen teksten van anderen over."
+    )
 
-    for nummer, s in enumerate(selecties, 1):
-        herkomst = " · ".join(filter(None, [s.categorie, s.bron, _kort_datum(s.datum)]))
-        regels += [
-            f"## {nummer}. {s.kop}",
-            "",
-            f"**{s.kern}**",
-            "",
-            s.wat,
-            "",
-            f"**Waarom het ertoe doet** — {s.waarom}",
-            "",
+
+# ─────────────────────────────── JSON ────────────────────────────────
+
+def naar_json(editie: Editie) -> str:
+    return json.dumps(editie.as_dict(), ensure_ascii=False, indent=2)
+
+
+# ────────────────────────────── Markdown ─────────────────────────────
+
+def naar_markdown(editie: Editie) -> str:
+    r = [f"# {MERK} — {datum_nl(editie.datum)}", ""]
+    if editie.onderwerp:
+        r.append(f"*Onderwerpregel: “{editie.onderwerp}” ({len(editie.onderwerp)} tekens)*")
+        if editie.preheader:
+            r.append(f"*Preheader: “{editie.preheader}”*")
+        r.append("")
+    r += [f"*{len(editie.items)} berichten · {leestijd(editie)} minuten lezen*", ""]
+
+    if editie.intro:
+        r += [f"> {editie.intro}", ""]
+    r += ["---", ""]
+
+    for nummer, s in enumerate(editie.items, 1):
+        r += [
+            f"## {nummer}. {s.kop}", "",
+            f"**{s.kern}**", "",
+            s.wat, "",
+            f"**Waarom het ertoe doet** — {s.waarom}", "",
         ]
         if s.kanttekening:
-            regels += [f"> **Kanttekening:** {s.kanttekening}", ""]
-        # Herkomst onderaan: de lezer wil eerst weten wát er staat, en pas
-        # daarna waar het vandaan komt — maar hij moet het wel kunnen vinden.
-        regels += [f"[Naar de bron →]({s.url}) · *{herkomst}*", "", "---", ""]
+            r += [f"> **Kanttekening:** {s.kanttekening}", ""]
+        herkomst = " · ".join(filter(None, [s.categorie, s.bron, kort_datum(s.datum)]))
+        r += [f"[Naar de bron →]({s.url}) · *{herkomst}*", "", "---", ""]
 
-    regels += [
-        "### Hoe deze editie tot stand kwam",
-        "",
-        methodeverantwoording(kandidaten, bronnen),
-        "",
-        f"*{CORRECTIEBELEID}*",
-        "",
+    if editie.toepassing:
+        t = editie.toepassing
+        titel = f"{t.titel} — {t.tijd}" if t.tijd else t.titel
+        r += [f"## Vandaag toepassen: {titel}", "", t.intro, ""]
+        r += [f"{n}. {stap}" for n, stap in enumerate(t.stappen, 1)]
+        r.append("")
+        if t.niet_doen:
+            r += [f"**Wat je níét hoeft te doen:** {t.niet_doen}", ""]
+        r += ["---", ""]
+
+    if editie.voor_bedrijven:
+        r += ["### Voor jouw bedrijf", "", editie.voor_bedrijven, "", "---", ""]
+
+    r += [
+        "### Hoe deze editie tot stand kwam", "",
+        methodeverantwoording(editie), "",
+        f"*{CORRECTIEBELEID}*", "",
     ]
-    return "\n".join(regels)
+    return "\n".join(r)
 
 
-def naar_html(
-    selecties: list[Selectie],
-    d: date,
-    kandidaten: int | None = None,
-    bronnen: int | None = None,
-    intro: str = "",
-    onderwerp: str = "",
-    preheader: str = "",
-) -> str:
+# ──────────────────────────────── HTML ───────────────────────────────
+
+def _bericht_html(nummer: int, s: Selectie, editie: Editie) -> str:
+    e = html.escape
+    herkomst = " · ".join(filter(None, [s.bron, kort_datum(s.datum)]))
+    return f"""
+  <tr><td style="padding:16px 34px 0;">
+    <h2 style="margin:0 0 5px;font:600 17px/1.35 Georgia,serif;color:#1c1a17;">
+      {nummer}. {e(s.kop)}</h2>
+    <p style="margin:0 0 6px;font:400 15px/1.6 {_SANS};color:#33302b;">{e(s.kern)}</p>
+    <p style="margin:0 0 7px;font:400 14px/1.6 {_SANS};color:#4a4437;">
+      <strong style="color:#1c1a17;">Waarom</strong> — {e(s.waarom)}</p>
+    <a href="{e(bericht_url(editie, s))}"
+       style="font:600 13px/1 {_SANS};color:#a4552b;text-decoration:none;">Het hele verhaal →</a>
+    <span style="font:400 12px/1 {_SANS};color:#8a7f6d;">&nbsp;{e(herkomst)}</span>
+  </td></tr>
+  <tr><td style="padding:18px 34px 0;">
+    <hr style="border:0;border-top:1px solid #f0eae0;margin:0;"></td></tr>"""
+
+
+def _toepassing_html(editie: Editie) -> str:
+    if not editie.toepassing:
+        return ""
+    e = html.escape
+    t = editie.toepassing
+    stappen = "".join(
+        f"""
+          <tr>
+            <td valign="top" width="26" style="font:600 14px/1.5 {_SANS};color:#a4552b;">{n}</td>
+            <td style="padding-bottom:12px;font:400 14px/1.6 {_SANS};color:#33302b;">{e(stap)}</td>
+          </tr>"""
+        for n, stap in enumerate(t.stappen, 1)
+    )
+    niet_doen = (
+        f"""
+        <div style="margin-top:16px;padding-top:13px;border-top:1px solid #ecdccd;
+                    font:400 13px/1.6 {_SANS};color:#6b6355;">
+          <strong style="color:#4a4437;">Wat je níét hoeft te doen:</strong> {e(t.niet_doen)}
+        </div>"""
+        if t.niet_doen
+        else ""
+    )
+    kop = e(t.titel) + (e(f" — {t.tijd}") if t.tijd else "")
+    return f"""
+  <tr><td style="padding:28px 34px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+           style="background:#faf4ee;border:1px solid #ecdccd;border-radius:8px;">
+      <tr><td style="padding:22px 24px 24px;">
+        <div style="font:600 11px/1.4 {_SANS};color:#a4552b;
+                    text-transform:uppercase;letter-spacing:.08em;">Vandaag toepassen</div>
+        <h2 style="margin:7px 0 6px;font:600 19px/1.32 Georgia,serif;color:#1c1a17;">{kop}</h2>
+        <p style="margin:0 0 15px;font:400 14px/1.6 {_SANS};color:#4a4437;">{e(t.intro)}</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">{stappen}
+        </table>{niet_doen}
+      </td></tr>
+    </table>
+  </td></tr>"""
+
+
+def naar_html(editie: Editie) -> str:
     """E-mail-HTML: tabellen en inline styles, want mailclients kunnen weinig."""
     e = html.escape
-    blokken = []
-    for nummer, s in enumerate(selecties, 1):
-        herkomst = " · ".join(filter(None, [s.categorie, s.bron, _kort_datum(s.datum)]))
-        kanttekening = (
-            f"""
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-               style="margin:0 0 14px 0;"><tr>
-          <td style="border-left:3px solid #d9cdb8;padding:8px 0 8px 12px;
-                     font:400 13px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:#6b6355;">
-            <strong style="color:#4a4437;">Kanttekening:</strong> {e(s.kanttekening)}
-          </td></tr></table>"""
-            if s.kanttekening
-            else ""
-        )
-        blokken.append(
-            f"""
-      <tr><td style="padding:0 0 34px 0;">
-        <div style="font:600 11px/1.4 -apple-system,Segoe UI,Roboto,sans-serif;
-                    color:#8a7f6d;text-transform:uppercase;letter-spacing:.07em;">
-          {nummer} · {e(s.categorie)}
-        </div>
-        <h2 style="margin:7px 0 12px;font:600 20px/1.32 Georgia,serif;color:#1c1a17;">
-          {e(s.kop)}
-        </h2>
-        <p style="margin:0 0 14px;font:400 17px/1.55 Georgia,serif;color:#4a4437;">
-          {e(s.kern)}
-        </p>
-        <p style="margin:0 0 12px;font:400 15px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;
-                  color:#33302b;">{e(s.wat)}</p>
-        <p style="margin:0 0 12px;font:400 15px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;
-                  color:#33302b;">
-          <strong style="color:#1c1a17;">Waarom het ertoe doet</strong> — {e(s.waarom)}
-        </p>{kanttekening}
-        <div style="font:400 13px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#8a7f6d;">
-          <a href="{e(s.url)}" style="font-weight:600;color:#a4552b;
-             text-decoration:none;">Naar de bron →</a>
-          &nbsp;{e(s.bron)}{e(f" · {_kort_datum(s.datum)}" if s.datum else "")}
-        </div>
-      </td></tr>"""
-        )
 
-    intro_blok = (
+    preheader = (
         f"""
-      <tr><td style="padding:0 0 26px 0;">
-        <p style="margin:0;font:400 16px/1.65 Georgia,serif;color:#4a4437;">{e(intro)}</p>
-      </td></tr>"""
-        if intro
-        else ""
-    )
-
-    # De preheader is de grijze regel naast het onderwerp in de inbox. Zonder
-    # deze truc vult de mailclient hem met de eerste tekst uit de mail — vaak
-    # "Bekijk in browser". De spaties duwen die standaardtekst weg.
-    preheader_blok = (
-        f"""
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">{e(preheader)}
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">{e(editie.preheader)}
 {"&nbsp;&zwnj;" * 60}</div>"""
-        if preheader
+        if editie.preheader
         else ""
     )
+
+    intro = (
+        f"""
+  <tr><td style="padding:22px 34px 0;">
+    <div style="border-left:3px solid #a4552b;padding:2px 0 2px 14px;
+                font:400 17px/1.55 Georgia,serif;color:#1c1a17;">{e(editie.intro)}</div>
+  </td></tr>"""
+        if editie.intro
+        else ""
+    )
+
+    bedrijven = (
+        f"""
+  <tr><td style="padding:22px 34px 0;">
+    <div style="font:600 11px/1.4 {_SANS};color:#8a7f6d;text-transform:uppercase;
+                letter-spacing:.08em;margin-bottom:7px;">Voor jouw bedrijf</div>
+    <p style="margin:0;font:400 14px/1.6 {_SANS};color:#4a4437;">{e(editie.voor_bedrijven)}
+      <a href="{SITE}/voorkeuren" style="color:#8a7f6d;">Niet relevant? Zet dit blok uit →</a>
+    </p>
+  </td></tr>"""
+        if editie.voor_bedrijven
+        else ""
+    )
+
+    berichten = "".join(_bericht_html(n, s, editie) for n, s in enumerate(editie.items, 1))
 
     return f"""<!doctype html>
 <html lang="nl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{e(onderwerp or f"AI Bulletin — {datum_nl(d)}")}</title></head>
-<body style="margin:0;padding:0;background:#f4f1ea;">{preheader_blok}
+<title>{e(editie.onderwerp or f"{MERK} — {datum_nl(editie.datum)}")}</title></head>
+<body style="margin:0;padding:0;background:#f4f1ea;">{preheader}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-       style="background:#f4f1ea;padding:32px 16px;">
-  <tr><td align="center">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-           style="max-width:620px;background:#fffdf8;border-radius:8px;padding:36px;">
-      <tr><td style="padding:0 0 6px 0;">
-        <div style="font:700 22px/1.2 Georgia,serif;color:#1c1a17;">AI Bulletin</div>
-        <div style="font:400 14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#8a7f6d;">
-          {e(datum_nl(d))} · {len(selecties)} berichten ·
-          {leestijd(selecties, intro)} minuten lezen
-        </div>
-      </td></tr>
-      <tr><td style="padding:18px 0 24px 0;">
-        <hr style="border:0;border-top:1px solid #e5ded1;margin:0;">
-      </td></tr>
-      {intro_blok}
-      {"".join(blokken)}
-      <tr><td style="padding:6px 0 0 0;border-top:1px solid #e5ded1;">
-        <div style="font:600 11px/1.4 -apple-system,Segoe UI,Roboto,sans-serif;color:#8a7f6d;
-                    text-transform:uppercase;letter-spacing:.07em;padding:18px 0 8px 0;">
-          Hoe deze editie tot stand kwam
-        </div>
-        <p style="margin:0 0 12px;font:400 13px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;
-                  color:#6b6355;">{e(methodeverantwoording(kandidaten, bronnen))}</p>
-        <p style="margin:0 0 16px;font:400 13px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;
-                  color:#6b6355;">{e(CORRECTIEBELEID)}</p>
-        <p style="margin:0;font:400 12px/1.6 -apple-system,Segoe UI,Roboto,sans-serif;
-                  color:#8a7f6d;">
-          Je ontvangt deze mail omdat je je hebt aangemeld voor AI Bulletin.<br>
-          <a href="{{{{unsubscribe}}}}" style="color:#8a7f6d;">Uitschrijven</a> ·
-          <a href="{{{{preferences}}}}" style="color:#8a7f6d;">Voorkeuren</a>
-        </p>
-      </td></tr>
-    </table>
+       style="background:#f4f1ea;padding:24px 14px 44px;">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="max-width:640px;background:#fffdf8;border-radius:10px;">
+
+  <tr><td style="padding:32px 34px 0;">
+    <table role="presentation" width="100%"><tr>
+      <td style="font:700 21px/1.2 Georgia,serif;color:#1c1a17;">{MERK}</td>
+      <td align="right" style="font:600 12px/1 {_SANS};color:#a4552b;background:#f6ece4;
+                 border-radius:20px;padding:6px 11px;white-space:nowrap;">
+        {leestijd(editie)} min</td>
+    </tr></table>
+    <div style="font:400 13px/1.5 {_SANS};color:#8a7f6d;margin-top:5px;">
+      {e(datum_nl(editie.datum).capitalize())} · AI-nieuws voor Nederland</div>
   </td></tr>
+{intro}
+  <tr><td style="padding:24px 34px 0;">
+    <div style="font:600 11px/1.4 {_SANS};color:#8a7f6d;text-transform:uppercase;
+                letter-spacing:.08em;">De zes</div>
+  </td></tr>
+{berichten}
+{_toepassing_html(editie)}
+{bedrijven}
+
+  <tr><td style="padding:26px 34px 30px;">
+    <div style="border-top:1px solid #e5ded1;padding-top:18px;
+                font:400 12.5px/1.65 {_SANS};color:#8a7f6d;">
+      <strong style="color:#4a4437;">Te veel mail?</strong> Je kunt overstappen naar
+      wekelijks of alleen groot nieuws —
+      <a href="{SITE}/voorkeuren" style="color:#a4552b;">pas je voorkeuren aan</a>.
+      Uitschrijven mag ook, maar dat hoeft niet je eerste optie te zijn.
+      <br><br>
+      <strong style="color:#4a4437;">Hoe deze editie tot stand kwam</strong><br>
+      {e(methodeverantwoording(editie))}
+      <br><br>
+      {e(CORRECTIEBELEID)}
+      <br><br>
+      <a href="{SITE}/voorkeuren" style="color:#8a7f6d;">Voorkeuren</a> ·
+      <a href="{SITE}/archief" style="color:#8a7f6d;">Archief</a> ·
+      <a href="{{{{unsubscribe}}}}" style="color:#8a7f6d;">Uitschrijven</a>
+      <br><br>
+      <strong style="color:#4a4437;">{MERK}</strong> · aibulletin.nl
+    </div>
+  </td></tr>
+
+</table>
+</td></tr>
 </table>
 </body></html>"""

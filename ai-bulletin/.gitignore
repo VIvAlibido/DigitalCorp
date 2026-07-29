@@ -6,3 +6,7 @@ venv/
 # Gegenereerde edities en audio — output, geen broncode.
 # edities/ wordt bewust wél gecommit: het archief is onderdeel van het product.
 audio/
+
+# De website is volledig af te leiden uit edities/ en wordt bij elke publicatie
+# opnieuw gebouwd. In de repo zou hij alleen dagelijkse diff-ruis opleveren.
+site/

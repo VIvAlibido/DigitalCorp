@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import re
+import unicodedata
 from dataclasses import dataclass, field, asdict
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 _TRACKING_PARAMS = re.compile(r"^(utm_|fbclid|gclid|mc_cid|mc_eid|ref$|source$)")
 
@@ -86,3 +87,96 @@ class Selectie:
 
     def as_dict(self) -> dict:
         return asdict(self)
+
+    @property
+    def slug(self) -> str:
+        """URL-fragment voor de eigen pagina van dit bericht."""
+        return _slug(self.kop)
+
+
+@dataclass
+class Toepassing:
+    """Het onderdeel 'Vandaag toepassen' — één ding dat de lezer vandaag kan doen.
+
+    Dit is het enige deel van de editie dat niet uit het nieuws volgt maar
+    zelf bedacht wordt, en daarmee het deel dat een concurrent niet kan
+    scrapen. Drie stappen, want twee is te dun en vier leest als huiswerk.
+    """
+
+    titel: str
+    intro: str
+    stappen: list[str] = field(default_factory=list)
+    # Wat expliciet níét hoeft. Geruststelling is even waardevol als een
+    # instructie, en voorkomt dat lezers meer doen dan nodig.
+    niet_doen: str = ""
+    tijd: str = ""
+    categorie: str = ""
+
+    def as_dict(self) -> dict:
+        return asdict(self)
+
+    @property
+    def slug(self) -> str:
+        return _slug(self.titel)
+
+
+@dataclass
+class Editie:
+    """Alles wat één editie uitmaakt.
+
+    Vervangt de losse parameters die render- en schrijffuncties eerder
+    doorgaven; die lijst groeide bij elke nieuwe rubriek en was niet meer
+    te overzien.
+    """
+
+    datum: date
+    items: list[Selectie] = field(default_factory=list)
+    onderwerp: str = ""
+    preheader: str = ""
+    intro: str = ""
+    toepassing: Toepassing | None = None
+    voor_bedrijven: str = ""
+    # Verantwoording: hoeveel kandidaten en bronnen deze editie opleverden.
+    kandidaten: int | None = None
+    bronnen: int | None = None
+
+    @property
+    def stam(self) -> str:
+        return self.datum.isoformat()
+
+    def as_dict(self) -> dict:
+        return {
+            "datum": self.datum.isoformat(),
+            "onderwerp": self.onderwerp,
+            "preheader": self.preheader,
+            "intro": self.intro,
+            "items": [i.as_dict() for i in self.items],
+            "toepassing": self.toepassing.as_dict() if self.toepassing else None,
+            "voor_bedrijven": self.voor_bedrijven,
+            "kandidaten": self.kandidaten,
+            "bronnen": self.bronnen,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Editie":
+        toepassing = data.get("toepassing")
+        return cls(
+            datum=date.fromisoformat(data["datum"]),
+            items=[Selectie(**rij) for rij in data.get("items", [])],
+            onderwerp=data.get("onderwerp", ""),
+            preheader=data.get("preheader", ""),
+            intro=data.get("intro", ""),
+            toepassing=Toepassing(**toepassing) if toepassing else None,
+            voor_bedrijven=data.get("voor_bedrijven", ""),
+            kandidaten=data.get("kandidaten"),
+            bronnen=data.get("bronnen"),
+        )
+
+
+def _slug(tekst: str) -> str:
+    """Leesbare, stabiele URL uit een kop of titel."""
+    zonder_accenten = (
+        unicodedata.normalize("NFKD", tekst).encode("ascii", "ignore").decode("ascii")
+    )
+    schoon = re.sub(r"[^a-z0-9]+", "-", zonder_accenten.lower()).strip("-")
+    return schoon[:70].rstrip("-") or "bericht"

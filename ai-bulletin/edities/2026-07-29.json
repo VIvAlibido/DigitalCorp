@@ -70,5 +70,20 @@
       "datum": "2026-07",
       "kanttekening": "Het cijfer voor 2026 gaat over een lopend jaar en is dus niet één-op-één te vergelijken met de volledige jaren ervoor."
     }
-  ]
+  ],
+  "toepassing": {
+    "titel": "Loop je eigen site na vóór zondag",
+    "intro": "Bericht 1 kost de meeste bedrijven één zin en een label. Dit is hoe je in twintig minuten weet of je die zin al hebt.",
+    "stappen": [
+      "Open je eigen site in een incognitovenster en start het chatvenster. Staat er in het eerste bericht dat de bezoeker met een AI-systeem praat? Zo niet, zet het daar neer — niet in de voorwaarden, maar in het gesprek zelf.",
+      "Loop de afgelopen maand aan publicaties door en markeer wat door AI is gemaakt of bewerkt: teksten, beelden, ingesproken audio. Eén regel eronder volstaat, bijvoorbeeld 'beeld gegenereerd met AI'.",
+      "Zet in één document welke systemen je hebt nagelopen en op welke datum. Bij een melding is dat het eerste wat een toezichthouder vraagt, en het is het enige stuk dat je achteraf niet meer kunt maken."
+    ],
+    "niet_doen": "Je hoeft geen conformiteitsbeoordeling te laten uitvoeren en je systeem nergens te registreren. Die verplichtingen horen bij hoog-risico AI en zijn juist doorgeschoven naar december 2027 — dat is precies het uitstel dat verwarring veroorzaakte.",
+    "tijd": "20 minuten",
+    "categorie": "regelgeving"
+  },
+  "voor_bedrijven": "Twee berichten van vandaag komen samen op één inkoopvraag. Uit bericht 3 blijkt dat 44 procent van de financiële instellingen een leverancier afwijst als de servers buiten Europa staan; uit bericht 5 dat AI vanaf nu een stuk makkelijker aan je eigen agenda, klantenbestand en boekhouding te koppelen is. De koppeling wordt dus goedkoper op het moment dat de eisen aan de hostinglocatie strenger worden. Zet die vraag in je volgende offerteaanvraag vóór de vraag welk model eronder zit.",
+  "kandidaten": null,
+  "bronnen": null
 }

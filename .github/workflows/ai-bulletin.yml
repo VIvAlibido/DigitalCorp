@@ -52,9 +52,40 @@ jobs:
             ${{ inputs.heuristisch && '--heuristisch' || '' }} \
             --verbose
 
+      - name: Bouw de website
+        run: python -m signaal.cli --site
+
       - name: Archiveer de editie
         uses: actions/upload-artifact@v4
         with:
           name: editie-${{ github.run_id }}
           path: ai-bulletin/edities/
           retention-days: 90
+
+      - name: Bewaar het archief in de repo
+        run: |
+          git config user.name "AI Bulletin"
+          git config user.email "noreply@aibulletin.nl"
+          git add edities
+          git diff --cached --quiet && exit 0
+          git commit -m "Editie van $(date -u +%F)"
+          git push
+
+      - name: Zet de site klaar voor Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ai-bulletin/site
+
+  publiceren:
+    # Aparte job omdat Pages eigen rechten vereist die de editie-job niet nodig heeft.
+    needs: editie
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

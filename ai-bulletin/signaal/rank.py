@@ -9,8 +9,9 @@ from __future__ import annotations
 import json
 import logging
 import os
+from datetime import date
 
-from .model import Item, Selectie
+from .model import Editie, Item, Selectie, Toepassing
 
 log = logging.getLogger(__name__)
 
@@ -120,6 +121,24 @@ Naast de zes berichten lever je drie velden voor de editie als geheel:
   een tweede haakje aanreikt.
 - "intro": twee tot drie zinnen die de dag samenvatten en de rode draad \
   benoemen als die er is. Geen opsomming van wat volgt — de lezer scrolt zelf.
+- "toepassing": het onderdeel dat deze nieuwsbrief onderscheidt. Eén ding dat \
+  de lezer vandaag kan dóén, bij voorkeur volgend uit het belangrijkste bericht.
+    * "titel": wat het oplevert, niet wat het is. Max 70 tekens.
+    * "tijd": realistische schatting, bijvoorbeeld "15 minuten".
+    * "intro": één zin die de drempel wegneemt — wat je níét nodig hebt.
+    * "stappen": precies drie. Elke stap begint met een werkwoord en is af te \
+      ronden zonder iets aan te schaffen. Geef bij tekststappen de voorbeeldzin \
+      letterlijk mee, zodat de lezer hem kan kopiëren.
+    * "niet_doen": wat expliciet niet hoeft. Geruststelling voorkomt dat mensen \
+      meer doen dan nodig, en is even waardevol als een instructie.
+    * "categorie": één woord, bijvoorbeeld juridisch, verkoop, klantenservice, \
+      hr, marketing, administratie.
+  Verzin geen toepassing die je niet kunt onderbouwen met het nieuws van vandaag \
+  of met algemeen bekende werkwijzen. Een verzonnen stappenplan is erger dan geen.
+- "voor_bedrijven": één zin voor wie een organisatie runt, volgend uit een van \
+  de zes berichten. Concreet en meteen uitvoerbaar. Is er vandaag niets \
+  zakelijks relevants, laat het veld dan leeg — een gedwongen zin leest als \
+  vulling en kost lezers.
 
 Zorg voor spreiding over categorieën: niet meer dan twee items uit dezelfde \
 categorie.
@@ -135,6 +154,20 @@ SCHEMA = {
         "onderwerp": {"type": "string"},
         "preheader": {"type": "string"},
         "intro": {"type": "string"},
+        "voor_bedrijven": {"type": "string"},
+        "toepassing": {
+            "type": "object",
+            "properties": {
+                "titel": {"type": "string"},
+                "intro": {"type": "string"},
+                "stappen": {"type": "array", "items": {"type": "string"}},
+                "niet_doen": {"type": "string"},
+                "tijd": {"type": "string"},
+                "categorie": {"type": "string"},
+            },
+            "required": ["titel", "intro", "stappen", "niet_doen", "tijd", "categorie"],
+            "additionalProperties": False,
+        },
         "items": {
             "type": "array",
             "items": {
@@ -160,7 +193,8 @@ SCHEMA = {
             },
         },
     },
-    "required": ["onderwerp", "preheader", "intro", "items"],
+    "required": ["onderwerp", "preheader", "intro", "voor_bedrijven",
+                 "toepassing", "items"],
     "additionalProperties": False,
 }
 
@@ -185,7 +219,7 @@ def _kandidaten_blok(items: list[Item]) -> str:
     return "\n\n".join(regels)
 
 
-def kies_en_schrijf(items: list[Item], config: dict) -> list[Selectie]:
+def kies_en_schrijf(items: list[Item], config: dict, datum: date) -> Editie:
     """Laat Claude de editie samenstellen. Vereist het pakket `anthropic`."""
     try:
         import anthropic
@@ -253,15 +287,19 @@ def kies_en_schrijf(items: list[Item], config: dict) -> list[Selectie]:
         response.usage.input_tokens,
         response.usage.output_tokens,
     )
-    kop_editie = {
-        "onderwerp": data.get("onderwerp", ""),
-        "preheader": data.get("preheader", ""),
-        "intro": data.get("intro", ""),
-    }
-    return selecties[:aantal], kop_editie
+    toepassing = data.get("toepassing")
+    return Editie(
+        datum=datum,
+        items=selecties[:aantal],
+        onderwerp=data.get("onderwerp", ""),
+        preheader=data.get("preheader", ""),
+        intro=data.get("intro", ""),
+        toepassing=Toepassing(**toepassing) if toepassing else None,
+        voor_bedrijven=data.get("voor_bedrijven", ""),
+    )
 
 
-def kies_heuristisch(items: list[Item], config: dict) -> list[Selectie]:
+def kies_heuristisch(items: list[Item], config: dict, datum: date) -> Editie:
     """Selectie zonder LLM — voor tests, offline draaien en als noodrem.
 
     Levert een bruikbare maar duidelijk mindere editie: de voorscore bepaalt
@@ -285,7 +323,11 @@ def kies_heuristisch(items: list[Item], config: dict) -> list[Selectie]:
                 Selectie(
                     kop=item.titel[:70],
                     kern="(heuristische selectie — geen redactionele samenvatting)",
-                    wat=item.samenvatting[:280] or item.titel,
+                    # Nooit de samenvatting van de uitgever overnemen: die tekst
+                    # is auteursrechtelijk beschermd en dit is juist de route die
+                    # aanslaat als de jury faalt. Alleen de eigen titel en een
+                    # link; de lezer klikt maar door.
+                    wat="(automatische selectie zonder redactie — zie de bron)",
                     waarom="(heuristische selectie — geen redactionele duiding)",
                     url=item.url,
                     bron=item.bron,
@@ -293,7 +335,7 @@ def kies_heuristisch(items: list[Item], config: dict) -> list[Selectie]:
                 )
             )
 
-    return gekozen, {"onderwerp": "", "preheader": "", "intro": ""}
+    return Editie(datum=datum, items=gekozen)
 
 
 def _categorie_uit_brontype(brontype: str) -> str:

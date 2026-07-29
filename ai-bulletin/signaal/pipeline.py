@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from dataclasses import dataclass
 from datetime import date
@@ -11,18 +12,29 @@ import yaml
 
 from . import audio as audio_mod
 from . import bronnen, dedupe, koptoets, rank, render, score
-from .model import Item, Selectie
+from .model import Editie, Item
 
 log = logging.getLogger(__name__)
 
 
 @dataclass
 class Resultaat:
-    datum: date
-    selecties: list[Selectie]
-    kandidaten: int
+    editie: Editie
     na_ontdubbelen: int
     bestanden: list[Path]
+
+    # Doorgeefluiken zodat aanroepers niet overal `.editie.` hoeven te typen.
+    @property
+    def datum(self) -> date:
+        return self.editie.datum
+
+    @property
+    def selecties(self) -> list:
+        return self.editie.items
+
+    @property
+    def kandidaten(self) -> int:
+        return self.editie.kandidaten or 0
 
 
 def laad_config(pad: str | Path) -> dict:
@@ -61,46 +73,36 @@ def draai(
     lijst = score.shortlist(items, config.get("shortlist", 40))
 
     if heuristisch:
-        selecties, kop = rank.kies_heuristisch(lijst, config)
+        editie = rank.kies_heuristisch(lijst, config, vandaag)
     else:
         try:
-            selecties, kop = rank.kies_en_schrijf(lijst, config)
+            editie = rank.kies_en_schrijf(lijst, config, vandaag)
         except rank.RankFout as exc:
             # Liever een mindere editie dan geen editie: de nieuwsbrief moet
             # elke ochtend de deur uit.
             log.error("jury faalde (%s) — val terug op heuristische selectie", exc)
-            selecties, kop = rank.kies_heuristisch(lijst, config)
+            editie = rank.kies_heuristisch(lijst, config, vandaag)
+
+    editie.kandidaten = kandidaten
+    editie.bronnen = len({i.bron for i in items})
 
     # Het model kan afdwalen van de kopregels; dat willen we zien in de logs
     # en niet pas als een lezer klaagt. Blokkeren doen we niet — een editie
     # met een matige kop is beter dan geen editie.
-    for kop, bezwaren in koptoets.toets_editie([s.kop for s in selecties]).items():
-        log.warning("zwakke kop — %s: %r", "; ".join(bezwaren), kop)
+    for zwakke_kop, bezwaren in koptoets.toets_editie([s.kop for s in editie.items]).items():
+        log.warning("zwakke kop — %s: %r", "; ".join(bezwaren), zwakke_kop)
 
-    bestanden = _schrijf(
-        selecties, vandaag, uitvoermap,
-        kandidaten=kandidaten,
-        bronnen=len({i.bron for i in items}),
-        intro=kop.get("intro", ""),
-        onderwerp=kop.get("onderwerp", ""),
-        preheader=kop.get("preheader", ""),
-    )
+    bestanden = _schrijf(editie, uitvoermap)
 
     if met_audio:
         try:
-            script = audio_mod.maak_script(selecties, vandaag)
-            (uitvoermap / f"{vandaag.isoformat()}-audio.txt").write_text(script, encoding="utf-8")
+            script = audio_mod.maak_script(editie.items, vandaag)
+            (uitvoermap / f"{editie.stam}-audio.txt").write_text(script, encoding="utf-8")
             bestanden.append(audio_mod.genereer(script, config, vandaag))
         except audio_mod.AudioFout as exc:
             log.error("audio overgeslagen: %s", exc)
 
-    return Resultaat(
-        datum=vandaag,
-        selecties=selecties,
-        kandidaten=kandidaten,
-        na_ontdubbelen=len(items),
-        bestanden=bestanden,
-    )
+    return Resultaat(editie=editie, na_ontdubbelen=len(items), bestanden=bestanden)
 
 
 def render_selectie(pad: Path, uitvoermap: Path) -> Resultaat:
@@ -110,49 +112,21 @@ def render_selectie(pad: Path, uitvoermap: Path) -> Resultaat:
     dezelfde code als een automatische run, en het hele archief opnieuw
     uitdraaien als het sjabloon verandert.
     """
-    import json
-
-    data = json.loads(pad.read_text(encoding="utf-8"))
-    selecties = [Selectie(**rij) for rij in data["items"]]
-    d = date.fromisoformat(data["datum"])
-    kandidaten = data.get("kandidaten")
-    bronnen = data.get("bronnen")
-
-    bestanden = _schrijf(
-        selecties, d, uitvoermap,
-        kandidaten=kandidaten,
-        bronnen=bronnen,
-        intro=data.get("intro", ""),
-        onderwerp=data.get("onderwerp", ""),
-        preheader=data.get("preheader", ""),
-    )
+    editie = Editie.from_dict(json.loads(pad.read_text(encoding="utf-8")))
+    bestanden = _schrijf(editie, uitvoermap)
     return Resultaat(
-        datum=d,
-        selecties=selecties,
-        kandidaten=kandidaten or 0,
-        na_ontdubbelen=kandidaten or 0,
+        editie=editie,
+        na_ontdubbelen=editie.kandidaten or len(editie.items),
         bestanden=bestanden,
     )
 
 
-def _schrijf(
-    selecties: list[Selectie],
-    d: date,
-    map_: Path,
-    kandidaten: int | None = None,
-    bronnen: int | None = None,
-    intro: str = "",
-    onderwerp: str = "",
-    preheader: str = "",
-) -> list[Path]:
+def _schrijf(editie: Editie, map_: Path) -> list[Path]:
     map_.mkdir(parents=True, exist_ok=True)
-    stam = d.isoformat()
     uitvoer = {
-        f"{stam}.json": render.naar_json(selecties, d, onderwerp, preheader, intro),
-        f"{stam}.md": render.naar_markdown(
-            selecties, d, kandidaten, bronnen, intro, onderwerp, preheader),
-        f"{stam}.html": render.naar_html(
-            selecties, d, kandidaten, bronnen, intro, onderwerp, preheader),
+        f"{editie.stam}.json": render.naar_json(editie),
+        f"{editie.stam}.md": render.naar_markdown(editie),
+        f"{editie.stam}.html": render.naar_html(editie),
     }
     paden = []
     for naam, inhoud in uitvoer.items():

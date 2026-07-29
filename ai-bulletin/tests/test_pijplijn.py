@@ -11,10 +11,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from signaal import dedupe, koptoets, pipeline, rank, render, score  # noqa: E402
+from signaal import dedupe, koptoets, pipeline, rank, render, score, site  # noqa: E402
 from signaal.bronnen import basis  # noqa: E402
 from signaal.cli import _laad_fixtures  # noqa: E402
-from signaal.model import Item, canonicaliseer_url  # noqa: E402
+from signaal.model import (  # noqa: E402
+    Editie, Item, Selectie, Toepassing, canonicaliseer_url,
+)
 
 PROJECT = Path(__file__).resolve().parent.parent
 CONFIG = pipeline.laad_config(PROJECT / "config.yaml")
@@ -171,100 +173,167 @@ class TestDedupe(unittest.TestCase):
         self.assertEqual(over[0].url, "https://sterk.example.com/1")
 
 
+DATUM = date(2026, 7, 29)
+
+
+def maak_editie(items, **kw) -> Editie:
+    return Editie(datum=DATUM, items=items, **kw)
+
+
+def fixture_editie() -> Editie:
+    items = score.scoor(_laad_fixtures(PROJECT / "fixtures" / "kandidaten.json"), CONFIG)
+    return rank.kies_heuristisch(items, CONFIG, DATUM)
+
+
 class TestRender(unittest.TestCase):
     def setUp(self):
-        self.selecties, _ = rank.kies_heuristisch(
-            score.scoor(_laad_fixtures(PROJECT / "fixtures" / "kandidaten.json"), CONFIG),
-            CONFIG,
-        )
-        self.datum = date(2026, 7, 29)
+        self.editie = fixture_editie()
 
     def test_datum_in_het_nederlands(self):
-        self.assertEqual(render.datum_nl(self.datum), "woensdag 29 juli 2026")
+        self.assertEqual(render.datum_nl(DATUM), "woensdag 29 juli 2026")
 
     def test_json_is_geldig(self):
-        data = json.loads(render.naar_json(self.selecties, self.datum))
+        data = json.loads(render.naar_json(self.editie))
         self.assertEqual(data["datum"], "2026-07-29")
         self.assertEqual(len(data["items"]), 6)
 
+    def test_json_rondreis_behoudt_de_editie(self):
+        self.editie.toepassing = Toepassing(
+            titel="Zet dit vandaag aan", intro="Kost vijf minuten.",
+            stappen=["Eén", "Twee", "Drie"], niet_doen="Niets installeren.", tijd="5 min")
+        self.editie.voor_bedrijven = "Voor mkb'ers met een klantenbestand."
+        terug = Editie.from_dict(json.loads(render.naar_json(self.editie)))
+        self.assertEqual(terug.datum, DATUM)
+        self.assertEqual(terug.toepassing.stappen, ["Eén", "Twee", "Drie"])
+        self.assertEqual(terug.voor_bedrijven, self.editie.voor_bedrijven)
+        self.assertEqual([i.kop for i in terug.items], [i.kop for i in self.editie.items])
+
     def test_markdown_bevat_alle_koppen(self):
-        md = render.naar_markdown(self.selecties, self.datum)
-        for s in self.selecties:
+        md = render.naar_markdown(self.editie)
+        for s in self.editie.items:
             self.assertIn(s.kop, md)
 
     def test_datum_van_de_gebeurtenis_wordt_getoond(self):
-        self.assertEqual(render._kort_datum("2026-07-27"), "27 juli")
-        self.assertEqual(render._kort_datum("2026-07"), "juli")
+        self.assertEqual(render.kort_datum("2026-07-27"), "27 juli")
+        self.assertEqual(render.kort_datum("2026-07"), "juli")
         # Onparseerbare invoer mag niet crashen maar blijft zichtbaar.
-        self.assertEqual(render._kort_datum("binnenkort"), "binnenkort")
+        self.assertEqual(render.kort_datum("binnenkort"), "binnenkort")
 
     def test_kanttekening_verschijnt_alleen_als_die_er_is(self):
-        from signaal.model import Selectie
-
         met = Selectie(kop="k", kern="s", wat="w", waarom="d", url="https://a.nl",
                        bron="b", categorie="model", kanttekening="Eén bron.")
         zonder = Selectie(kop="k", kern="s", wat="w", waarom="d", url="https://a.nl",
                           bron="b", categorie="model")
-        self.assertIn("Kanttekening", render.naar_markdown([met], self.datum))
-        self.assertNotIn("Kanttekening", render.naar_markdown([zonder], self.datum))
-        self.assertIn("Kanttekening", render.naar_html([met], self.datum))
-        self.assertNotIn("Kanttekening", render.naar_html([zonder], self.datum))
+        self.assertIn("Kanttekening", render.naar_markdown(maak_editie([met])))
+        self.assertNotIn("Kanttekening", render.naar_markdown(maak_editie([zonder])))
 
     def test_kernzin_staat_in_beide_formaten(self):
-        from signaal.model import Selectie
-
         s = Selectie(kop="Kop", kern="Dit is de kernzin zonder jargon.", wat="w",
                      waarom="d", url="https://a.nl", bron="b", categorie="model")
-        self.assertIn("Dit is de kernzin zonder jargon.",
-                      render.naar_markdown([s], self.datum))
-        self.assertIn("Dit is de kernzin zonder jargon.",
-                      render.naar_html([s], self.datum))
+        editie = maak_editie([s])
+        self.assertIn("Dit is de kernzin zonder jargon.", render.naar_markdown(editie))
+        self.assertIn("Dit is de kernzin zonder jargon.", render.naar_html(editie))
+
+    def test_mail_linkt_door_naar_de_eigen_pagina(self):
+        s = Selectie(kop="Toezichthouder tikt drie banken op de vingers", kern="k",
+                     wat="w", waarom="d", url="https://bron.nl/a", bron="b")
+        html = render.naar_html(maak_editie([s]))
+        self.assertIn(
+            "https://aibulletin.nl/2026-07-29/toezichthouder-tikt-drie-banken-op-de-vingers",
+            html)
 
     def test_intro_is_optioneel(self):
-        md_met = render.naar_markdown(self.selecties, self.datum, intro="Vandaag twee thema's.")
-        md_zonder = render.naar_markdown(self.selecties, self.datum)
+        md_met = render.naar_markdown(maak_editie(self.editie.items,
+                                                  intro="Vandaag twee thema's."))
+        md_zonder = render.naar_markdown(self.editie)
         self.assertIn("Vandaag twee thema's.", md_met)
         self.assertNotIn("Vandaag twee thema's.", md_zonder)
 
     def test_leestijd_schaalt_mee_en_is_minstens_een_minuut(self):
-        from signaal.model import Selectie
-
-        kort = [Selectie(kop="k", kern="s", wat="w", waarom="d",
-                         url="https://a.nl", bron="b")]
-        lang = [Selectie(kop="k", kern="s", wat="woord " * 400, waarom="d",
-                         url="https://a.nl", bron="b")]
+        kort = maak_editie([Selectie(kop="k", kern="s", wat="w", waarom="d",
+                                     url="https://a.nl", bron="b")])
+        lang = maak_editie([Selectie(kop="k", kern="s", wat="w", waarom="woord " * 400,
+                                     url="https://a.nl", bron="b")])
         self.assertEqual(render.leestijd(kort), 1)
         self.assertGreater(render.leestijd(lang), render.leestijd(kort))
-        self.assertIn("minuten lezen", render.naar_markdown(lang, self.datum))
+        self.assertIn("minuten lezen", render.naar_markdown(lang))
+
+    def test_toepassing_verschijnt_in_beide_formaten(self):
+        editie = maak_editie(self.editie.items, toepassing=Toepassing(
+            titel="Controleer je eigen chatbot", intro="Kost vijf minuten.",
+            stappen=["Open de bot", "Stel de vraag", "Noteer het antwoord"],
+            niet_doen="Je hoeft geen software te kopen.", tijd="5 min"))
+        for uitvoer in (render.naar_markdown(editie), render.naar_html(editie)):
+            self.assertIn("Vandaag toepassen", uitvoer)
+            self.assertIn("Controleer je eigen chatbot", uitvoer)
+            self.assertIn("Noteer het antwoord", uitvoer)
+            self.assertIn("níét hoeft te doen", uitvoer)
 
     def test_methodeverantwoording_staat_in_beide_formaten(self):
-        for uitvoer in (render.naar_markdown(self.selecties, self.datum),
-                        render.naar_html(self.selecties, self.datum)):
-            self.assertIn("Hoe deze editie tot stand kwam", uitvoer)
+        for uitvoer in (render.naar_markdown(self.editie), render.naar_html(self.editie)):
+            self.assertIn("Hoe deze editie tot stand kwam".lower(), uitvoer.lower())
             self.assertIn("correcties", uitvoer.lower())
 
     def test_html_ontsnapt_gebruikersinhoud(self):
-        from signaal.model import Selectie
-
-        gevaarlijk = [Selectie(
+        gevaarlijk = maak_editie([Selectie(
             kop="<script>alert(1)</script>", kern="k", wat="a", waarom="b",
             url="https://example.com", bron="x", categorie="model",
-        )]
-        html = render.naar_html(gevaarlijk, self.datum)
+        )])
+        html = render.naar_html(gevaarlijk)
         self.assertNotIn("<script>alert(1)</script>", html)
         self.assertIn("&lt;script&gt;", html)
 
 
 class TestHeuristischeSelectie(unittest.TestCase):
     def test_levert_gevraagd_aantal(self):
-        items = score.scoor(_laad_fixtures(PROJECT / "fixtures" / "kandidaten.json"), CONFIG)
-        selecties, _ = rank.kies_heuristisch(items, CONFIG)
-        self.assertEqual(len(selecties), 6)
+        self.assertEqual(len(fixture_editie().items), 6)
 
     def test_geen_dubbele_urls(self):
-        items = score.scoor(_laad_fixtures(PROJECT / "fixtures" / "kandidaten.json"), CONFIG)
-        urls = [s.url for s in rank.kies_heuristisch(items, CONFIG)[0]]
+        urls = [s.url for s in fixture_editie().items]
         self.assertEqual(len(urls), len(set(urls)))
+
+    def test_neemt_geen_brontekst_over(self):
+        """Auteursrecht: een samenvatting van de uitgever mag niet in de editie."""
+        items = score.scoor(_laad_fixtures(PROJECT / "fixtures" / "kandidaten.json"), CONFIG)
+        samenvattingen = {i.samenvatting for i in items if i.samenvatting}
+        for s in rank.kies_heuristisch(items, CONFIG, DATUM).items:
+            self.assertNotIn(s.wat, samenvattingen)
+
+
+class TestSite(unittest.TestCase):
+    def test_bouwt_alle_paginas(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            edities, uit = Path(tmp) / "edities", Path(tmp) / "site"
+            edities.mkdir()
+            editie = fixture_editie()
+            editie.toepassing = Toepassing(
+                titel="Doe deze test", intro="Vijf minuten.",
+                stappen=["Een", "Twee", "Drie"], tijd="5 min")
+            (edities / f"{editie.stam}.json").write_text(
+                render.naar_json(editie), encoding="utf-8")
+
+            paden = site.bouw(edities, uit)
+            self.assertTrue(paden)
+            for verwacht in ("index.html", "stijl.css", "sitemap.xml",
+                             "archief/index.html", "werkwijze/index.html",
+                             f"{editie.stam}/index.html"):
+                self.assertTrue((uit / verwacht).exists(), f"{verwacht} ontbreekt")
+            # Elk bericht krijgt een eigen pagina — dat is waar de mail naartoe linkt.
+            for item in editie.items:
+                self.assertTrue((uit / editie.stam / item.slug / "index.html").exists())
+
+    def test_lege_map_is_een_fout(self):
+        """Liever hard falen dan een lege site over de bestaande heen publiceren."""
+        with tempfile.TemporaryDirectory() as tmp:
+            edities, uit = Path(tmp) / "edities", Path(tmp) / "site"
+            edities.mkdir()
+            with self.assertRaises(ValueError):
+                site.bouw(edities, uit)
+
+    def test_slug_is_stabiel_en_url_veilig(self):
+        s = Selectie(kop="ACM: 40% méér meldingen — “fors” gestegen", kern="k", wat="w",
+                     waarom="d", url="https://a.nl", bron="b")
+        self.assertEqual(s.slug, "acm-40-meer-meldingen-fors-gestegen")
 
 
 class TestAudioScript(unittest.TestCase):

@@ -16,6 +16,7 @@ export ANTHROPIC_API_KEY=sk-ant-...
 
 python -m signaal.cli                 # volledige run met LLM-jury
 python -m signaal.cli --audio         # inclusief gesproken editie
+python -m signaal.cli --site          # bouw de website uit alle edities
 ```
 
 Zonder API-sleutel of internet, met meegeleverde voorbeelddata:
@@ -27,12 +28,33 @@ python -m unittest discover -s tests
 
 Output belandt in `edities/` als JSON (archief/API), Markdown (web) en
 HTML (e-mail, met inline styles zodat Outlook het niet sloopt).
+`--site` leest die JSON-bestanden en schrijft de complete statische site naar
+`site/`. De site is dus volledig af te leiden uit `edities/` en staat daarom
+niet in de repo — alleen het archief zelf.
+
+## Wat er in één editie zit
+
+Zes berichten, en twee dingen die het nieuws niet zelf oplevert:
+
+- **Elk bericht** heeft een kop, een `kern` (één zin zonder jargon die het hele
+  bericht draagt), `wat` (het verifieerbare feit), `waarom` (de duiding, apart
+  gelabeld zodat de lezer ziet waar het feit ophoudt), bron, datum van de
+  gebeurtenis, en waar nodig een `kanttekening` bij het cijfer zelf.
+- **Vandaag toepassen** — drie stappen die de lezer vandaag kan doen, met
+  expliciet erbij wat níét hoeft. Dit is het enige onderdeel dat niet uit een
+  bron komt en dus niet te scrapen is door een concurrent.
+- **Voor jouw bedrijf** — wat de dag betekent voor wie iets moet beslissen.
+
+De mail is korter dan de site: hij bevat kop, kern en waarom, en linkt per
+bericht door naar `aibulletin.nl/{datum}/{slug}` voor het volledige feitenrelaas.
+Dat houdt de belofte van een paar minuten haalbaar en geeft de site
+bestaansrecht.
 
 ## Hoe het werkt
 
 ```
-bronnen  →  leeftijdsfilter  →  voorscore  →  ontdubbelen  →  shortlist  →  jury  →  render
- ~200        ~150               ~150          ~120            40           6        3 formaten
+bronnen → leeftijdsfilter → voorscore → ontdubbelen → shortlist → jury → render → site
+ ~200      ~150              ~150        ~120          40          6      3 formaten  HTML
 ```
 
 **1. Bronnen** (`signaal/bronnen/`) — arXiv, GitHub (sterren-per-dag, niet totaal:
@@ -63,7 +85,14 @@ Nederlandse professional. De systeemprompt verbiedt expliciet holle frasen en
 speculatie. Faalt de jury, dan valt de pijplijn terug op een heuristische
 selectie — een mindere editie is beter dan geen editie.
 
-**6. Audio** (`signaal/audio.py`) — het voorleesscript is níét de mailtekst.
+**6. Website** (`signaal/site.py`) — leest alle edities uit `edities/` en
+genereert een statische site: homepage, editiepagina, een eigen pagina per
+bericht (waar de mail naartoe linkt), een doorzoekbare bibliotheek van alle
+"Vandaag toepassen"-stukken, archief, voorkeuren, werkwijze en een sitemap.
+Geen build-tooling, geen JavaScript, één stylesheet — te hosten op elke statische
+host en snel genoeg op een telefoon met slecht bereik.
+
+**7. Audio** (`signaal/audio.py`) — het voorleesscript is níét de mailtekst.
 URL's worden verwijderd, afkortingen fonetisch gespeld (`LLM` → `el-el-em`,
 `AVG` → `aa-vee-gee`), haakjes worden komma's. ElevenLabs `eleven_multilingual_v2`
 is geïmplementeerd; het Engelstalige model spreekt Nederlands met een Engels
@@ -200,6 +229,12 @@ draaien, niet een goedkoper model.
 
 ## Automatisch draaien
 
-`.github/workflows/ai-bulletin.yml` draait op werkdagen om 05:15 UTC. Vereist
-`ANTHROPIC_API_KEY` als repository secret; `ELEVENLABS_API_KEY` en
-`ELEVENLABS_VOICE_ID` alleen als je audio aanzet.
+`.github/workflows/ai-bulletin.yml` draait op werkdagen om 05:15 UTC: tests,
+editie samenstellen, site bouwen, het archief terugcommitten en de site naar
+GitHub Pages publiceren. Vereist `ANTHROPIC_API_KEY` als repository secret;
+`ELEVENLABS_API_KEY` en `ELEVENLABS_VOICE_ID` alleen als je audio aanzet.
+
+De Pages-stap werkt pas nadat je in **Settings → Pages** de bron op *GitHub
+Actions* hebt gezet; zonder dat faalt die ene job terwijl de editie zelf gewoon
+klaarstaat in `edities/`. Voor `aibulletin.nl` zet je het domein daar als custom
+domain in en laat je de DNS ernaar wijzen.

@@ -9,7 +9,7 @@ import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
 
-from . import pipeline
+from . import pipeline, site
 from .model import Item
 
 PROJECT = Path(__file__).resolve().parent.parent
@@ -65,6 +65,14 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         help="render een bestaande selectie opnieuw; slaat verzamelen en jury over",
     )
+    parser.add_argument(
+        "--site",
+        nargs="?",
+        const=PROJECT / "site",
+        type=Path,
+        metavar="MAP",
+        help="bouw de statische website uit alle edities en stop daarna",
+    )
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)
 
@@ -75,6 +83,14 @@ def main(argv: list[str] | None = None) -> int:
 
     config = pipeline.laad_config(args.config)
     uitvoermap = args.uitvoer or (PROJECT / config.get("output", {}).get("map", "edities"))
+
+    if args.site is not None:
+        paden = site.bouw(uitvoermap, args.site)
+        print(f"\nAI Bulletin — website: {len(paden)} bestanden in {args.site}")
+        for pad in paden:
+            print(f"  {pad.relative_to(args.site)}")
+        return 0
+
     if args.selectie:
         resultaat = pipeline.render_selectie(args.selectie, uitvoermap)
     else:
