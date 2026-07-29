@@ -692,9 +692,33 @@ class TestKoptoets(unittest.TestCase):
             [],
         )
 
+    def test_abstract_onderwerp_zonder_lezer_wordt_afgekeurd(self):
+        """De kop die deze controle heeft uitgelokt: waar, en zegt niemand iets."""
+        bezwaren = koptoets.controleer_kop("De AI-wet is uitgesteld en gaat vandaag gewoon in")
+        self.assertTrue(any("abstract onderwerp" in b for b in bezwaren))
+
+    def test_abstractie_mag_als_de_lezer_erin_staat(self):
+        self.assertEqual(
+            koptoets.controleer_kop("De AI-wet is uitgesteld — behalve voor jouw chatbot"), [])
+
+    def test_concrete_koppen_krijgen_geen_vals_alarm(self):
+        for kop in ("DNB: bij 73% van de aanvallen bestond de update nog niet",
+                    "Kimi K3 is gratis te downloaden en onbetaalbaar om te draaien",
+                    "Drie bedrijven bezitten de AI's die jouw webshop moeten vinden"):
+            self.assertEqual(koptoets.controleer_kop(kop), [], kop)
+
     def test_te_lange_kop(self):
         bezwaren = koptoets.controleer_kop("DNB " + "woord " * 20)
         self.assertTrue(any("te lang" in b for b in bezwaren))
+
+    def test_de_kop_van_het_zondagsstuk_voldoet_ook(self):
+        """Een essay heeft dezelfde koppentoets nodig als een nieuwsbericht."""
+        for pad in sorted((PROJECT / "redactie").glob("*-selectie.json")):
+            data = json.loads(pad.read_text(encoding="utf-8"))
+            b = data.get("beschouwing")
+            if b:
+                self.assertEqual(koptoets.controleer_kop(b["titel"]), [],
+                                 f"{pad.name}: zwakke kop boven het zondagsstuk")
 
     def test_gepubliceerde_edities_voldoen_aan_de_kopregels(self):
         """Elke editie in redactie/ moet door de eigen toets komen."""

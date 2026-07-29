@@ -51,6 +51,23 @@ _TIJDWOORDEN = re.compile(
 )
 
 
+# Onderwerpen waar de lezer zich niets bij voorstelt. Ze zijn niet verboden —
+# het nieuws gáát soms over een wet — maar dan moet er wel iemand in de kop
+# staan die het merkt. "De AI-wet is uitgesteld en gaat vandaag gewoon in" is
+# waar, klopt, en zegt de lezer niets; "De AI-wet is uitgesteld — behalve voor
+# jouw chatbot" gaat over precies hetzelfde.
+_ABSTRACT = re.compile(
+    r"\b(wet|wetgeving|regel|regels|regelgeving|verordening|richtlijn|beleid|"
+    r"verplichting|verplichtingen|norm|normen|kader|standaard|protocol|"
+    r"sector|branche|markt|technologie|innovatie|transitie|ontwikkeling)\w*\b",
+    re.IGNORECASE,
+)
+
+# De lezer zelf in de kop. Een eigennaam telt ook: "banken", "DNB" en "Mistral"
+# zijn concreet, ook al staat er geen "je".
+_LEZER = re.compile(r"\b(je|jij|jou|jouw|uw|u)\b", re.IGNORECASE)
+
+
 def controleer_kop(kop: str) -> list[str]:
     """Geeft de gevonden bezwaren terug. Lege lijst betekent: geen bezwaar."""
     bezwaren: list[str] = []
@@ -84,6 +101,15 @@ def controleer_kop(kop: str) -> list[str]:
     heeft_tijd = bool(_TIJDWOORDEN.search(kop))
     if not (heeft_getal or heeft_naam or heeft_tijd):
         bezwaren.append("niets specifieks: geen getal, naam of tijdstip")
+
+    # Een abstract onderwerp mag, maar dan moet er iemand in staan die het
+    # merkt. Anders is de kop waar en betekenisloos tegelijk.
+    abstractie = _ABSTRACT.search(kop)
+    if abstractie and not _LEZER.search(kop):
+        bezwaren.append(
+            f"abstract onderwerp ('{abstractie.group()}') zonder lezer erin — "
+            "wie merkt dit, en waaraan?"
+        )
 
     return bezwaren
 

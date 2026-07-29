@@ -84,6 +84,11 @@ passen, niet alle vier in elk bericht:
    laat zich niet wegscrollen. "Kimi K3 is gratis te downloaden en onbetaalbaar \
    om te draaien" verslaat "Moonshot brengt Kimi K3 uit". Alleen als de \
    tegenstelling echt in het nieuws zit — verzin er geen.
+   Voorwaarde: minstens één helft van de tegenstelling moet iets zijn dat de \
+   lezer kan zien of aanwijzen. "De AI-wet is uitgesteld en gaat vandaag gewoon \
+   in" is spanning tussen twee abstracties en dus geen spanning maar verwarring; \
+   "De AI-wet is uitgesteld — behalve voor jouw chatbot" gaat over hetzelfde \
+   feit en werkt wel.
 2. EEN SCÈNE IN PLAATS VAN EEN DEFINITIE. Moet je een begrip uitleggen, laat \
    het dan zien in een situatie die de lezer kent. Niet "buiten de \
    trainingsverdeling", maar: je rijdt 's nachts door de sneeuw en er ligt iets \
