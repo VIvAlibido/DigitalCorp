@@ -137,6 +137,16 @@ aside{display:flex;flex-direction:column;gap:16px;position:sticky;top:20px}
 .bol{width:13px;height:13px;border-radius:50%;border:2px solid var(--lijn);
 flex-shrink:0;background:#fff}
 .bol.aan{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 2.5px #fff}
+.essay{border-top:2px solid var(--inkt);padding-top:20px;margin-bottom:44px}
+.essay-label{font:600 11px/1.4 var(--sans);color:var(--accent);
+text-transform:uppercase;letter-spacing:.08em}
+.essay h1,.essay h2{font:600 30px/1.22 var(--serif);margin:10px 0 8px;
+letter-spacing:-.01em;text-wrap:balance}
+.essay h2 a{color:inherit;text-decoration:none}
+.essay-kern{font-size:17px;color:var(--zacht);margin:0 0 6px}
+.essay-auteur{font:600 13px/1.4 var(--sans);color:var(--gedempt);margin:0 0 22px}
+.essay-body p{font:400 17px/1.7 var(--serif);color:#33302b;margin:0 0 16px;max-width:64ch}
+.essay-body h3{font:600 19px/1.35 var(--serif);margin:28px 0 10px}
 .artikel{padding:40px 0 56px}
 .artikel h1{font:600 30px/1.28 var(--serif);margin:10px 0 14px;letter-spacing:-.01em}
 .kruimels{font-size:13px;color:var(--gedempt);margin-bottom:6px}
@@ -322,6 +332,7 @@ def _homepage(edities: list[Editie]) -> Sitepagina:
 {_aanmeldblok()}
 <div class="binnen kolommen">
   <main>
+    {_beschouwingblok(laatste, als_link=True, diepte=0)}
     {_toepassingblok(laatste, als_link=True, diepte=0)}
     <section>
       <div class="sectiekop">
@@ -364,6 +375,7 @@ def _editiepagina(editie: Editie) -> Sitepagina:
       <span class="tijd">{len(editie.items)} berichten</span>
     </div>
     {f'<p class="ene-zin">{e(editie.intro)}</p>' if editie.intro else ""}
+    {_beschouwingblok(editie, als_link=True, diepte=1)}
     {_toepassingblok(editie, als_link=True, diepte=1)}
     {berichten}
     {bedrijven}
@@ -414,6 +426,55 @@ def _verder_in_editie(editie: Editie, huidig) -> str:
     <a class="meer" href="../">Hele editie →</a></div>
   <ul class="lijst">{regels}</ul>
 </section>"""
+
+
+def _beschouwingblok(editie: Editie, als_link: bool, diepte: int) -> str:
+    """Het zondagsstuk. Andere typografie dan de zes berichten, want dit is
+    geen nieuws maar een mening — en dat mag de lezer meteen zien."""
+    if not editie.beschouwing:
+        return ""
+    e = html.escape
+    op = "../" * diepte or "./"
+    b = editie.beschouwing
+    titel = (
+        f'<h2><a href="{op}{editie.stam}/{b.slug}/">{e(b.titel)}</a></h2>'
+        if als_link else f"<h1>{e(b.titel)}</h1>"
+    )
+    body = "".join(
+        f"<h3>{e(a[2:])}</h3>" if a.startswith("# ") else f"<p>{e(a)}</p>"
+        for a in b.alineas
+    )
+    herkomst = (
+        f'<p class="herkomst">Gebaseerd op: '
+        f'<a href="{e(b.url)}" rel="noopener">{e(b.bron)}</a></p>'
+        if b.bron and b.url else ""
+    )
+    return f"""
+<section class="essay">
+  <div class="essay-label">Zondagsstuk</div>
+  {titel}
+  <p class="essay-kern">{e(b.kern)}</p>
+  <p class="essay-auteur">{e(b.auteur)}</p>
+  <div class="essay-body">{body}</div>
+  {herkomst}
+</section>"""
+
+
+def _beschouwingpagina(editie: Editie) -> Sitepagina:
+    b = editie.beschouwing
+    inhoud = f"""
+<div class="binnen smal artikel">
+  <p class="kruimels"><a href="../../">{MERK}</a> ·
+    <a href="../">{html.escape(datum_nl(editie.datum))}</a></p>
+  {_beschouwingblok(editie, als_link=False, diepte=2)}
+  <div class="methode">
+    Dit stuk is geschreven door {html.escape(b.auteur)} en is een mening, geen
+    nieuwsbericht. De zes dagelijkse berichten volgen andere regels — zie onze
+    <a href="../../werkwijze/">werkwijze</a>.
+  </div>
+  {_strip(2)}
+</div>"""
+    return Sitepagina(f"{editie.stam}/{b.slug}", f"{b.titel} — {MERK}", b.kern, inhoud)
 
 
 def _berichtpagina(editie: Editie, item) -> Sitepagina:
@@ -771,6 +832,8 @@ def bouw(edities_map: Path, uitvoer: Path, config: dict | None = None,
         paginas += [_berichtpagina(ed, item) for item in ed.items]
         if ed.toepassing:
             paginas.append(_toepassingpagina(ed))
+        if ed.beschouwing:
+            paginas.append(_beschouwingpagina(ed))
 
     geschreven = [uitvoer / "stijl.css"]
     (uitvoer / "stijl.css").write_text(_stylesheet().strip() + "\n", encoding="utf-8")

@@ -18,7 +18,7 @@ import html
 import json
 from datetime import date
 
-from .model import Editie, Selectie
+from .model import Beschouwing, Editie, Selectie
 
 MERK = "AI Bulletin"
 SITE = "https://aibulletin.nl"
@@ -61,6 +61,8 @@ def bericht_url(editie: Editie, item: Selectie) -> str:
 def leestijd(editie: Editie) -> int:
     """Geschatte leestijd in minuten, op 200 woorden per minuut."""
     delen = [editie.intro, editie.voor_bedrijven]
+    if editie.beschouwing:
+        delen += editie.beschouwing.alineas + [editie.beschouwing.kern]
     delen += [f"{i.kop} {i.kern} {i.waarom}" for i in editie.items]
     if editie.toepassing:
         t = editie.toepassing
@@ -107,6 +109,16 @@ def naar_markdown(editie: Editie) -> str:
     if editie.intro:
         r += [f"> {editie.intro}", ""]
     r += ["---", ""]
+
+    if editie.beschouwing:
+        b = editie.beschouwing
+        r += [f"## {b.titel}", "", f"*{b.kern}*", ""]
+        r += [f"**{b.auteur}**" if b.auteur else "", ""]
+        for alinea in b.alineas:
+            r += [f"### {alinea[2:]}" if alinea.startswith("# ") else alinea, ""]
+        if b.bron:
+            r += [f"*Gebaseerd op: [{b.bron}]({b.url})*" if b.url else f"*Bron: {b.bron}*", ""]
+        r += ["---", ""]
 
     # De toepassing staat vóór de zes. Dit is het onderdeel waar AI Bulletin om
     # bekend staat; onder zes nieuwsberichten is het een voetnoot.
@@ -204,6 +216,41 @@ def _toepassing_html(editie: Editie) -> str:
   </td></tr>"""
 
 
+def _beschouwing_html(editie: Editie) -> str:
+    """Het zondagsstuk in de mail. Bewust anders van vorm dan de zes berichten:
+    de lezer moet in één oogopslag zien dat hier een mens aan het woord is."""
+    if not editie.beschouwing:
+        return ""
+    e = html.escape
+    b = editie.beschouwing
+    body = ""
+    for alinea in b.alineas:
+        if alinea.startswith("# "):
+            body += (f'<h3 style="margin:22px 0 8px;font:600 16px/1.35 Georgia,serif;'
+                     f'color:#1c1a17;">{e(alinea[2:])}</h3>')
+        else:
+            body += (f'<p style="margin:0 0 13px;font:400 15.5px/1.68 Georgia,serif;'
+                     f'color:#33302b;">{e(alinea)}</p>')
+    herkomst = (
+        f'<p style="margin:16px 0 0;font:400 12.5px/1.6 {_SANS};color:#8a7f6d;">'
+        f'Gebaseerd op: <a href="{e(b.url)}" style="color:#a4552b;">{e(b.bron)}</a></p>'
+        if b.bron and b.url else ""
+    )
+    return f"""
+  <tr><td style="padding:26px 34px 0;">
+    <div style="border-top:2px solid #1c1a17;padding-top:18px;">
+      <div style="font:600 11px/1.4 {_SANS};color:#a4552b;text-transform:uppercase;
+                  letter-spacing:.08em;">Zondagsstuk</div>
+      <h2 style="margin:9px 0 7px;font:600 25px/1.24 Georgia,serif;color:#1c1a17;">
+        {e(b.titel)}</h2>
+      <p style="margin:0 0 6px;font:400 16px/1.55 {_SANS};color:#4a4437;">{e(b.kern)}</p>
+      <p style="margin:0 0 20px;font:600 13px/1.4 {_SANS};color:#8a7f6d;">
+        {e(b.auteur)}</p>
+      {body}{herkomst}
+    </div>
+  </td></tr>"""
+
+
 def naar_html(editie: Editie) -> str:
     """E-mail-HTML: tabellen en inline styles, want mailclients kunnen weinig."""
     e = html.escape
@@ -263,6 +310,7 @@ def naar_html(editie: Editie) -> str:
       {e(datum_nl(editie.datum).capitalize())} · AI-nieuws voor Nederland</div>
   </td></tr>
 {intro}
+{_beschouwing_html(editie)}
 {_toepassing_html(editie)}
   <tr><td style="padding:26px 34px 0;">
     <div style="font:600 11px/1.4 {_SANS};color:#8a7f6d;text-transform:uppercase;

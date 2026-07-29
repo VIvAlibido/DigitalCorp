@@ -121,6 +121,40 @@ class Toepassing:
 
 
 @dataclass
+class Beschouwing:
+    """Het zondagsstuk: één onderwerp, uitgeschreven, met een naam eronder.
+
+    Dit is het enige deel van AI Bulletin dat níét uit een bron volgt en niet
+    door de automaat wordt gemaakt. Zes dagen machinewerk met verantwoording,
+    één dag mensenwerk met een handtekening — en dat verschil is voor de lezer
+    zichtbaar. Daarom staat `auteur` hier verplicht bij: een stuk met een mening
+    zonder naam is het slechtste van twee werelden.
+
+    In `alineas` begint een tussenkop met "# ". Dat is de enige opmaak; de rest
+    is gewone tekst.
+    """
+
+    titel: str
+    kern: str
+    alineas: list[str] = field(default_factory=list)
+    auteur: str = ""
+    # Waar het stuk op teruggrijpt, als dat er is: een rapport, een cijfer.
+    bron: str = ""
+    url: str = ""
+
+    def as_dict(self) -> dict:
+        return asdict(self)
+
+    @property
+    def slug(self) -> str:
+        return _slug(self.titel)
+
+    @property
+    def woorden(self) -> int:
+        return sum(len(a.split()) for a in self.alineas if not a.startswith("# "))
+
+
+@dataclass
 class Editie:
     """Alles wat één editie uitmaakt.
 
@@ -136,6 +170,8 @@ class Editie:
     intro: str = ""
     toepassing: Toepassing | None = None
     voor_bedrijven: str = ""
+    # Alleen op zondag. Zie Beschouwing.
+    beschouwing: Beschouwing | None = None
     # Verantwoording: hoeveel kandidaten en bronnen deze editie opleverden.
     kandidaten: int | None = None
     bronnen: int | None = None
@@ -152,6 +188,7 @@ class Editie:
             "intro": self.intro,
             "items": [i.as_dict() for i in self.items],
             "toepassing": self.toepassing.as_dict() if self.toepassing else None,
+            "beschouwing": self.beschouwing.as_dict() if self.beschouwing else None,
             "voor_bedrijven": self.voor_bedrijven,
             "kandidaten": self.kandidaten,
             "bronnen": self.bronnen,
@@ -160,6 +197,7 @@ class Editie:
     @classmethod
     def from_dict(cls, data: dict) -> "Editie":
         toepassing = data.get("toepassing")
+        beschouwing = data.get("beschouwing")
         return cls(
             datum=date.fromisoformat(data["datum"]),
             items=[Selectie(**rij) for rij in data.get("items", [])],
@@ -167,6 +205,7 @@ class Editie:
             preheader=data.get("preheader", ""),
             intro=data.get("intro", ""),
             toepassing=Toepassing(**toepassing) if toepassing else None,
+            beschouwing=Beschouwing(**beschouwing) if beschouwing else None,
             voor_bedrijven=data.get("voor_bedrijven", ""),
             kandidaten=data.get("kandidaten"),
             bronnen=data.get("bronnen"),

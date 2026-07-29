@@ -91,7 +91,9 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 14 | `waarom` is **hoogstens twee zinnen / 60 woorden**, bewaakt door `rank.toets_verhouding()` | de mail toont alleen `kern` en `waarom`; bij langere duiding bestaat de nieuwsbrief voor 80% uit onze mening. Gemeten op de editie van 29 juli: 79–84% |
 | 15 | Het duidingslabel heet **"Wat het betekent"**, klein en ingesprongen, met één uitleg boven De zes | zes keer een vetgedrukt "Waarom" leest als geschreeuw; de scheiding moet zichtbaar zijn, niet luid |
 | 7 | Weekend krijgt een **ander formaat** dan doordeweeks | za/zo is de dunste invoer van de week; zie plan §6 |
-| 8 | Zondagstuk wordt **niet geautomatiseerd** | het enige deel dat niet te scrapen is, moet mensenwerk zijn |
+| 8 | Zondagstuk wordt **niet geautomatiseerd** en verschijnt onder de naam **Kees Cornelius** | het enige deel dat niet te scrapen is, moet mensenwerk zijn; een mening zonder naam is het slechtste van twee werelden |
+| 16 | De dagelijkse editie leent **vier technieken** van essayisten als Alberto Romero: spanning boven mededeling, scène boven definitie, een cijfer dat blijft hangen, duiding die oordeelt | de vorm schaalt niet naar 180 woorden, het gereedschap wel |
+| 17 | De dagelijkse editie gebruikt **géén ik-vorm, geen uitweidingen, geen gespeelde oneerbiedigheid** | 6 berichten × 7 dagen = 42 meningen per week; die heeft niemand. Nagedane branietaal is binnen twee edities doorzichtig |
 | 9 | Eerst **goedkeuren vóór verzenden**, later omschakelen naar een annuleervenster | opdrachtgever heeft nu veel tijd, straks weinig; de omschakeling moet één regel config zijn, geen verbouwing |
 | 10 | Colofon en privacyverklaring worden **uit `uitgever:` in config.yaml gegenereerd** | één plek voor deze gegevens, zodat er geen tweede versie kan verouderen; publicatie wordt geblokkeerd zolang ze ontbreken |
 | 11 | Hosting op **Vercel**, gekoppeld aan deze repo. Root directory `ai-bulletin` | opdrachtgever, 29 juli. Let op: de repo-root bevat een ándere website; zonder die instelling publiceert Vercel die |
@@ -144,8 +146,9 @@ beslissing 9.)*
 
 ## Stand van de bouw
 
-**Werkt en is getest** (99 tests): verzamelen uit 8 brontypes, scoren,
+**Werkt en is getest** (106 tests): verzamelen uit 8 brontypes, scoren,
 ontdubbelen, geheugen tussen edities, ondergrens, shortlist, LLM-jury met terugval, koptoets/kopscore/kopvarianten,
+zondagsstuk met eigen sjabloon en auteursnaam,
 render naar JSON/Markdown/mail-HTML, statische sitegenerator inclusief
 colofon en privacyverklaring, robots.txt met noindex op voorvertoningen,
 GitHub Actions-workflow met Pages-deploy, en `vercel.json` + `bouw_site.py`

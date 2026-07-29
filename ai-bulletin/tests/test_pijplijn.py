@@ -17,7 +17,7 @@ from signaal import (  # noqa: E402
 from signaal.bronnen import basis  # noqa: E402
 from signaal.cli import _laad_fixtures  # noqa: E402
 from signaal.model import (  # noqa: E402
-    Editie, Item, Selectie, Toepassing, canonicaliseer_url,
+    Beschouwing, Editie, Item, Selectie, Toepassing, canonicaliseer_url,
 )
 
 PROJECT = Path(__file__).resolve().parent.parent
@@ -433,6 +433,64 @@ class TestOndergrens(unittest.TestCase):
         # Het origineel mag niet meeveranderen — anders lekt de ene run in de andere.
         self.assertEqual(rank.bouw_schema(1, 2)["properties"]["items"]["minItems"], 1)
         self.assertEqual(schema["properties"]["items"]["minItems"], 3)
+
+
+class TestZondagsstuk(unittest.TestCase):
+    """Zes dagen machinewerk, één dag mensenwerk — en dat moet zichtbaar zijn."""
+
+    ZONDAG = PROJECT / "redactie" / "2026-08-02-selectie.json"
+
+    def editie(self) -> Editie:
+        return Editie.from_dict(json.loads(self.ZONDAG.read_text(encoding="utf-8")))
+
+    def test_de_auteur_staat_erbij(self):
+        """Een stuk met een mening zonder naam is het slechtste van twee werelden."""
+        b = self.editie().beschouwing
+        self.assertEqual(b.auteur, "Kees Cornelius")
+        for uitvoer in (render.naar_markdown(self.editie()), render.naar_html(self.editie())):
+            self.assertIn("Kees Cornelius", uitvoer)
+
+    def test_tussenkoppen_worden_koppen(self):
+        b = Beschouwing(titel="T", kern="k", auteur="A",
+                        alineas=["# Een tussenkop", "Gewone tekst."])
+        html = render.naar_html(maak_editie([], beschouwing=b))
+        self.assertIn("<h3", html)
+        self.assertNotIn("# Een tussenkop", html)
+        self.assertIn("Een tussenkop", html)
+
+    def test_woorden_telt_de_tussenkoppen_niet_mee(self):
+        b = Beschouwing(titel="T", kern="k", alineas=["# Kop hier", "een twee drie vier"])
+        self.assertEqual(b.woorden, 4)
+
+    def test_essay_telt_mee_in_de_leestijd(self):
+        """Anders belooft de zondagseditie één minuut voor een stuk van 400 woorden."""
+        leeg = maak_editie([])
+        met = maak_editie([], beschouwing=self.editie().beschouwing)
+        self.assertGreater(render.leestijd(met), render.leestijd(leeg))
+
+    def test_rondreis_door_json(self):
+        terug = Editie.from_dict(json.loads(render.naar_json(self.editie())))
+        self.assertEqual(terug.beschouwing.auteur, "Kees Cornelius")
+        self.assertEqual(terug.beschouwing.alineas, self.editie().beschouwing.alineas)
+
+    def test_editie_zonder_beschouwing_blijft_werken(self):
+        editie = maak_editie([])
+        self.assertIsNone(editie.beschouwing)
+        self.assertNotIn("Zondagsstuk", render.naar_html(editie))
+
+    def test_eigen_pagina_op_de_site(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            edities, uit = Path(tmp) / "edities", Path(tmp) / "site"
+            edities.mkdir()
+            editie = self.editie()
+            (edities / f"{editie.stam}.json").write_text(
+                render.naar_json(editie), encoding="utf-8")
+            site.bouw(edities, uit)
+            pagina = uit / editie.stam / editie.beschouwing.slug / "index.html"
+            self.assertTrue(pagina.exists(), "het zondagsstuk heeft geen eigen pagina")
+            html = pagina.read_text(encoding="utf-8")
+            self.assertIn("Kees Cornelius", html)
+            self.assertIn("is een mening, geen", html)
 
 
 class TestUitgever(unittest.TestCase):
