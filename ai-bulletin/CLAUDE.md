@@ -62,9 +62,9 @@ opmerking omzette in werk zonder tegen te spreken.
 1. **Tegenspreken hoort bij het werk.** Een opdracht die botst met eerder
    onderzoek, met een eerdere beslissing of met het doel, wordt eerst benoemd.
    Daarna pas uitgevoerd of aangepast — maar de tegenspraak komt eerst.
-2. **Geen nieuw kenmerk zonder dat er één afvalt.** Zie het openstaande punt B
-   hieronder. Dit project heeft al één keer vijf onderscheidende kenmerken
-   gekregen waar het onderzoek er één voorschreef.
+2. **Geen nieuw kenmerk zonder dat er één afvalt.** Het kenmerk is
+   *toepasbaar*; zie hierboven. Dit project heeft al één keer vijf
+   onderscheidende kenmerken gekregen waar het onderzoek er één voorschreef.
 3. **Niets beweren zonder bewijs.** Geen verzonnen cijfers, geen "dat werkt
    goed" zonder bron of test. Bij twijfel: opzoeken of het onbekend noemen.
 4. **Afmaken voor doorgaan.** Een half werkend onderdeel is geen voortgang.
@@ -87,8 +87,8 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 6 | Feit (`wat`) en duiding (`waarom`) blijven zichtbaar gescheiden | geloofwaardigheid is de enige verdediging tegen "zoveelste AI-nieuwsbrief" |
 | 7 | Weekend krijgt een **ander formaat** dan doordeweeks | za/zo is de dunste invoer van de week; zie plan §6 |
 | 8 | Zondagstuk wordt **niet geautomatiseerd** | het enige deel dat niet te scrapen is, moet mensenwerk zijn |
-| 10 | Colofon en privacyverklaring worden **uit `uitgever:` in config.yaml gegenereerd** | één plek voor deze gegevens, zodat er geen tweede versie kan verouderen; publicatie wordt geblokkeerd zolang ze ontbreken |
 | 9 | Eerst **goedkeuren vóór verzenden**, later omschakelen naar een annuleervenster | opdrachtgever heeft nu veel tijd, straks weinig; de omschakeling moet één regel config zijn, geen verbouwing |
+| 10 | Colofon en privacyverklaring worden **uit `uitgever:` in config.yaml gegenereerd** | één plek voor deze gegevens, zodat er geen tweede versie kan verouderen; publicatie wordt geblokkeerd zolang ze ontbreken |
 
 ## Beslissingen die openstaan — deze blokkeren werk
 
@@ -109,11 +109,13 @@ beslissing 9.)*
   getest met fixtures.
 - **De LLM-jury heeft nog nooit echt gedraaid.** De editie van 2026-07-29 op de
   site is met de hand geschreven en zegt niets over wat de automaat produceert.
-- **De pijplijn kan niet zeggen "vandaag was er weinig".** `kies_heuristisch`
-  neemt `selecties[:6]`; de prompt dwingt zes items af. Er is geen ondergrens.
-  Dit moet opgelost worden vóór automatisering (plan §5.2).
-- **De pijplijn heeft geen geheugen tussen edities.** Ontdubbelen werkt binnen
-  één run; hetzelfde verhaal kan drie dagen achtereen terugkomen (plan §3.1).
+- **Een editie mag korter zijn dan zes** — opgelost op 29 juli. De jury krijgt
+  een bereik van 3 tot 6; de heuristische terugval gebruikt een verhouding tot
+  de sterkste kandidaat van die dag. Die verhouding vangt een zwakke staart,
+  niet een middelmatige dag: dat laatste kan alleen de jury zien, en die heeft
+  nog nooit gedraaid.
+- **De pijplijn heeft geheugen tussen edities** — `historie.py`, opgelost op
+  29 juli. Zelfde bron-URL wordt geweerd, een sterk gelijkende kop gestraft.
 - **Nieuwssamenvattingen ranken niet.** Google zet de primaire bron boven een
   samenvatting daarvan. Het archief is geen SEO-bezit; de toepassingen en de
   naslagpagina's zijn dat wel. Zie "SEO" hieronder.
@@ -125,10 +127,11 @@ beslissing 9.)*
 
 ## Stand van de bouw
 
-**Werkt en is getest** (70 tests): verzamelen uit 8 brontypes, scoren,
-ontdubbelen, shortlist, LLM-jury met terugval, koptoets/kopscore/kopvarianten,
-render naar JSON/Markdown/mail-HTML, statische sitegenerator, GitHub
-Actions-workflow met Pages-deploy.
+**Werkt en is getest** (93 tests): verzamelen uit 8 brontypes, scoren,
+ontdubbelen, geheugen tussen edities, ondergrens, shortlist, LLM-jury met terugval, koptoets/kopscore/kopvarianten,
+render naar JSON/Markdown/mail-HTML, statische sitegenerator inclusief
+colofon en privacyverklaring, GitHub Actions-workflow met Pages-deploy en een
+publicatieblokkade zolang de uitgeversgegevens ontbreken.
 
 **Ontbreekt:** verzendlaag (ESP), abonneebeheer, weekendformaten,
 SEO-technisch fundament (zie hieronder), en de uitgeversgegevens zelf —
