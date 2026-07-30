@@ -14,6 +14,17 @@ on:
         description: "Sla de LLM-jury over (goedkope testrun)"
         type: boolean
         default: false
+  # Startknop voor wie de dispatch-knop niet mag gebruiken. De assistent heeft
+  # geen recht om workflows te starten (403 Resource not accessible by
+  # integration) maar mag wel pushen; een tag draai-* is dus de enige manier
+  # waarop hij een proefrun kan aftrappen zonder de opdrachtgever erbij.
+  #
+  # Alléén op een tag, niet op elke push naar een branch: anders draait de
+  # jury bij iedere komma in de documentatie en kost elke commit geld.
+  # Een tagrun is een próefrun — hij publiceert niet, zie de archiefstap.
+  push:
+    tags:
+      - "draai-*"
 
 defaults:
   run:
@@ -103,7 +114,11 @@ jobs:
       # (beslissing 11) en bouwt bij elke push opnieuw via vercel.json.
       # Er is dus bewust geen deploy-stap in deze workflow: die zou een tweede
       # versie van de site opleveren op een tweede adres.
+      #
+      # Niet op een tagrun: die staat op een losse commit zonder branch, en een
+      # proefrun hoort de lezer niet te bereiken.
       - name: Bewaar het archief in de repo — hiermee publiceert Vercel
+        if: github.ref_type == 'branch'
         run: |
           git config user.name "AI Bulletin"
           git config user.email "noreply@aibulletin.nl"
