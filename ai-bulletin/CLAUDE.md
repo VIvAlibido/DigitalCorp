@@ -115,7 +115,9 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | # | Vraag | Wat het blokkeert |
 |---|---|---|
 | **D** | **Beantwoord op 30 juli — zie hieronder.** Rest: welk adres hoort in de colofon, en is aibulletin.nl geregistreerd? | Zie "Feiten die vaststaan". |
-| **E** | Wat betekent "nummer één" in een getal — abonnees, bezoekers, iets anders? | Kunnen beoordelen of een keuze over zes maanden heeft gewerkt |
+| **E** | Wat betekent "nummer één" in een getal — abonnees, bezoekers, iets anders? | Kunnen beoordelen of een keuze over zes maanden heeft gewerkt. **Context sinds 30 juli:** AI Report zit op ~48.000 abonnees. "Nummer één" op breedte is daarmee geen doel maar een fantasie; zie plan/groei.md §1 |
+| **F** | **Welke beroepsgroep wordt de doelgroep?** Juristen, accountants, HR of zorg — kies er één | Alles. Zolang de doelgroep "de geïnteresseerde professional" is, is het dezelfde doelgroep als AI Report en verliezen we van een bekende Nederlander met drie jaar voorsprong. Zie plan/groei.md §3 fase 0 |
+| **G** | **Blijft de ESP Laposta, of wordt het Substack?** | Fase 2 van de groei. Laposta heeft geen aanbevelingsnetwerk en dat netwerk is 30–50% van de groei van een nieuwe nieuwsbrief. Advies staat in plan/groei.md §4: Substack tot 1.000, aibulletin.nl blijft archief |
 
 *(A, B en C zijn beantwoord op 29 juli — zie "De lezer", "Het ene kenmerk" en
 beslissing 9.)*
@@ -150,6 +152,16 @@ beslissing 9.)*
   nog nooit gedraaid.
 - **De pijplijn heeft geheugen tussen edities** — `historie.py`, opgelost op
   29 juli. Zelfde bron-URL wordt geweerd, een sterk gelijkende kop gestraft.
+- **De markt is niet leeg — uitgezocht op 30 juli, zie plan/groei.md.**
+  **TheAIDaily.nl** doet exact ons product: elke werkdag om 07:00 een mail van
+  vijf minuten met "wat er nieuw is en waarom het uitmaakt", voor Nederlandse
+  bedrijven. **AI Report** (Klöpping) heeft ~48.000 abonnees en is de grootste
+  Nederlandstalige Substack. Dit had vóór de eerste regel code uitgezocht
+  moeten worden. Niet opnieuw gaan onderzoeken; wel de gevolgen trekken.
+- **De nieuwsbrief is het gevolg van een publiek, niet de oorzaak.**
+  AlphaSignal heeft 200.000+ LinkedIn-volgers en bereikt 10 miljoen mensen per
+  maand; AI Report begon als podcast met een bekende naam. Wij bouwen het
+  omgekeerd, en dat is de grootste risicofactor in dit project.
 - **Nieuwssamenvattingen ranken niet.** Google zet de primaire bron boven een
   samenvatting daarvan. Het archief is geen SEO-bezit; de toepassingen en de
   naslagpagina's zijn dat wel. Zie "SEO" hieronder.
