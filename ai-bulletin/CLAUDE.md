@@ -116,7 +116,7 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 |---|---|---|
 | **D** | **Beantwoord op 30 juli — zie hieronder.** Rest: welk adres hoort in de colofon, en is aibulletin.nl geregistreerd? | Zie "Feiten die vaststaan". |
 | **E** | Wat betekent "nummer één" in een getal — abonnees, bezoekers, iets anders? | Kunnen beoordelen of een keuze over zes maanden heeft gewerkt. **Context sinds 30 juli:** AI Report zit op ~48.000 abonnees. "Nummer één" op breedte is daarmee geen doel maar een fantasie; zie plan/groei.md §1 |
-| **F** | **Welke beroepsgroep wordt de doelgroep?** Juristen, accountants, HR of zorg — kies er één | Alles. Zolang de doelgroep "de geïnteresseerde professional" is, is het dezelfde doelgroep als AI Report en verliezen we van een bekende Nederlander met drie jaar voorsprong. Zie plan/groei.md §3 fase 0 |
+| **F** | **Wordt de doelgroep toetsbaar gemaakt** — een beroepsgroep, of een andere vorm van "voor wie is dit"? | De selectie. Niet omdat de markt bezet zou zijn (dat is hij niet, zie hieronder), maar omdat er bij "de geïnteresseerde professional" niets te toetsen valt en de editie dan terugglijdt naar algemeen AI-nieuws. Zie plan/groei.md §3 fase 0 |
 | **G** | **Blijft de ESP Laposta, of wordt het Substack?** | Fase 2 van de groei. Laposta heeft geen aanbevelingsnetwerk en dat netwerk is 30–50% van de groei van een nieuwe nieuwsbrief. Advies staat in plan/groei.md §4: Substack tot 1.000, aibulletin.nl blijft archief |
 
 *(A, B en C zijn beantwoord op 29 juli — zie "De lezer", "Het ene kenmerk" en
@@ -158,6 +158,13 @@ beslissing 9.)*
   bedrijven. **AI Report** (Klöpping) heeft ~48.000 abonnees en is de grootste
   Nederlandstalige Substack. Dit had vóór de eerste regel code uitgezocht
   moeten worden. Niet opnieuw gaan onderzoeken; wel de gevolgen trekken.
+  **Maar: dat is geen reden om af te haken, en die conclusie was een
+  overcorrectie van mij.** Lezers zitten op meerdere nieuwsbrieven tegelijk;
+  48.000 is een fractie van de Nederlandse beroepsbevolking. De vraag is niet
+  of er plek is (die is er) maar waarom iemand ons leest *náást* wat hij al
+  krijgt. Vuistregel, vastgelegd door de opdrachtgever op 30 juli: **kopieer de
+  machinerie — formaat, tijdstip, ritme, platform, aanbevelingsruil — maar niet
+  de reden van bestaan.** Zij duiden, wij laten handelen.
 - **De nieuwsbrief is het gevolg van een publiek, niet de oorzaak.**
   AlphaSignal heeft 200.000+ LinkedIn-volgers en bereikt 10 miljoen mensen per
   maand; AI Report begon als podcast met een bekende naam. Wij bouwen het

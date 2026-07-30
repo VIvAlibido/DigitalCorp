@@ -6,6 +6,28 @@ onbevestigd.
 
 ---
 
+> **Herzien op 30 juli, na tegenspraak van de opdrachtgever.** De eerste versie
+> van dit stuk las als "de plek is bezet". Dat is niet wat de cijfers zeggen en
+> het was een overcorrectie: ik had de markt niet onderzocht vóór we bouwden, en
+> sloeg bij het inhalen door naar de andere kant.
+>
+> Een nieuwsbriefmarkt is geen verdringingsmarkt. Lezers zitten op meerdere
+> nieuwsbrieven tegelijk en zeggen de ene niet op voor de andere. 48.000
+> abonnees is een fractie van de Nederlandse beroepsbevolking; de overgrote
+> meerderheid kent AI Report niet. Er is ruimte voor een tweede en een derde.
+>
+> Wat de concurrentie wél verandert is de vraag die de lezer stelt. Die is
+> nooit *"is er plek voor nog één?"* maar **"waarom zou ik deze lezen náást die
+> ik al krijg?"** Een kopie heeft daar geen antwoord op: die is een vervanging,
+> en dan moet je winnen van iemand met drie jaar voorsprong.
+>
+> De werkbare scheiding: **kopieer de machinerie, niet de reden van bestaan.**
+> Formaat, tijdstip, ritme, kwaliteitslat, platformkeuze, aanbevelingsruil,
+> LinkedIn-aanpak — allemaal lenen, er is geen reden dat zelf uit te vinden.
+> Maar er moet één zin overblijven die de anderen niet kunnen zeggen. Bij ons is
+> dat het ene kenmerk uit CLAUDE.md: *elke dag één ding dat je kunt dóén.* Zij
+> duiden; wij laten handelen.
+
 ## 1. De markt is niet leeg
 
 Dit is het belangrijkste dat het onderzoek opleverde, en het staat haaks op de
@@ -130,13 +152,20 @@ af is.
 
 Zonder dit is werven zonde van je tijd.
 
-1. **Kies een smallere categorie dan "de geïnteresseerde professional".**
-   Tegen AI Report kun je niet winnen op breedte. Wat je kunt winnen is één
-   beroepsgroep waar niemand op zit. Kandidaten, op volgorde van hoe scherp de
-   pijn is: **juristen en advocaten** (de berisping van deze week is precies
-   waarom), **accountants en boekhouders**, **HR en recruitment**,
-   **zorgmanagers**. Kies er één. De site kan later verbreden; de eerste
-   duizend lezers moeten het gevoel hebben dat het voor hén is gemaakt.
+1. **Formuleer de reden om erbij te komen, niet in plaats van.**
+   Niet "voor wie is dit" maar "waarom lees je dit náást AI Report". Wij hebben
+   die zin al: *elke dag één ding dat je kunt dóén* — zij duiden, wij laten
+   handelen. Die zin moet boven aan de aanmeldpagina staan en in elke uitnodiging
+   terugkomen.
+
+   Een **beroepsgroep** is de makkelijkste vorm van zo'n reden, en daarom nog
+   steeds het overwegen waard: bij elk bericht kun je dan toetsen *raakt dit een
+   jurist?* Bij "de geïnteresseerde professional" is niets te toetsen, en dan
+   glijdt de editie vanzelf terug naar algemeen AI-nieuws — precies wat er op
+   30 juli gebeurde met het bericht over platenlabels in de hitlijsten.
+   Kandidaten op volgorde van hoe scherp de pijn is: **juristen en advocaten**
+   (de berisping van deze week is precies waarom), **accountants**, **HR**,
+   **zorg**. Verplicht is het niet; toetsbaar zijn wel.
 2. **Zet de aanmeldpagina op orde.** Eén belofte, één veld, één knop. Zonder
    dit lekt alles wat je daarna doet weg.
 3. **Publiceer twintig edities voordat je iemand uitnodigt.** Wie op een leeg
