@@ -114,7 +114,7 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 
 | # | Vraag | Wat het blokkeert |
 |---|---|---|
-| **D** | De uitgeversgegevens: statutaire naam, adres, postcode, plaats, KvK-nummer, btw-nummer, e-mail en correctie-adres. Ook: is aibulletin.nl geregistreerd? | **Lancering.** De machinerie staat klaar — `uitgever:` in config.yaml invullen en het is af. `site.controleer_publicatiegereed()` blokkeert de workflow tot dat gebeurd is. Bron nieuwsradio.com was niet bereikbaar vanuit deze omgeving (proxy 403). |
+| **D** | Nog ontbrekend: **registratienummer** (zie hieronder), **e-mail** en **correctie-adres**. Ook: is aibulletin.nl geregistreerd? | **Lancering.** `site.controleer_publicatiegereed()` blokkeert de workflow tot dat gebeurd is. Op 30 juli ingevuld: **Digital Corp OÜ, Koninginneweg 11, 1217 KP Hilversum**. Let op: **OÜ is een Estse rechtsvorm**, geen Nederlandse — het veld `kvk` moet het nummer bevatten van het register waar de onderneming werkelijk staat (Estse registrikood, of het KvK-nummer van een Nederlandse vestiging als die is ingeschreven). Bron nieuwsradio.com was niet bereikbaar vanuit deze omgeving (proxy 403). |
 | **E** | Wat betekent "nummer één" in een getal — abonnees, bezoekers, iets anders? | Kunnen beoordelen of een keuze over zes maanden heeft gewerkt |
 
 *(A, B en C zijn beantwoord op 29 juli — zie "De lezer", "Het ene kenmerk" en
