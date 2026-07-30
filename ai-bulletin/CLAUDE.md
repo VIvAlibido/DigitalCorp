@@ -114,7 +114,7 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 
 | # | Vraag | Wat het blokkeert |
 |---|---|---|
-| **D** | Nog ontbrekend: **registratienummer** (zie hieronder), **e-mail** en **correctie-adres**. Ook: is aibulletin.nl geregistreerd? | **Lancering.** `site.controleer_publicatiegereed()` blokkeert de workflow tot dat gebeurd is. Op 30 juli ingevuld: **Digital Corp OÜ, Koninginneweg 11, 1217 KP Hilversum**. Let op: **OÜ is een Estse rechtsvorm**, geen Nederlandse — het veld `kvk` moet het nummer bevatten van het register waar de onderneming werkelijk staat (Estse registrikood, of het KvK-nummer van een Nederlandse vestiging als die is ingeschreven). Bron nieuwsradio.com was niet bereikbaar vanuit deze omgeving (proxy 403). |
+| **D** | **Beantwoord op 30 juli — zie hieronder.** Rest: welk adres hoort in de colofon, en is aibulletin.nl geregistreerd? | Zie "Feiten die vaststaan". |
 | **E** | Wat betekent "nummer één" in een getal — abonnees, bezoekers, iets anders? | Kunnen beoordelen of een keuze over zes maanden heeft gewerkt |
 
 *(A, B en C zijn beantwoord op 29 juli — zie "De lezer", "Het ene kenmerk" en
@@ -153,6 +153,24 @@ beslissing 9.)*
 - **Nieuwssamenvattingen ranken niet.** Google zet de primaire bron boven een
   samenvatting daarvan. Het archief is geen SEO-bezit; de toepassingen en de
   naslagpagina's zijn dat wel. Zie "SEO" hieronder.
+- **De uitgever is `Digitalcorp OÜ`** — aan elkaar geschreven, zoals het Estse
+  handelsregister hem noemt. Registrikood **16962575**, opgericht 9 april 2024,
+  statutair adres Tornimäe tn 5, 10145 Tallinn, EMTAK 61101 (telecom),
+  aandelenkapitaal €800. **Geen btw-nummer** — het register meldt "VAT
+  identification number: Missing". Contact: kees@telemedia.es, +34 666 431 167.
+  Bron: inforegister.ee, doorgegeven door de opdrachtgever op 30 juli.
+  Sinds die invulling geeft `site.controleer_publicatiegereed()` **geen
+  blokkades meer**: de site mag live.
+- **Het colofonlabel is niet "KvK-nummer".** Een Estse registrikood onder een
+  Nederlands label zetten is een onwaarheid op precies de pagina die de
+  identiteit moet bewijzen. `uitgever.register` bepaalt het label; een test
+  bewaakt dat er geen "KvK" meer boven staat.
+- **Twee dingen om in de gaten te houden** (opgemerkt bij het invullen, niet
+  door de opdrachtgever genoemd): het adres Koninginneweg 11, 1217 KP Hilversum
+  is doorgegeven als werkadres maar staat in geen enkel register — daarom staat
+  het (nog) niet in de colofon. En het jaarverslag over 2025 stond op
+  inforegister.ee rood doorgestreept, wat op een achterstallige deponering
+  wijst; in Estland kan dat uiteindelijk tot doorhaling leiden.
 - **AI Bulletin valt zelf onder art. 50 AI-verordening** vanaf 2 augustus 2026:
   de teksten zijn door een taalmodel geschreven en dat moet kenbaar zijn. De
   methodeverantwoording doet dat al.

@@ -630,7 +630,12 @@ def _uitgever_regels(config: dict) -> list[tuple[str, str]]:
         ("Adres", veld("adres")),
         ("Postcode en plaats", postcode_plaats),
         ("Land", veld("land", verplicht=False)),
-        ("KvK-nummer", veld("kvk")),
+        # Het label mag niet vastliggen op "KvK-nummer". De uitgever is een
+        # Estse OÜ met een registrikood, en dat nummer onder een Nederlands
+        # label zetten is een onwaarheid — uitgerekend op de pagina die je
+        # identiteit moet bewijzen. Welk register het is, staat in config.yaml.
+        (f"Registratienummer ({veld('register', verplicht=False) or 'handelsregister'})",
+         veld("kvk")),
         ("Btw-nummer", veld("btw", verplicht=False)),
         ("E-mail", veld("email")),
         ("Correcties", str(u.get("correcties") or u.get("email") or "").strip() or ontbreekt),

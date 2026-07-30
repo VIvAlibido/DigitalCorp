@@ -27,24 +27,29 @@ verzending:
 # Laat een veld nooit met een gok staan: site.controleer_publicatiegereed()
 # blokkeert de publicatie zolang hier iets ontbreekt. Dat is met opzet.
 uitgever:
-  naam: "Digital Corp OÜ"
+  # Naam exact zoals hij in het register staat — anders is de uitgever daar niet
+  # terug te vinden en heeft het nummer geen functie. Het register schrijft
+  # "Digitalcorp OÜ" aan elkaar, niet "Digital Corp".
+  naam: "Digitalcorp OÜ"
   handelsnaam: "AI Bulletin"
-  adres: "Koninginneweg 11"
-  postcode: "1217 KP"
-  plaats: "Hilversum"
-  land: "Nederland"
-  # OÜ is een Estse osaühing, geen Nederlandse rechtsvorm. Het veld heet hier
-  # "kvk" maar moet het registratienummer bevatten van het register waar de
-  # onderneming werkelijk staat ingeschreven — art. 3:15d BW vraagt om
-  # identificeerbaarheid, niet om een Nederlands nummer. Voor een Estse OÜ is
-  # dat de registrikood (8 cijfers). Is er daarnaast een Nederlandse vestiging
-  # ingeschreven, vul dan dát KvK-nummer in; een lezer in Hilversum die iets
-  # wil verhalen moet bij het juiste register uitkomen.
-  kvk: ""
-  btw: ""               # EE-nummer of NL-nummer, afhankelijk van waar je btw afdraagt
-  email: ""             # algemeen contact — moet werken, wordt gepubliceerd
-  correcties: ""        # waar "fout gezien?" heen gaat; mag gelijk zijn aan email
-  telefoon: ""          # optioneel
+  # Het statutaire adres uit het Estse handelsregister. Hilversum
+  # (Koninginneweg 11) is doorgegeven als werkadres maar staat niet als
+  # vestiging in enig register; zie de open vraag in CLAUDE.md. Een adres
+  # publiceren dat nergens is ingeschreven maakt de uitgever juist minder
+  # vindbaar, dus tot dat is uitgezocht staat hier het geregistreerde adres.
+  adres: "Tornimäe tn 5"
+  postcode: "10145"
+  plaats: "Tallinn"
+  land: "Estland"
+  register: "Estse handelsregister"
+  # Registrikood, niet een KvK-nummer. Zie site._uitgever_regels().
+  kvk: "16962575"
+  # Het register meldt "VAT identification number: Missing" — dus leeg laten.
+  # Een btw-nummer verzinnen of dat van een ander bedrijf lenen is erger dan geen.
+  btw: ""
+  email: "kees@telemedia.es"
+  correcties: "kees@telemedia.es"
+  telefoon: "+34 666 431 167"
 
 output:
   # Hoogstens dit aantal berichten. Zijn er minder die de toets doorstaan, dan

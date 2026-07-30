@@ -619,9 +619,29 @@ class TestUitgever(unittest.TestCase):
         self.assertTrue(blokkades)
         self.assertTrue(any("kvk" in b for b in blokkades))
 
-    def test_de_echte_config_is_nog_niet_publicatiegereed(self):
-        """Bewaakt dat er niet per ongeluk live wordt gegaan zonder KvK-gegevens."""
-        self.assertTrue(site.controleer_publicatiegereed(CONFIG))
+    def test_de_echte_config_is_publicatiegereed(self):
+        """Sinds 30 juli zijn de uitgeversgegevens bekend en mag de site live.
+
+        Deze test stond hiervóór omgekeerd: hij bewaakte dat er níét live werd
+        gegaan zolang de gegevens ontbraken. Nu bewaakt hij het omgekeerde —
+        dat ze niet stilletjes weer uit config.yaml verdwijnen.
+        """
+        self.assertEqual(site.controleer_publicatiegereed(CONFIG), [])
+
+    def test_een_weggevallen_veld_blokkeert_de_echte_config_alsnog(self):
+        """De poort moet blijven werken nu hij eenmaal open staat."""
+        for veld in ("naam", "adres", "kvk", "email"):
+            with self.subTest(veld=veld):
+                kaal = {"uitgever": dict(CONFIG["uitgever"], **{veld: ""})}
+                self.assertTrue(site.controleer_publicatiegereed(kaal),
+                                f"leeg {veld} werd niet opgemerkt")
+
+    def test_het_registratienummer_heet_niet_zomaar_kvk(self):
+        """De uitgever is een Estse OÜ; "KvK-nummer" zou een onwaarheid zijn."""
+        labels = [label for label, _ in site._uitgever_regels(CONFIG)]
+        self.assertFalse([x for x in labels if x.startswith("KvK")],
+                         f"colofon noemt een Estse registrikood een KvK-nummer: {labels}")
+        self.assertTrue([x for x in labels if x.startswith("Registratienummer")])
 
     def test_volledige_gegevens_geven_groen_licht(self):
         self.assertEqual(site.controleer_publicatiegereed(self.VOLLEDIG), [])
@@ -957,10 +977,21 @@ class TestVerzenden(unittest.TestCase):
         Zodra er iemand anders meeleest gelden de identiteitsverplichtingen wel,
         en die moeten dan ergens vandaan komen.
         """
+        # Expliciet een uitschrijflink meegeven, anders struikelt hij daar eerst
+        # over en bewijst de test niet wat hij beweert.
+        zonder_gegevens = self.config(uitgever={"naam": "X", "email": "x@x.nl"})
         with self.assertRaises(verzenden.VerzendFout) as fout:
-            verzenden.verstuur(self.editie(), self.config(),
-                               naar=["iemand@anders.nl"], proef=True)
+            verzenden.verstuur(self.editie(), zonder_gegevens,
+                               naar=["iemand@anders.nl"],
+                               uitschrijflink="https://aibulletin.nl/uit", proef=True)
         self.assertIn("uitgeversgegevens", str(fout.exception))
+
+    def test_naar_vreemden_mag_wel_met_volledige_gegevens(self):
+        """Anders bewijst de vorige test alleen dat er íéts misgaat."""
+        volledig = self.config(uitgever=dict(CONFIG["uitgever"]))
+        v = verzenden.verstuur(self.editie(), volledig, naar=["iemand@anders.nl"],
+                               uitschrijflink="https://aibulletin.nl/uit", proef=True)
+        self.assertEqual(v.ontvangers, ["iemand@anders.nl"])
 
     def test_echt_versturen_gaat_via_de_verbinding_en_niet_verder(self):
         """Eén ontvanger, één send_message — geen stille tweede aanroep."""
