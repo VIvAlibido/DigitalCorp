@@ -597,12 +597,64 @@ class TestZondagsstuk(unittest.TestCase):
             editie = self.editie()
             (edities / f"{editie.stam}.json").write_text(
                 render.naar_json(editie), encoding="utf-8")
-            site.bouw(edities, uit)
+            # Het stuk is van 2 augustus; zonder die datum houdt bouw() het
+            # terecht tegen als toekomstige editie.
+            site.bouw(edities, uit, vandaag=editie.datum)
             pagina = uit / editie.stam / editie.beschouwing.slug / "index.html"
             self.assertTrue(pagina.exists(), "het zondagsstuk heeft geen eigen pagina")
             html = pagina.read_text(encoding="utf-8")
             self.assertIn("Kees Cornelius", html)
             self.assertIn("is een mening, geen", html)
+
+
+class TestToekomstigeEdities(unittest.TestCase):
+    """Een stuk van aanstaande zondag hoort donderdag niet op de voorpagina.
+
+    Het zondagsstuk wordt vooruit geschreven en ligt dus in `edities/` vóór de
+    dag zelf. De site sorteert op datum en toonde daardoor op 30 juli de editie
+    van 2 augustus als nieuwste. Voor een nieuwssite is dat geen
+    schoonheidsfout maar een onwaarheid over wat er vandaag speelt.
+    """
+
+    def _map(self, tmp: Path, *datums: date) -> Path:
+        edities = tmp / "edities"
+        edities.mkdir()
+        for d in datums:
+            editie = Editie(
+                datum=d, onderwerp=f"Editie van {d.isoformat()} met genoeg tekens",
+                items=[Selectie(kop="Een kop die ergens over gaat en je iets vertelt",
+                                kern="De kern.", wat="Wat er gebeurd is.",
+                                waarom="Wat het voor je betekent.",
+                                url=f"https://example.com/{d.isoformat()}",
+                                bron="Bron", categorie="bedrijf", datum=d.isoformat())])
+            (edities / f"{editie.stam}.json").write_text(
+                render.naar_json(editie), encoding="utf-8")
+        return edities
+
+    def test_een_editie_van_later_komt_niet_op_de_site(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            edities = self._map(tmp, date(2026, 7, 30), date(2026, 8, 2))
+            site.bouw(edities, tmp / "site", keuren=False, vandaag=date(2026, 7, 30))
+            self.assertTrue((tmp / "site" / "2026-07-30").exists())
+            self.assertFalse((tmp / "site" / "2026-08-02").exists(),
+                             "editie van later staat al op de site")
+
+    def test_de_homepage_toont_de_editie_van_vandaag(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            edities = self._map(tmp, date(2026, 7, 30), date(2026, 8, 2))
+            site.bouw(edities, tmp / "site", keuren=False, vandaag=date(2026, 7, 30))
+            homepage = (tmp / "site" / "index.html").read_text(encoding="utf-8")
+            self.assertIn("2026-07-30", homepage)
+            self.assertNotIn("2026-08-02", homepage)
+
+    def test_op_de_dag_zelf_verschijnt_hij_alsnog(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            edities = self._map(tmp, date(2026, 7, 30), date(2026, 8, 2))
+            site.bouw(edities, tmp / "site", keuren=False, vandaag=date(2026, 8, 2))
+            self.assertTrue((tmp / "site" / "2026-08-02").exists())
 
 
 class TestUitgever(unittest.TestCase):

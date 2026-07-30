@@ -25,6 +25,7 @@ import json
 import logging
 import shutil
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 from . import keuring
@@ -796,14 +797,28 @@ def _werkwijze() -> Sitepagina:
 
 # ─────────────────────────────── Bouwen ──────────────────────────────
 
-def laad_edities(map_: Path) -> list[Editie]:
-    """Leest alle editie-JSON's, nieuwste eerst. Kapotte bestanden overslaan."""
+def laad_edities(map_: Path, vandaag: date | None = None) -> list[Editie]:
+    """Leest alle editie-JSON's, nieuwste eerst. Kapotte bestanden overslaan.
+
+    Edities met een datum in de toekomst blijven liggen. Ze horen in de map —
+    het zondagsstuk wordt vooruit geschreven — maar niet op de site: de
+    homepage toont de nieuwste editie, en zonder deze regel stond een stuk van
+    aanstaande zondag op donderdag al op de voorpagina. Voor een nieuwssite is
+    dat geen schoonheidsfout maar een onwaarheid over wat er vandaag speelt.
+    """
+    vandaag = vandaag or date.today()
     edities = []
     for pad in sorted(map_.glob("*.json"), reverse=True):
         try:
-            edities.append(Editie.from_dict(json.loads(pad.read_text(encoding="utf-8"))))
+            editie = Editie.from_dict(json.loads(pad.read_text(encoding="utf-8")))
         except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
             log.warning("editie overgeslagen (%s): %s", pad.name, exc)
+            continue
+        if editie.datum > vandaag:
+            log.info("editie %s is van later (%s) — nog niet op de site",
+                     pad.name, editie.datum.isoformat())
+            continue
+        edities.append(editie)
     return edities
 
 
@@ -813,7 +828,7 @@ class OngekeurdeEditie(ValueError):
 
 def bouw(edities_map: Path, uitvoer: Path, config: dict | None = None,
          leeg_eerst: bool = True, indexeerbaar: bool = True,
-         keuren: bool = True) -> list[Path]:
+         keuren: bool = True, vandaag: date | None = None) -> list[Path]:
     """Bouwt de volledige site. Retourneert de geschreven paden.
 
     `config` levert de uitgeversgegevens voor colofon en privacyverklaring.
@@ -821,9 +836,11 @@ def bouw(edities_map: Path, uitvoer: Path, config: dict | None = None,
     zichtbare waarschuwing — bouwen mag altijd, publiceren niet.
     """
     config = config or {}
-    edities = laad_edities(edities_map)
+    edities = laad_edities(edities_map, vandaag)
     if not edities:
-        raise ValueError(f"geen edities gevonden in {edities_map}")
+        raise ValueError(
+            f"geen publiceerbare edities in {edities_map} — staan ze allemaal "
+            "in de toekomst?")
 
     # Dit is de route die de lezer werkelijk bereikt. Blokkeren in
     # render_selectie() helpt niet als het JSON-bestand daarna nog met de hand
