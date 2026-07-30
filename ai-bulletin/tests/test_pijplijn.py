@@ -426,13 +426,26 @@ class TestOndergrens(unittest.TestCase):
         editie = rank.kies_heuristisch(self._items([10, 0.1, 0.1, 0.1]), CONFIG, DATUM)
         self.assertGreaterEqual(len(editie.items), 1)
 
-    def test_schema_staat_een_kortere_editie_toe(self):
-        schema = rank.bouw_schema(3, 6)
-        self.assertEqual(schema["properties"]["items"]["minItems"], 3)
-        self.assertEqual(schema["properties"]["items"]["maxItems"], 6)
-        # Het origineel mag niet meeveranderen — anders lekt de ene run in de andere.
-        self.assertEqual(rank.bouw_schema(1, 2)["properties"]["items"]["minItems"], 1)
-        self.assertEqual(schema["properties"]["items"]["minItems"], 3)
+    def test_schema_bevat_geen_sleutels_die_de_api_weigert(self):
+        """De fout die run 30541853787 rood maakte, in één regel vastgelegd.
+
+        De API antwoordde met 400: "For 'array' type, property 'maxItems' is
+        not supported". Geen enkele van de 120 tests kon dat zien, want het
+        schema werd nooit tegen de API gehouden. Deze test kan dat evenmin —
+        wat hij wel doet is voorkomen dat de sleutel er ooit weer in sluipt.
+        """
+        self.assertEqual(rank.verboden_schemasleutels(rank.SCHEMA), [])
+        self.assertEqual(rank.verboden_schemasleutels(rank.bouw_schema(1, 6)), [])
+        # En de controle zelf moet wél aanslaan, anders bewijst hij niets.
+        self.assertEqual(
+            rank.verboden_schemasleutels({"a": {"b": {"maxItems": 6}}}),
+            ["a.b.maxItems"])
+
+    def test_bouw_schema_geeft_een_eigen_kopie(self):
+        """Anders lekt de ene run in de andere."""
+        schema = rank.bouw_schema()
+        schema["properties"]["items"]["type"] = "aangetast"
+        self.assertEqual(rank.SCHEMA["properties"]["items"]["type"], "array")
 
 
 class TestKeuring(unittest.TestCase):

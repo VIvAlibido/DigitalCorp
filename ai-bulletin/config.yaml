@@ -128,22 +128,32 @@ bronnen:
     actief: true
     feeds:
       - https://openai.com/blog/rss.xml
-      - https://www.anthropic.com/rss.xml
       - https://deepmind.google/blog/rss.xml
       - https://huggingface.co/blog/feed.xml
       - https://blog.google/technology/ai/rss/
       - https://engineering.fb.com/feed/
+      # DOOD — 404 in run 30541853787 op 30 juli 2026:
+      # - https://www.anthropic.com/rss.xml
 
   # Nederlandstalige bronnen — dit is wat de kloon onderscheidt.
+  #
+  # LET OP: van de zes stond op 30 juli de helft op 404 (run 30541853787).
+  # Wat overblijft is Tweakers (grotendeels gaming en consumentennieuws),
+  # Emerce en de AP. Dat is de reden dat de kandidatenlijst die dag vrijwel
+  # geheel uit Engelstalige GitHub-repo's bestond: de Nederlandse invoer
+  # bestaat nauwelijks. Vervangende feed-URL's zijn niet vanuit de
+  # ontwikkelomgeving te controleren (proxy weigert deze domeinen), dus ze
+  # staan hier uitgezet in plaats van geraden.
   rss_nl:
     actief: true
     feeds:
       - https://tweakers.net/feeds/mixed.xml
-      - https://www.bnr.nl/rss/podcast/onbeperkt-houdbaar
       - https://www.emerce.nl/nieuws/rss
-      - https://www.agconnect.nl/rss.xml
-      - https://www.computable.nl/rss.xml
       - https://autoriteitpersoonsgegevens.nl/rss.xml
+      # DOOD — 404 in run 30541853787 op 30 juli 2026:
+      # - https://www.bnr.nl/rss/podcast/onbeperkt-houdbaar
+      # - https://www.agconnect.nl/rss.xml
+      # - https://www.computable.nl/rss.xml
 
   # Zie README: Instagram heeft geen officiële API voor accounts van derden.
   instagram:

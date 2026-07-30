@@ -227,10 +227,13 @@ SCHEMA = {
             "required": ["titel", "intro", "stappen", "niet_doen", "tijd", "categorie"],
             "additionalProperties": False,
         },
+        # Geen minItems/maxItems. Structured outputs weigert die met een 400:
+        # "For 'array' type, property 'maxItems' is not supported". Waargenomen
+        # in run 30541853787, niet uit de documentatie geraden. De grenzen staan
+        # daarom in de systeemprompt en worden ná het antwoord afgedwongen in
+        # kies_en_schrijf().
         "items": {
             "type": "array",
-            "minItems": MIN_ITEMS,
-            "maxItems": MAX_ITEMS,
             "items": {
                 "type": "object",
                 "properties": {
@@ -281,17 +284,41 @@ def toets_verhouding(editie) -> list[str]:
     return bezwaren
 
 
-def bouw_schema(minimaal: int = MIN_ITEMS, maximaal: int = MAX_ITEMS) -> dict:
-    """SCHEMA met de grenzen van deze run erin.
+# Sleutels die de API weigert in een structured-outputs-schema. Deze lijst is
+# geen gok uit de documentatie maar komt uit een echte 400 op run 30541853787;
+# staat er ooit een nieuwe bij, zet hem er dan pas bij als je hem hebt gezien.
+VERBODEN_SCHEMASLEUTELS = ("minItems", "maxItems")
 
-    Het aantal items is geen vast getal maar een bereik: op een rustige dag
-    levert de jury er vier, en dat moet het schema toestaan. Zie de
-    systeemprompt voor wanneer dat mag.
+
+def verboden_schemasleutels(knoop, pad: str = "") -> list[str]:
+    """Waar in het schema staat een sleutel die de API niet accepteert.
+
+    Bestaat omdat de fout die dit vond niet door 120 tests is gevangen: het
+    schema werd nooit tegen de API gehouden, en dat kan in een test ook niet.
+    Wat wél kan is vastleggen wat we één keer aan den lijve hebben ondervonden.
     """
-    schema = copy.deepcopy(SCHEMA)
-    schema["properties"]["items"]["minItems"] = minimaal
-    schema["properties"]["items"]["maxItems"] = maximaal
-    return schema
+    gevonden = []
+    if isinstance(knoop, dict):
+        for sleutel, waarde in knoop.items():
+            plek = f"{pad}.{sleutel}" if pad else sleutel
+            if sleutel in VERBODEN_SCHEMASLEUTELS:
+                gevonden.append(plek)
+            gevonden.extend(verboden_schemasleutels(waarde, plek))
+    elif isinstance(knoop, list):
+        for nummer, waarde in enumerate(knoop):
+            gevonden.extend(verboden_schemasleutels(waarde, f"{pad}[{nummer}]"))
+    return gevonden
+
+
+def bouw_schema(minimaal: int = MIN_ITEMS, maximaal: int = MAX_ITEMS) -> dict:
+    """Een kopie van SCHEMA voor deze run.
+
+    De grenzen op het aantal items staan hier bewust *niet* in — zie de
+    toelichting bij SCHEMA. Het aantal is geen vast getal maar een bereik: op
+    een rustige dag levert de jury er één, en dat moet kunnen. De bovengrens
+    wordt afgekapt en de ondergrens gecontroleerd in kies_en_schrijf().
+    """
+    return copy.deepcopy(SCHEMA)
 
 
 class RankFout(RuntimeError):
@@ -379,6 +406,10 @@ def kies_en_schrijf(items: list[Item], config: dict, datum: date) -> Editie:
     selecties = [Selectie(**rij) for rij in data.get("items", [])]
     if not selecties:
         raise RankFout("model leverde een lege selectie")
+    # Het schema kan dit niet afdwingen (zie VERBODEN_SCHEMASLEUTELS), dus hier.
+    if len(selecties) < minimaal:
+        raise RankFout(
+            f"model leverde {len(selecties)} items, minimaal {minimaal} gevraagd")
 
     log.info(
         "jury koos %d items (%d tokens in, %d uit)",
