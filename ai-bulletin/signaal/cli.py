@@ -9,8 +9,8 @@ import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
 
-from . import pipeline, site
-from .model import Item
+from . import pipeline, site, verzenden
+from .model import Editie, Item
 
 PROJECT = Path(__file__).resolve().parent.parent
 
@@ -73,6 +73,17 @@ def main(argv: list[str] | None = None) -> int:
         metavar="MAP",
         help="bouw de statische website uit alle edities en stop daarna",
     )
+    parser.add_argument(
+        "--verstuur",
+        type=Path,
+        metavar="EDITIE.JSON",
+        help="verstuur een bestaande editie per e-mail en stop daarna",
+    )
+    parser.add_argument(
+        "--proef",
+        action="store_true",
+        help="bij --verstuur: alle controles doorlopen maar niets versturen",
+    )
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)
 
@@ -89,6 +100,20 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\nAI Bulletin — website: {len(paden)} bestanden in {args.site}")
         for pad in paden:
             print(f"  {pad.relative_to(args.site)}")
+        return 0
+
+    if args.verstuur is not None:
+        editie = Editie.from_dict(json.loads(args.verstuur.read_text(encoding="utf-8")))
+        try:
+            verzending = verzenden.verstuur(editie, config, proef=args.proef)
+        except verzenden.VerzendFout as exc:
+            print(f"\nNIET VERSTUURD — {exc}\n", file=sys.stderr)
+            return 1
+        werkwoord = "opgebouwd (proefdraai)" if args.proef else "verstuurd"
+        print(f"\n{len(verzending.ontvangers)} bericht(en) {werkwoord}")
+        print(f"  onderwerp: {verzending.onderwerp}")
+        for adres in verzending.ontvangers:
+            print(f"  naar: {adres}")
         return 0
 
     if args.selectie:

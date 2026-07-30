@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from signaal import (  # noqa: E402
     dedupe, historie, keuring, koptoets, pipeline, rank, render, score, site,
+    verzenden,
 )
 from signaal.bronnen import basis  # noqa: E402
 from signaal.cli import _laad_fixtures  # noqa: E402
@@ -868,6 +869,97 @@ class TestVolledigeRun(unittest.TestCase):
                             "fixtures bevatten een duplicaat dat niet is samengevoegd")
             for pad in resultaat.bestanden:
                 self.assertTrue(pad.exists() and pad.stat().st_size > 0)
+
+
+class TestVerzenden(unittest.TestCase):
+    """De enige route naar de lezer die niet terug te draaien is.
+
+    Een fout op de website herstel je met een commit. Een fout in een verzonden
+    mail staat in andermans inbox. Vandaar dat hier meer wordt geweigerd dan
+    elders, en dat elk van die weigeringen een test heeft.
+    """
+
+    EDITIE = PROJECT / "redactie" / "2026-07-29-selectie.json"
+
+    def editie(self) -> Editie:
+        return Editie.from_dict(json.loads(self.EDITIE.read_text(encoding="utf-8")))
+
+    def config(self, **overschrijf) -> dict:
+        basis_cfg = {
+            "verzending": {"altijd_naar": ["kees@telemedia.es"]},
+            "uitgever": dict(CONFIG.get("uitgever") or {}, email="post@aibulletin.nl"),
+        }
+        basis_cfg.update(overschrijf)
+        return basis_cfg
+
+    def test_de_vaste_ontvanger_valt_nooit_weg(self):
+        """Beslissing 12: elke editie gaat altijd naar kees@telemedia.es."""
+        self.assertIn("kees@telemedia.es", verzenden.ontvangers(CONFIG))
+
+    def test_proefdraai_bouwt_de_mail_maar_verstuurt_niets(self):
+        v = verzenden.verstuur(self.editie(), self.config(), proef=True)
+        self.assertFalse(v.verstuurd)
+        self.assertEqual(v.ontvangers, ["kees@telemedia.es"])
+        self.assertEqual(v.onderwerp, self.editie().onderwerp)
+        self.assertEqual(len(v.berichten), 1)
+
+    def test_de_mail_heeft_zowel_tekst_als_html(self):
+        """Wie HTML uitzet hoort dezelfde editie te krijgen, geen lege mail."""
+        bericht = verzenden.verstuur(self.editie(), self.config(), proef=True).berichten[0]
+        soorten = {deel.get_content_type() for deel in bericht.walk()}
+        self.assertIn("text/plain", soorten)
+        self.assertIn("text/html", soorten)
+
+    def test_het_sjabloonhaakje_staat_niet_meer_in_de_verstuurde_mail(self):
+        """Zonder ESP vult niemand {{unsubscribe}} in; dan leest de lezer dat letterlijk."""
+        bericht = verzenden.verstuur(self.editie(), self.config(), proef=True).berichten[0]
+        html = bericht.get_body(("html",)).get_content()
+        self.assertNotIn("{{unsubscribe}}", html)
+        self.assertIn("Uitschrijven", html)
+
+    def test_een_editie_met_een_blokkade_gaat_de_deur_niet_uit(self):
+        """De poort van keuring.py geldt ook hier — juist hier."""
+        kapot = self.editie()
+        kapot.items[0].kop = "TODO nog een kop verzinnen"
+        with self.assertRaises(verzenden.VerzendFout) as fout:
+            verzenden.verstuur(kapot, self.config(), proef=True)
+        self.assertIn("verzendgereed", str(fout.exception))
+
+    def test_zonder_afzender_wordt_er_niets_verstuurd(self):
+        leeg = self.config(uitgever={})
+        with self.assertRaises(verzenden.VerzendFout) as fout:
+            verzenden.verstuur(self.editie(), leeg, proef=True)
+        self.assertIn("afzender", str(fout.exception))
+
+    def test_zonder_ontvangers_wordt_er_niets_verstuurd(self):
+        with self.assertRaises(verzenden.VerzendFout):
+            verzenden.verstuur(self.editie(), self.config(verzending={}), proef=True)
+
+    def test_naar_vreemden_mag_pas_als_de_uitgeversgegevens_er_zijn(self):
+        """Bij één ontvanger — de uitgever zelf — beschermt een colofon niemand.
+
+        Zodra er iemand anders meeleest gelden de identiteitsverplichtingen wel,
+        en die moeten dan ergens vandaan komen.
+        """
+        with self.assertRaises(verzenden.VerzendFout) as fout:
+            verzenden.verstuur(self.editie(), self.config(),
+                               naar=["iemand@anders.nl"], proef=True)
+        self.assertIn("uitgeversgegevens", str(fout.exception))
+
+    def test_echt_versturen_gaat_via_de_verbinding_en_niet_verder(self):
+        """Eén ontvanger, één send_message — geen stille tweede aanroep."""
+
+        class NepSmtp:
+            def __init__(self):
+                self.verzonden = []
+
+            def send_message(self, bericht):
+                self.verzonden.append(bericht["To"])
+
+        nep = NepSmtp()
+        v = verzenden.verstuur(self.editie(), self.config(), smtp=nep)
+        self.assertTrue(v.verstuurd)
+        self.assertEqual(nep.verzonden, ["kees@telemedia.es"])
 
 
 if __name__ == "__main__":

@@ -111,3 +111,21 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "Editie van $(date -u +%F)"
           git push
+
+      # Ná de publicatiepoort: een mail is niet terug te halen, dus hij gaat pas
+      # de deur uit als alles wat de site tegenhoudt ook hier is doorstaan.
+      # Slaat zichzelf over zolang er geen mailserver is ingesteld — beter dan
+      # elke ochtend een rode run om iets dat nog niet bestaat.
+      - name: Verstuur de editie
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_POORT: ${{ secrets.SMTP_POORT }}
+          SMTP_GEBRUIKER: ${{ secrets.SMTP_GEBRUIKER }}
+          SMTP_WACHTWOORD: ${{ secrets.SMTP_WACHTWOORD }}
+          SMTP_AFZENDER: ${{ secrets.SMTP_AFZENDER }}
+        run: |
+          if [ -z "$SMTP_HOST" ]; then
+            echo "::notice::SMTP_HOST ontbreekt — editie is gemaakt maar niet gemaild."
+            exit 0
+          fi
+          python -m signaal.cli --verstuur "edities/$(date -u +%F).json"

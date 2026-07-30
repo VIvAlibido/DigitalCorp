@@ -230,9 +230,29 @@ draaien, niet een goedkoper model.
 ## Automatisch draaien
 
 `.github/workflows/ai-bulletin.yml` draait elke dag om 05:15 UTC: tests, editie
-samenstellen, site proefbouwen, controleren of publiceren mag, en het archief
-terugcommitten. Vereist `ANTHROPIC_API_KEY` als repository secret;
-`ELEVENLABS_API_KEY` en `ELEVENLABS_VOICE_ID` alleen als je audio aanzet.
+samenstellen, site proefbouwen, controleren of publiceren mag, het archief
+terugcommitten en de editie mailen. Vereist `ANTHROPIC_API_KEY` als repository
+secret; `ELEVENLABS_API_KEY` en `ELEVENLABS_VOICE_ID` alleen als je audio aanzet.
+
+## Verzenden
+
+`python -m signaal.cli --verstuur edities/2026-07-30.json` mailt een editie naar
+alle adressen in `verzending.altijd_naar`. Zet `--proef` erbij om alle controles
+te doorlopen zonder dat er iets de deur uit gaat.
+
+Geheimen komen uit de omgeving, nooit uit `config.yaml`:
+
+| Variabele | |
+|---|---|
+| `SMTP_HOST` | verplicht; zonder deze slaat de workflow het mailen over |
+| `SMTP_POORT` | 587 (STARTTLS) als je niets invult, 465 schakelt over op SSL |
+| `SMTP_GEBRUIKER`, `SMTP_WACHTWOORD` | leeg laten bij een server zonder login |
+| `SMTP_AFZENDER` | overschrijft het From-adres uit `uitgever.email` |
+
+De verzendstap staat ná de publicatiepoort. Een mail is niet terug te halen, dus
+alles wat de website tegenhoudt houdt ook de mail tegen — plus twee eisen die
+alleen voor e-mail gelden: er moet een afzender zijn, en de uitschrijfknop mag
+niet naar een niet-ingevuld sjabloonhaakje wijzen.
 
 **Publiceren doet Vercel, niet deze workflow.** Vercel is aan de repo gekoppeld
 en bouwt bij elke push opnieuw via `vercel.json`; de commit met de nieuwe editie

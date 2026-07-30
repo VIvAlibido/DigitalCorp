@@ -137,8 +137,12 @@ beslissing 9.)*
   Niet opnieuw gaan zoeken.
 - **Gmail is wél gekoppeld** maar stond op 29 juli uit voor de chat. Zodra dat
   aanstaat is dat het verzendkanaal — zie beslissing 13.
-- **De LLM-jury heeft nog nooit echt gedraaid.** De editie van 2026-07-29 op de
-  site is met de hand geschreven en zegt niets over wat de automaat produceert.
+- **De LLM-jury heeft gedraaid op 30 juli** (run 30542389141): 89 kandidaten,
+  6 berichten, keuring doorstaan, 26 pagina's gebouwd. Twee lessen: het schema
+  mag geen `minItems`/`maxItems` bevatten (400 van de API), en vier van de elf
+  feeds stonden op 404 — waaronder drie van de zes Nederlandse. Eén bericht
+  (Gemma 4) had een willekeurige GitHub-repo als bron; de feitenchecker moet
+  daaroverheen vóór er ooit iets verstuurd wordt.
 - **Een editie mag korter zijn dan zes** — opgelost op 29 juli. De jury krijgt
   een bereik van 3 tot 6; de heuristische terugval gebruikt een verhouding tot
   de sterkste kandidaat van die dag. Die verhouding vangt een zwakke staart,
@@ -166,7 +170,19 @@ GitHub Actions-workflow die de editie vastlegt, en `vercel.json` +
 `bouw_site.py` voor Vercel — met een publicatieblokkade zolang de
 uitgeversgegevens ontbreken.
 
-**Ontbreekt:** verzendlaag (ESP), abonneebeheer, weekendformaten,
+**Verzenden** (30 juli): `verzenden.py` stuurt de editie per SMTP naar
+`verzending.altijd_naar`, met tekst én HTML, en vervangt `{{unsubscribe}}` —
+zonder ESP vult niemand dat haakje in. Het is de derde en strengste poort:
+weigert bij elke blokkade uit `keuring.keur()`, bij een ontbrekende afzender,
+bij een lege uitschrijflink, en bij verzenden naar iemand anders dan de vaste
+ontvanger zolang de uitgeversgegevens ontbreken. Reden: een fout op de site
+herstel je met een commit, een fout in een mail staat in andermans inbox.
+Geheimen komen uit de omgeving (`SMTP_HOST`, `SMTP_POORT`, `SMTP_GEBRUIKER`,
+`SMTP_WACHTWOORD`, `SMTP_AFZENDER`), nooit uit config.yaml. De workflow slaat
+de stap over zolang `SMTP_HOST` leeg is.
+
+**Ontbreekt:** ESP-koppeling en abonneebeheer (nodig vanaf de tweede lezer),
+weekendformaten,
 SEO-technisch fundament (zie hieronder), en de uitgeversgegevens zelf —
 zie openstaand punt D.
 

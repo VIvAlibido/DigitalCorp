@@ -109,7 +109,12 @@ def _keur_items(editie: Editie, streng: bool) -> list[Bevinding]:
     b = []
     for n, s in enumerate(editie.items, 1):
         waar = f"bericht {n}"
-        for veld in ("kern", "wat", "waarom", "url", "bron"):
+        # "kop" ontbrak hier tot 30 juli. Uitgerekend het veld dat de lezer als
+        # eerste ziet mocht dus leeg zijn, en een kop met "TODO" erin kwam er
+        # ook doorheen omdat de placeholdertoets alleen naar de tekst keek.
+        # Gevonden doordat een verzendtest een editie probeerde te breken en
+        # de keuring hem gewoon goedkeurde.
+        for veld in ("kop", "kern", "wat", "waarom", "url", "bron"):
             if not str(getattr(s, veld, "")).strip():
                 b.append(Bevinding("blokkade", waar, f"leeg veld: {veld}"))
         if not s.datum:
@@ -117,7 +122,7 @@ def _keur_items(editie: Editie, streng: bool) -> list[Bevinding]:
         if len(s.kern) > MAX_KERN_TEKENS:
             b.append(Bevinding("waarschuwing", waar,
                                f"kern is {len(s.kern)} tekens (max {MAX_KERN_TEKENS})"))
-        b += _keur_placeholders(waar, f"{s.kern} {s.wat} {s.waarom}", streng)
+        b += _keur_placeholders(waar, f"{s.kop} {s.kern} {s.wat} {s.waarom}", streng)
 
     for bezwaar in rank.toets_verhouding(editie):
         nummer = bezwaar.split(".", 1)[0]
