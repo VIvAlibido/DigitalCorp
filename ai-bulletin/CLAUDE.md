@@ -165,6 +165,13 @@ beslissing 9.)*
   krijgt. Vuistregel, vastgelegd door de opdrachtgever op 30 juli: **kopieer de
   machinerie — formaat, tijdstip, ritme, platform, aanbevelingsruil — maar niet
   de reden van bestaan.** Zij duiden, wij laten handelen.
+- **Een AI-melding kost vertrouwen; een bronnenlijst wint het terug.**
+  Peer-reviewed (ACM FAccT 2026; Toff & Simon 2025): lezers vertrouwen nieuws
+  dat als AI-gemaakt is gelabeld mínder, ook als het niet onnauwkeuriger is —
+  en een *uitgebreide* verantwoording verlaagt het vertrouwen verder dan een
+  korte regel. Wat het effect grotendeels tenietdoet is het publiceren van de
+  gebruikte bronnen. Onze methodeverantwoording doet dus op dit moment het
+  verkeerde: veel uitleg, geen bronnenlijst. Zie plan/onderscheid.md deel B.
 - **De nieuwsbrief is het gevolg van een publiek, niet de oorzaak.**
   AlphaSignal heeft 200.000+ LinkedIn-volgers en bereikt 10 miljoen mensen per
   maand; AI Report begon als podcast met een bekende naam. Wij bouwen het
