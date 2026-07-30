@@ -27,15 +27,22 @@ verzending:
 # Laat een veld nooit met een gok staan: site.controleer_publicatiegereed()
 # blokkeert de publicatie zolang hier iets ontbreekt. Dat is met opzet.
 uitgever:
-  naam: ""              # statutaire naam, bv. "Telemedia B.V."
+  naam: "Digital Corp OÜ"
   handelsnaam: "AI Bulletin"
-  adres: ""             # straat en huisnummer
-  postcode: ""
-  plaats: ""
+  adres: "Koninginneweg 11"
+  postcode: "1217 KP"
+  plaats: "Hilversum"
   land: "Nederland"
+  # OÜ is een Estse osaühing, geen Nederlandse rechtsvorm. Het veld heet hier
+  # "kvk" maar moet het registratienummer bevatten van het register waar de
+  # onderneming werkelijk staat ingeschreven — art. 3:15d BW vraagt om
+  # identificeerbaarheid, niet om een Nederlands nummer. Voor een Estse OÜ is
+  # dat de registrikood (8 cijfers). Is er daarnaast een Nederlandse vestiging
+  # ingeschreven, vul dan dát KvK-nummer in; een lezer in Hilversum die iets
+  # wil verhalen moet bij het juiste register uitkomen.
   kvk: ""
-  btw: ""               # leeglaten als je niet btw-plichtig bent
-  email: ""             # algemeen contact
+  btw: ""               # EE-nummer of NL-nummer, afhankelijk van waar je btw afdraagt
+  email: ""             # algemeen contact — moet werken, wordt gepubliceerd
   correcties: ""        # waar "fout gezien?" heen gaat; mag gelijk zijn aan email
   telefoon: ""          # optioneel
 
@@ -44,8 +51,11 @@ output:
   # wordt de editie korter — een zwak zesde bericht kost meer lezers dan een
   # korte editie. Zie rank.py.
   aantal_items: 6
-  # Hieronder komt er geen editie; dat is een storing, geen rustige dag.
-  minimaal_items: 3
+  # De ondergrens. Stond op 3 en dwong daarmee opvulling af: op een dag met
+  # één werkelijk bericht verbood onze eigen poort om dat ene bericht te
+  # sturen. Eén bericht dat iets verandert verslaat vier die dat niet doen.
+  # Nul blijft wél een storing — dan is er niet verzameld.
+  minimaal_items: 1
   taal: nl
   # Waar de dagelijkse editie terechtkomt (relatief aan projectmap).
   map: edities
