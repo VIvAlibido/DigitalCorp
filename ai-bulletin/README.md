@@ -229,12 +229,13 @@ draaien, niet een goedkoper model.
 
 ## Automatisch draaien
 
-`.github/workflows/ai-bulletin.yml` draait op werkdagen om 05:15 UTC: tests,
-editie samenstellen, site bouwen, het archief terugcommitten en de site naar
-GitHub Pages publiceren. Vereist `ANTHROPIC_API_KEY` als repository secret;
+`.github/workflows/ai-bulletin.yml` draait elke dag om 05:15 UTC: tests, editie
+samenstellen, site proefbouwen, controleren of publiceren mag, en het archief
+terugcommitten. Vereist `ANTHROPIC_API_KEY` als repository secret;
 `ELEVENLABS_API_KEY` en `ELEVENLABS_VOICE_ID` alleen als je audio aanzet.
 
-De Pages-stap werkt pas nadat je in **Settings → Pages** de bron op *GitHub
-Actions* hebt gezet; zonder dat faalt die ene job terwijl de editie zelf gewoon
-klaarstaat in `edities/`. Voor `aibulletin.nl` zet je het domein daar als custom
-domain in en laat je de DNS ernaar wijzen.
+**Publiceren doet Vercel, niet deze workflow.** Vercel is aan de repo gekoppeld
+en bouwt bij elke push opnieuw via `vercel.json`; de commit met de nieuwe editie
+ís de publicatie. Zet in Vercel de root directory op `ai-bulletin` — de repo-root
+bevat een andere website. Er staat bewust geen GitHub Pages-deploy meer in de
+workflow: twee routes leveren twee versies van de site op twee adressen.

@@ -107,6 +107,7 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 9 | Eerst **goedkeuren vóór verzenden**, later omschakelen naar een annuleervenster | opdrachtgever heeft nu veel tijd, straks weinig; de omschakeling moet één regel config zijn, geen verbouwing |
 | 10 | Colofon en privacyverklaring worden **uit `uitgever:` in config.yaml gegenereerd** | één plek voor deze gegevens, zodat er geen tweede versie kan verouderen; publicatie wordt geblokkeerd zolang ze ontbreken |
 | 11 | Hosting op **Vercel**, gekoppeld aan deze repo. Root directory `ai-bulletin` | opdrachtgever, 29 juli. Let op: de repo-root bevat een ándere website; zonder die instelling publiceert Vercel die |
+| 19 | **Vercel is de enige publicatieroute.** De GitHub Pages-deploy is op 30 juli uit de workflow gehaald | opdrachtgever, 30 juli. Twee routes naast elkaar leveren twee versies van de site op twee adressen; dan is niet meer te zeggen welke de lezer ziet. De workflow publiceert nu door de editie te committen — die push laat Vercel bouwen |
 | 12 | **Elke editie gaat altijd naar kees@telemedia.es** | opdrachtgever, 29 juli. Vastgelegd in `verzending.altijd_naar`; een test bewaakt dat het niet wegvalt |
 
 ## Beslissingen die openstaan — deze blokkeren werk
@@ -161,8 +162,9 @@ ontdubbelen, geheugen tussen edities, ondergrens, shortlist, LLM-jury met terugv
 zondagsstuk met eigen sjabloon en auteursnaam,
 render naar JSON/Markdown/mail-HTML, statische sitegenerator inclusief
 colofon en privacyverklaring, robots.txt met noindex op voorvertoningen,
-GitHub Actions-workflow met Pages-deploy, en `vercel.json` + `bouw_site.py`
-voor Vercel — met een publicatieblokkade zolang de uitgeversgegevens ontbreken.
+GitHub Actions-workflow die de editie vastlegt, en `vercel.json` +
+`bouw_site.py` voor Vercel — met een publicatieblokkade zolang de
+uitgeversgegevens ontbreken.
 
 **Ontbreekt:** verzendlaag (ESP), abonneebeheer, weekendformaten,
 SEO-technisch fundament (zie hieronder), en de uitgeversgegevens zelf —

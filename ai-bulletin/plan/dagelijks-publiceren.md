@@ -40,8 +40,9 @@ resultaat af bij twee partijen die wél op de klok kunnen leveren:
 
 - de e-mail gaat als *ingeplande campagne* naar de ESP, met verzendtijd 06:00 —
   op tijd versturen is hun kernproduct, niet iets wat wij moeten nabouwen;
-- de website gaat naar GitHub Pages, waar publicatietijd niet uitmaakt zolang
-  het vóór 06:00 gebeurt.
+- de website gaat naar Vercel, waar publicatietijd niet uitmaakt zolang het
+  vóór 06:00 gebeurt. De workflow commit de editie; die push laat Vercel
+  bouwen.
 
 Daarmee wordt de vertraging van GitHub een marge in plaats van een probleem.
 Start je om 04:20, dan heb je 100 minuten speling voordat de belofte breekt — en
@@ -62,7 +63,7 @@ Om niet te verkopen wat er al is:
 | Koppentoets | klaar, draait in de pijplijn |
 | Mail-HTML, Markdown, JSON | klaar en getest |
 | Statische website uit alle edities | klaar en getest |
-| Workflow met cron, tests, Pages-deploy | klaar, **timing onbetrouwbaar (§1)** |
+| Workflow met cron, tests, editie-commit die Vercel laat bouwen | klaar, **timing onbetrouwbaar (§1)** |
 
 Wat ontbreekt is alles tussen "er is een editie gerenderd" en "de lezer heeft
 hem". Dat is §3.
@@ -190,8 +191,8 @@ dat is fase 4, niet fase 1.
 |---|---|
 | 04:20 | Workflow start, alle zeven dagen. Ruim vóór de belofte; §1 verklaart waarom. |
 | 04:20–04:40 | Verzamelen, filteren tegen de historie, scoren, ontdubbelen, jury. Op zaterdag geen live bronnen maar het eigen archief (§6). |
-| | **Kwaliteitspoort in code:** minstens 3 items boven de drempel? Koppen door de toets? Geen item dat al gepubliceerd is? Minstens 3 verschillende bronnen? Zo nee → terugval of stop, met melding. |
-| 04:40 | Site naar Pages. Campagne aangemaakt bij de ESP, **ingepland op 06:00**. |
+| | **Kwaliteitspoort in code (`keuring.py`):** minstens één item boven de drempel? Koppen door de toets? Geen item dat al gepubliceerd is? Zo nee → terugval of stop, met melding. Er is bewust géén ondergrens van drie: die dwong opvulling af op dagen waarop er één ding te melden viel. |
+| 04:40 | Editie gecommit — die push laat Vercel de site bouwen. Campagne aangemaakt bij de ESP, **ingepland op 06:00**. |
 | 04:42 | Proefmail naar de redactie met een link om te annuleren. |
 | 05:30 | Harde afkap: niets ingepland → fout + melding, geen late verzending. |
 | 06:00 | De ESP verstuurt. Betrouwbaar, want dat is hun vak. |
