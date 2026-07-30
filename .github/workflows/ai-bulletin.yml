@@ -53,6 +53,19 @@ jobs:
             ${{ inputs.heuristisch && '--heuristisch' || '' }} \
             --verbose
 
+      # De editie in de log. Klinkt overbodig naast het artifact, maar dat
+      # artifact ligt in GitHub's blob-opslag en die is niet overal te bereiken
+      # — vanuit de ontwikkelomgeving geeft de proxy er 403 op. Zonder deze stap
+      # is een rode run alleen te beoordelen door hem met de hand te downloaden.
+      - name: Toon de editie in de log
+        if: always()
+        run: |
+          for bestand in edities/*.md; do
+            echo "::group::$bestand"
+            cat "$bestand"
+            echo "::endgroup::"
+          done
+
       # Proefbouw. Vercel bouwt de site die de lezer ziet; deze stap laat de
       # workflow falen als de generator struikelt, vóórdat de editie wordt
       # vastgelegd en Vercel er alsnog mee aan de haal gaat.
