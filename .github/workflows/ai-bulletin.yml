@@ -59,6 +59,19 @@ jobs:
       - name: Bouw de website (proef)
         run: python -m signaal.cli --site
 
+      # Vóór de publicatiepoort, en met if: always(). Faalt de poort — of de
+      # editie zelf — dan is het samenstellen al gebeurd en wil je juist zien
+      # wát er gemaakt is. Stond deze stap erachter, dan gooide een rode run
+      # het resultaat weg en hield je alleen logregels over.
+      - name: Archiveer de editie
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editie-${{ github.run_id }}
+          path: ai-bulletin/edities/
+          retention-days: 90
+          if-no-files-found: warn
+
       # Een nieuwssite die op betrouwbaarheid concurreert kan niet anoniem zijn,
       # en art. 3:15d BW verplicht een commerciële site tot naam, adres, e-mail
       # en KvK-nummer. Liever hier falen dan het ontdekken via een lezer.
@@ -72,13 +85,6 @@ jobs:
               print(f"::error::{regel}")
           sys.exit(1 if blokkades else 0)
           PY
-
-      - name: Archiveer de editie
-        uses: actions/upload-artifact@v4
-        with:
-          name: editie-${{ github.run_id }}
-          path: ai-bulletin/edities/
-          retention-days: 90
 
       # Dit is tevens de publicatiestap. Vercel is aan deze repo gekoppeld
       # (beslissing 11) en bouwt bij elke push opnieuw via vercel.json.
