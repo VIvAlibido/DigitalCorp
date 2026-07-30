@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html as html_module
 import json
 import sys
 import tempfile
@@ -891,6 +892,21 @@ class TestVerzenden(unittest.TestCase):
         }
         basis_cfg.update(overschrijf)
         return basis_cfg
+
+    def test_de_mail_toont_de_kanttekeningen_die_hij_belooft(self):
+        """De methodeverantwoording beloofde ze; de mail toonde er nul.
+
+        Op de site en in de Markdown stonden ze wel. Zolang er niets verstuurd
+        werd was dat een schoonheidsfout — met een verzendlaag is het een
+        belofte die de deur uit gaat zonder wat erbij hoort.
+        """
+        editie = self.editie()
+        mail = render.naar_html(editie)
+        self.assertIn("kanttekening bij elk cijfer", mail)
+        met_kanttekening = [s for s in editie.items if getattr(s, "kanttekening", "")]
+        self.assertTrue(met_kanttekening, "testeditie heeft geen enkele kanttekening")
+        for s in met_kanttekening:
+            self.assertIn(html_module.escape(s.kanttekening), mail)
 
     def test_de_vaste_ontvanger_valt_nooit_weg(self):
         """Beslissing 12: elke editie gaat altijd naar kees@telemedia.es."""

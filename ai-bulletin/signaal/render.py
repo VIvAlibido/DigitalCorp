@@ -160,6 +160,17 @@ def naar_markdown(editie: Editie) -> str:
 def _bericht_html(nummer: int, s: Selectie, editie: Editie) -> str:
     e = html.escape
     herkomst = " · ".join(filter(None, [s.bron, kort_datum(s.datum)]))
+    # De methodeverantwoording onderaan deze mail belooft "een kanttekening bij
+    # elk cijfer dat niet onafhankelijk is getoetst". Die kanttekeningen stonden
+    # wel in de Markdown en op de site, maar niet in de mail — de belofte werd
+    # dus verstuurd zonder wat erbij hoort. Kleiner gezet dan de duiding: het is
+    # een voorbehoud, geen tweede mening.
+    kanttekening = ""
+    if getattr(s, "kanttekening", ""):
+        kanttekening = f"""
+    <p style="margin:0 0 7px;font:400 12.5px/1.6 {_SANS};color:#7a7264;">
+      <span style="font:600 12.5px/1.6 {_SANS};color:#5c5548;">Kanttekening:</span>
+      {e(s.kanttekening)}</p>"""
     return f"""
   <tr><td style="padding:16px 34px 0;">
     <h2 style="margin:0 0 5px;font:600 17px/1.35 Georgia,serif;color:#1c1a17;">
@@ -168,7 +179,7 @@ def _bericht_html(nummer: int, s: Selectie, editie: Editie) -> str:
     <p style="margin:0 0 7px;font:400 14px/1.6 {_SANS};color:#4a4437;
               border-left:2px solid #e5ded1;padding-left:11px;">
       <span style="font:600 10px/1 {_SANS};color:#a08a72;text-transform:uppercase;
-                   letter-spacing:.09em;">Wat het betekent</span><br>{e(s.waarom)}</p>
+                   letter-spacing:.09em;">Wat het betekent</span><br>{e(s.waarom)}</p>{kanttekening}
     <a href="{e(bericht_url(editie, s))}"
        style="font:600 13px/1 {_SANS};color:#a4552b;text-decoration:none;">Het hele verhaal →</a>
     <span style="font:400 12px/1 {_SANS};color:#8a7f6d;">&nbsp;{e(herkomst)}</span>
