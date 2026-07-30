@@ -85,6 +85,23 @@ jobs:
           retention-days: 90
           if-no-files-found: warn
 
+      # Het archief vastleggen is geen publicatie maar opslag, en het staat
+      # daarom vóór de identiteitspoort hieronder. Een editie die de vorige stap
+      # doorstaat is inhoudelijk in orde; dat er nog geen KvK-nummer is, is een
+      # tekortkoming van ons en geen reden om het werk van vandaag weg te gooien.
+      #
+      # Live gaat er hierdoor niets: `bouw_site.py` weigert een productiedeploy
+      # zolang `site.controleer_publicatiegereed()` blokkades geeft, dus Vercel
+      # valt om op precies dezelfde grond. Twee poorten, dezelfde functie.
+      - name: Bewaar het archief in de repo
+        run: |
+          git config user.name "AI Bulletin"
+          git config user.email "noreply@aibulletin.nl"
+          git add edities
+          git diff --cached --quiet && exit 0
+          git commit -m "Editie van $(date -u +%F)"
+          git push
+
       # Een nieuwssite die op betrouwbaarheid concurreert kan niet anoniem zijn,
       # en art. 3:15d BW verplicht een commerciële site tot naam, adres, e-mail
       # en KvK-nummer. Liever hier falen dan het ontdekken via een lezer.
@@ -98,19 +115,6 @@ jobs:
               print(f"::error::{regel}")
           sys.exit(1 if blokkades else 0)
           PY
-
-      # Dit is tevens de publicatiestap. Vercel is aan deze repo gekoppeld
-      # (beslissing 11) en bouwt bij elke push opnieuw via vercel.json.
-      # Er is dus bewust geen deploy-stap in deze workflow: die zou een tweede
-      # versie van de site opleveren op een tweede adres.
-      - name: Bewaar het archief in de repo — hiermee publiceert Vercel
-        run: |
-          git config user.name "AI Bulletin"
-          git config user.email "noreply@aibulletin.nl"
-          git add edities
-          git diff --cached --quiet && exit 0
-          git commit -m "Editie van $(date -u +%F)"
-          git push
 
       # Ná de publicatiepoort: een mail is niet terug te halen, dus hij gaat pas
       # de deur uit als alles wat de site tegenhoudt ook hier is doorstaan.
