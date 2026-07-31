@@ -11,13 +11,60 @@ in te staan. Niet in een samenvatting, niet in een chatbericht — hier.
 
 ## Wat we bouwen
 
-Een Nederlandstalig AI-nieuwsplatform: elke dag een editie met de belangrijkste
-berichten, een website met een archief dat vindbaar is in Google, en later een
-podcast.
+> **Dit is de doelstelling. Vastgelegd op 30 juli 2026 op uitdrukkelijk verzoek
+> van de opdrachtgever, met de opdracht er nooit van af te wijken.**
+>
+> Wijkt een voorstel — van de assistent of van een agent — hiervan af, dan wordt
+> dat eerst benoemd en niet stil uitgevoerd. Verandert de doelstelling zelf, dan
+> gebeurt dat hier en met een datum erbij.
 
-**Doel:** nummer één worden in het eigen vakgebied op de Nederlandse markt.
+**AI Bulletin is een Nederlandstalige dagelijkse AI-nieuwsbrief met een
+website-archief, die twee dingen doet die de andere niet doen:**
 
-**Domein:** aibulletin.nl · **Merknaam:** AI Bulletin
+**1. Elke dag één ding dat je kunt dóén.**
+De anderen duiden — wat er gebeurd is en waarom het uitmaakt. Wij laten
+handelen. Elke editie bevat één toepassing die de lezer vandaag kan uitvoeren,
+met een eerlijke tijdsindicatie. Is er geen echte handeling, dan is er geen
+rubriek; er wordt nooit een handeling verzonnen om de rubriek te vullen.
+
+**2. Laten zien wat we niet zeker weten.**
+Dit is niet bescheidenheid maar het bewijsstuk. Peer-reviewed onderzoek (ACM
+FAccT 2026; Toff & Simon 2025): lezers vertrouwen als AI gelabeld nieuws
+mínder, en een uitgebreide verantwoording maakt het erger — behalve wanneer de
+gebruikte bronnen worden gepubliceerd, want dán wordt het effect grotendeels
+tenietgedaan. Concreet, en niet onderhandelbaar:
+
+  - **elk cijfer heeft een herkomst** — of het bericht gaat eruit;
+  - **elke editie publiceert zijn bronnen**, bij naam en met tellingen;
+  - **elke editie laat zien wat het níét haalde** en waarom.
+
+De belofte in één zin, en dit is de zin waar alles aan getoetst wordt:
+
+> ### De enige AI-nieuwsbrief die laat zien wat hij niet zeker weet.
+
+Die zin kan AI Report niet zeggen — geen machine die het bijhoudt. En The
+Rundown wíl hem niet zeggen. Wat voor een menselijke redactie duur werk is, is
+voor ons een bijproduct: de pijplijn wéét al hoeveel kandidaten er waren, uit
+welke bronnen, en wat afviel.
+
+### Wat we niet worden
+
+- **Niet de grootste.** AI Report zit op ~48.000 abonnees met een bekende naam
+  en drie jaar voorsprong. Dat gevecht voeren we niet. Ben's Bites bewijst het
+  alternatief: 120.000 goed gekozen lezers verslaan 1,75 miljoen willekeurige.
+- **Niet de eerste.** TheAIDaily.nl doet al een dagelijkse Nederlandse
+  AI-nieuwsbrief om 07:00. Dat is een gegeven, geen probleem: lezers zitten op
+  meerdere nieuwsbrieven tegelijk.
+- **Niet een kopie.** Vuistregel van de opdrachtgever, 30 juli: **kopieer de
+  machinerie — formaat, tijdstip, ritme, platform, aanbevelingsruil — maar
+  nooit de reden van bestaan.** De lezer vraagt niet "is er plek voor nog één",
+  maar "waarom lees ik deze náást wat ik al krijg". De twee punten hierboven
+  zijn dat antwoord.
+- **Niet doorverkocht aan wie we bespreken.** Advertenties van AI-leveranciers
+  zijn het makkelijkste verdienmodel en vernietigen punt 2. Nog te beslissen,
+  maar niet stilzwijgend.
+
+**Domein:** aibulletin.nl · **Merknaam:** AI Bulletin · Later: een podcast.
 
 ### De lezer
 
@@ -33,9 +80,16 @@ modelvergelijkingen om het vergelijken. Elk bericht beantwoordt impliciet
 
 **Toepasbaar — elke dag één ding dat je kunt dóén.**
 
-Gekozen boven "begrijpelijk", "controleerbaar" en "kort". Begrijpelijkheid en
-controleerbaarheid blijven volledige eisen aan het werk, maar zijn niet wat we
-zéggen.
+Gekozen boven "begrijpelijk", "controleerbaar" en "kort". Begrijpelijkheid
+blijft een volledige eis aan het werk maar is niet wat we zéggen.
+
+**Herzien op 30 juli:** controleerbaarheid is niet langer alleen een eis aan
+het werk — het is het tweede punt van de doelstelling geworden, omdat het
+onderzoek uitwijst dat het het enige is dat het vertrouwensverlies van een
+AI-nieuwsbrief compenseert. Toepasbaar is nog steeds waar we om bekend willen
+staan; aantoonbaar is waaróm je ons gelooft. Werkafspraak 2 ("geen nieuw
+kenmerk zonder dat er één afvalt") blijft gelden: er is geen derde bij gekomen
+en er komt er ook geen.
 
 Waarom dit werkt: het is het enige kenmerk waarbij datgene waar je om bekend
 staat ook datgene is dat zoekverkeer oplevert. Mensen zoeken op *"hoe gebruik ik
@@ -109,6 +163,9 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 11 | Hosting op **Vercel**, gekoppeld aan deze repo. Root directory `ai-bulletin` | opdrachtgever, 29 juli. Let op: de repo-root bevat een ándere website; zonder die instelling publiceert Vercel die |
 | 19 | **Vercel is de enige publicatieroute.** De GitHub Pages-deploy is op 30 juli uit de workflow gehaald | opdrachtgever, 30 juli. Twee routes naast elkaar leveren twee versies van de site op twee adressen; dan is niet meer te zeggen welke de lezer ziet. De workflow publiceert nu door de editie te committen — die push laat Vercel bouwen |
 | 12 | **Elke editie gaat altijd naar kees@telemedia.es** | opdrachtgever, 29 juli. Vastgelegd in `verzending.altijd_naar`; een test bewaakt dat het niet wegvalt |
+| 20 | **Elk cijfer heeft een herkomst, of het bericht gaat eruit.** Blokkade in `keuring.py`, geen redactionele keuze | opdrachtgever, 30 juli. Op 30 juli stond "900 miljoen wekelijkse ChatGPT-gebruikers" zonder kanttekening terwijl vergelijkbare cijfers er wél een kregen. Inconsequentie is hier erger dan strengheid: de belofte staat onder elke editie |
+| 21 | **Elke editie publiceert zijn bronnen**, bij naam en met tellingen — niet "89 berichten uit 6 bronnen" maar wélke 6 | opdrachtgever, 30 juli, op grond van ACM FAccT 2026: het publiceren van de bronnenlijst is wat het vertrouwensverlies van een AI-melding grotendeels tenietdoet. Een langere verantwoording doet het tegenovergestelde |
+| 22 | **Elke editie laat zien wat het níét haalde**, met de reden | opdrachtgever, 30 juli. Voor een menselijke redactie duur werk, voor ons een bijproduct: de shortlist en de afvalredenen lopen al door de pijplijn. Geen enkele onderzochte nieuwsbrief doet dit |
 
 ## Beslissingen die openstaan — deze blokkeren werk
 
