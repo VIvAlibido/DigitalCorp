@@ -222,18 +222,48 @@ def _pagina(p: Sitepagina, diepte: int) -> str:
 
 # ─────────────────────────── Bouwstenen ──────────────────────────────
 
-def _aanmeldblok() -> str:
+def aanmeldadres(config: dict | None) -> str:
+    """Waar het aanmeldformulier heen post — leeg als het nergens heen kan.
+
+    Stond tot 31 juli op `action="#"`. Wie zijn adres invulde en op de knop
+    drukte kreeg niets: de pagina laadde opnieuw en er werd niemand
+    geregistreerd. Dat is de stilste manier waarop een nieuwsbrief lezers
+    verliest, want er gaat niets zichtbaar mis.
+    """
+    publicatie = str(((config or {}).get("verzending") or {}).get("substack") or "").strip()
+    return f"{publicatie.rstrip('/')}/subscribe" if publicatie else ""
+
+
+def _formulier(config: dict | None, knop: str, anker: str = "") -> str:
+    """Het aanmeldformulier, of een eerlijke mededeling dat het nog niet kan.
+
+    Een knop die niets doet is erger dan geen knop: de bezoeker denkt dat hij
+    zich heeft ingeschreven en komt nooit meer terug. `method="get"` omdat het
+    doel Substacks eigen aanmeldpagina is; het adres gaat mee als invulling en
+    de bezoeker bevestigt daar. Zo is ook zichtbaar bij wie hij zich abonneert.
+    """
+    doel = aanmeldadres(config)
+    if not doel:
+        return ('<p class="hero-klein"><strong>Aanmelden kan nog niet.</strong> '
+                "De nieuwsbrief is er wel — de inschrijving wordt deze week "
+                "opengezet.</p>")
+    return f"""
+  <form class="aanmelden"{f' id="{anker}"' if anker else ''}
+        method="get" action="{html.escape(doel)}">
+    <input type="email" name="email" placeholder="jouw@e-mailadres.nl"
+           aria-label="E-mailadres" required>
+    <button type="submit">{html.escape(knop)}</button>
+  </form>"""
+
+
+def _aanmeldblok(config: dict | None = None) -> str:
     return f"""
 <section class="hero"><div class="binnen">
   <h1>{html.escape(BESCHRIJVING)}</h1>
   <p class="hero-sub">Geen cursus, geen abonnement: één stap die je vandaag afmaakt,
     met het Nederlandse AI-nieuws eronder. Jij bepaalt of je ons dagelijks, wekelijks
     of alleen bij groot nieuws hoort.</p>
-  <form class="aanmelden" id="aanmelden" method="post" action="#">
-    <input type="email" name="email" placeholder="jouw@e-mailadres.nl"
-           aria-label="E-mailadres" required>
-    <button type="submit">Ontvang de nieuwsbrief</button>
-  </form>
+{_formulier(config, "Ontvang de nieuwsbrief", anker="aanmelden")}
   <p class="hero-klein">Geen spam. Uitschrijven met één klik. Verzonden vanuit de EU.</p>
 </div></section>"""
 
@@ -297,9 +327,9 @@ def _zijkolom(diepte: int) -> str:
   </div>
   <div class="blokje">
     <h3>Hoe wij werken</h3>
-    <p>Zes berichten per dag, per feit gecontroleerd tegen minstens twee bronnen.
-      Twijfel vermelden we, we verzwijgen het niet. Teksten van anderen nemen we
-      niet over.</p>
+    <p>Elk cijfer krijgt een kanttekening over de herkomst, of het bericht gaat
+      eruit. Elke editie noemt de bronnen die we die dag hebben bekeken. Teksten
+      van anderen nemen we niet over.</p>
     <a class="link" href="{op}werkwijze/">Lees onze werkwijze →</a>
   </div>
 </aside>"""
@@ -307,7 +337,7 @@ def _zijkolom(diepte: int) -> str:
 
 # ───────────────────────────── Pagina's ──────────────────────────────
 
-def _homepage(edities: list[Editie]) -> Sitepagina:
+def _homepage(edities: list[Editie], config: dict | None = None) -> Sitepagina:
     e = html.escape
     laatste = edities[0]
     berichten = "".join(_bericht_kaart(laatste, i, 0) for i in laatste.items)
@@ -331,7 +361,7 @@ def _homepage(edities: list[Editie]) -> Sitepagina:
     )
 
     inhoud = f"""
-{_aanmeldblok()}
+{_aanmeldblok(config)}
 <div class="binnen kolommen">
   <main>
     {_beschouwingblok(laatste, als_link=True, diepte=0)}
@@ -388,14 +418,13 @@ def _editiepagina(editie: Editie) -> Sitepagina:
     return Sitepagina(editie.stam, titel, editie.intro or BESCHRIJVING, inhoud)
 
 
-def _strip(diepte: int) -> str:
+def _strip(diepte: int, config: dict | None = None) -> str:
     """Compacte aanmeldbalk voor pagina's zonder hero.
 
     Een gedeelde link of een klik uit de mail landt op een losse pagina. Zonder
     dit blok is dat een doodlopende weg: de lezer heeft het beste wat we maken
     net gelezen en kan zich nergens aanmelden.
     """
-    op = "../" * diepte or "./"
     return f"""
 <section class="strip">
   <div class="strip-tekst">
@@ -403,11 +432,7 @@ def _strip(diepte: int) -> str:
     <p>Zes berichten over AI die er in Nederland toe doen, in vier minuten.
       Jij bepaalt of dat dagelijks, wekelijks of alleen bij groot nieuws is.</p>
   </div>
-  <form class="aanmelden" method="post" action="{op}#aanmelden">
-    <input type="email" name="email" placeholder="jouw@e-mailadres.nl"
-           aria-label="E-mailadres" required>
-    <button type="submit">Aanmelden</button>
-  </form>
+{_formulier(config, "Aanmelden")}
 </section>"""
 
 
@@ -462,7 +487,7 @@ def _beschouwingblok(editie: Editie, als_link: bool, diepte: int) -> str:
 </section>"""
 
 
-def _beschouwingpagina(editie: Editie) -> Sitepagina:
+def _beschouwingpagina(editie: Editie, config: dict | None = None) -> Sitepagina:
     b = editie.beschouwing
     inhoud = f"""
 <div class="binnen smal artikel">
@@ -474,12 +499,12 @@ def _beschouwingpagina(editie: Editie) -> Sitepagina:
     nieuwsbericht. De zes dagelijkse berichten volgen andere regels — zie onze
     <a href="../../werkwijze/">werkwijze</a>.
   </div>
-  {_strip(2)}
+  {_strip(2, config)}
 </div>"""
     return Sitepagina(f"{editie.stam}/{b.slug}", f"{b.titel} — {MERK}", b.kern, inhoud)
 
 
-def _berichtpagina(editie: Editie, item) -> Sitepagina:
+def _berichtpagina(editie: Editie, item, config: dict | None = None) -> Sitepagina:
     e = html.escape
     herkomst = " · ".join(filter(None, [item.bron, kort_datum(item.datum)]))
     kanttekening = (
@@ -504,13 +529,13 @@ def _berichtpagina(editie: Editie, item) -> Sitepagina:
     van anderen over; feiten worden gecontroleerd tegen minstens twee bronnen.
     Fout gezien? <a href="../../werkwijze/">Laat het ons weten</a>.
   </div>
-  {_strip(2)}
+  {_strip(2, config)}
   {_verder_in_editie(editie, item)}
 </div>"""
     return Sitepagina(f"{editie.stam}/{item.slug}", f"{item.kop} — {MERK}", item.kern, inhoud)
 
 
-def _toepassingpagina(editie: Editie) -> Sitepagina:
+def _toepassingpagina(editie: Editie, config: dict | None = None) -> Sitepagina:
     t = editie.toepassing
     e = html.escape
     inhoud = f"""
@@ -522,7 +547,7 @@ def _toepassingpagina(editie: Editie) -> Sitepagina:
     Uit de editie van <a href="../../{editie.stam}/">{e(datum_nl(editie.datum))}</a>.
     Elke werkdag komt er één toepassing bij.
   </div>
-  {_strip(2)}
+  {_strip(2, config)}
 </div>"""
     return Sitepagina(f"toepassingen/{t.slug}", f"{t.titel} — {MERK}", t.intro, inhoud)
 
@@ -603,6 +628,13 @@ def controleer_publicatiegereed(config: dict) -> list[str]:
         blokkades.append(
             "geen correctie-adres: elke editie belooft correcties, dus er moet "
             "een adres zijn waar die belofte terechtkomt"
+        )
+    if not aanmeldadres(config):
+        blokkades.append(
+            "geen aanmeldadres: vul verzending.substack in config.yaml. Tot 31 juli "
+            "stond het formulier op action=\"#\" — wie zijn adres invulde raakten we "
+            "kwijt zonder dat er zichtbaar iets misging, en dat is de stilste manier "
+            "om lezers te verliezen"
         )
     return blokkades
 
@@ -729,32 +761,33 @@ def _privacy(config: dict) -> Sitepagina:
                       f"Wat {MERK} van je bijhoudt, en wat niet.", inhoud)
 
 
-def _voorkeuren() -> Sitepagina:
-    inhoud = """
+def _voorkeuren(config: dict | None = None) -> Sitepagina:
+    """Voorkeuren worden bij het nieuwsbriefplatform beheerd, niet hier.
+
+    Hier stond een formulier met radioknoppen en een knop "Opslaan" die op
+    action="#" uitkwam: het sloeg niets op en er was geen enkele manier waarop
+    de bezoeker dat kon zien. Erger nog dan het dode aanmeldformulier, want dit
+    beloofde iets aan iemand die al lezer was.
+    """
+    adres = aanmeldadres(config)
+    beheer = adres.rsplit("/subscribe", 1)[0] + "/account" if adres else ""
+    knop = (f'<p style="margin:26px 0"><a class="knop" href="{html.escape(beheer)}">'
+            "Beheer je voorkeuren →</a></p>" if beheer else
+            '<p class="kanttekening" style="margin:26px 0"><strong>Nog niet '
+            "beschikbaar.</strong> Zodra de inschrijving openstaat, beheer je hier "
+            "je frequentie. Uitschrijven kan altijd met één klik onderaan elke "
+            "mail.</p>")
+    inhoud = f"""
 <div class="binnen smal artikel">
   <h1>Hoe vaak wil je ons horen?</h1>
   <p class="kern">De belangrijkste reden dat mensen een nieuwsbrief opzeggen is niet de
-    inhoud maar de hoeveelheid. Daarom hoef je hier niet te kiezen tussen alles of
-    niets.</p>
-  <form method="post" action="#" style="margin:26px 0">
-    <div class="blokje" style="margin-bottom:12px">
-      <label><input type="radio" name="frequentie" value="dagelijks" checked>
-        <strong>Dagelijks</strong> — elke werkdag om 7 uur, vier minuten</label>
-    </div>
-    <div class="blokje" style="margin-bottom:12px">
-      <label><input type="radio" name="frequentie" value="wekelijks">
-        <strong>Wekelijks</strong> — vrijdag, alleen wat er echt toe deed</label>
-    </div>
-    <div class="blokje" style="margin-bottom:20px">
-      <label><input type="radio" name="frequentie" value="groot">
-        <strong>Alleen groot nieuws</strong> — een paar keer per maand</label>
-    </div>
-    <div class="blokje" style="margin-bottom:20px">
-      <label><input type="checkbox" name="bedrijven" checked>
-        Toon het blok <strong>Voor jouw bedrijf</strong></label>
-    </div>
-    <button class="knop" type="submit" style="border:0;cursor:pointer">Opslaan</button>
-  </form>
+    inhoud maar de hoeveelheid. Daarom hoef je niet te kiezen tussen alles of niets.</p>
+  <ul class="keuzes" style="margin:22px 0">
+    <li><span class="bol aan"></span><strong>Dagelijks</strong> — elke ochtend, vier minuten</li>
+    <li><span class="bol"></span><strong>Wekelijks</strong> — vrijdag, alleen wat er echt toe deed</li>
+    <li><span class="bol"></span><strong>Alleen groot nieuws</strong> — een paar keer per maand</li>
+  </ul>
+  {knop}
   <div class="methode">
     Liever helemaal weg? Dat kan met één klik onderaan elke mail. We houden je niet
     tegen met een enquête.
@@ -864,21 +897,21 @@ def bouw(edities_map: Path, uitvoer: Path, config: dict | None = None,
     uitvoer.mkdir(parents=True, exist_ok=True)
 
     paginas: list[Sitepagina] = [
-        _homepage(edities),
+        _homepage(edities, config),
         _bibliotheek(edities),
         _archief(edities),
-        _voorkeuren(),
+        _voorkeuren(config),
         _werkwijze(),
         _colofon(config),
         _privacy(config),
     ]
     for ed in edities:
         paginas.append(_editiepagina(ed))
-        paginas += [_berichtpagina(ed, item) for item in ed.items]
+        paginas += [_berichtpagina(ed, item, config) for item in ed.items]
         if ed.toepassing:
-            paginas.append(_toepassingpagina(ed))
+            paginas.append(_toepassingpagina(ed, config))
         if ed.beschouwing:
-            paginas.append(_beschouwingpagina(ed))
+            paginas.append(_beschouwingpagina(ed, config))
 
     geschreven = [uitvoer / "stijl.css"]
     (uitvoer / "stijl.css").write_text(_stylesheet().strip() + "\n", encoding="utf-8")

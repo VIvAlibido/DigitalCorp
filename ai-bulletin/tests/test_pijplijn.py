@@ -722,6 +722,68 @@ class TestBronnenlijst(unittest.TestCase):
                              len(resultaat.editie.bronlijst))
 
 
+class TestAanmelden(unittest.TestCase):
+    """Het formulier stond tot 31 juli op action="#" en ging dus nergens heen.
+
+    Wie zijn adres invulde en op de knop drukte, kreeg niets: de pagina laadde
+    opnieuw en er werd niemand geregistreerd. Er ging niets zichtbaar mis, en
+    dat is precies wat het gevaarlijk maakte — je nodigt tweehonderd mensen uit
+    en raakt ze kwijt op het laatste scherm.
+    """
+
+    MET = {"verzending": {"substack": "https://aibulletin.substack.com"}}
+
+    def test_zonder_platform_wijst_het_formulier_nergens_heen(self):
+        self.assertEqual(site.aanmeldadres({}), "")
+        self.assertEqual(site.aanmeldadres(None), "")
+
+    def test_met_platform_wijst_het_naar_de_aanmeldpagina(self):
+        self.assertEqual(site.aanmeldadres(self.MET),
+                         "https://aibulletin.substack.com/subscribe")
+
+    def test_een_slash_te_veel_geeft_geen_dubbele_slash(self):
+        config = {"verzending": {"substack": "https://aibulletin.substack.com/"}}
+        self.assertEqual(site.aanmeldadres(config),
+                         "https://aibulletin.substack.com/subscribe")
+
+    def test_geen_knop_die_niets_doet(self):
+        """Liever een eerlijke mededeling dan een knop die de lezer wegwerpt."""
+        zonder = site._formulier({}, "Aanmelden")
+        self.assertNotIn("<form", zonder)
+        self.assertIn("kan nog niet", zonder)
+
+    def test_publiceren_wordt_geblokkeerd_zonder_aanmeldadres(self):
+        kaal = {"uitgever": dict(CONFIG["uitgever"])}
+        self.assertTrue(
+            [b for b in site.controleer_publicatiegereed(kaal) if "aanmeld" in b])
+
+    def test_met_alles_ingevuld_mag_het_wel(self):
+        compleet = {"uitgever": dict(CONFIG["uitgever"]), **self.MET}
+        self.assertEqual(site.controleer_publicatiegereed(compleet), [])
+
+    def test_de_gebouwde_site_bevat_geen_dood_formulier(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            edities = tmp / "edities"
+            edities.mkdir()
+            editie = Editie(
+                datum=date(2026, 7, 30),
+                onderwerp="Een onderwerpregel van de juiste lengte",
+                items=[Selectie(kop="Een kop die ergens over gaat en je iets zegt",
+                                kern="Kern.", wat="Wat.", waarom="Waarom.",
+                                url="https://example.com/a", bron="Bron",
+                                categorie="bedrijf", datum="2026-07-30")])
+            (edities / f"{editie.stam}.json").write_text(
+                render.naar_json(editie), encoding="utf-8")
+            site.bouw(edities, tmp / "site", self.MET, keuren=False,
+                      vandaag=date(2026, 7, 30))
+            for pagina in (tmp / "site").rglob("index.html"):
+                inhoud = pagina.read_text(encoding="utf-8")
+                self.assertNotIn('action="#"', inhoud, f"dood formulier in {pagina}")
+                if "<form" in inhoud:
+                    self.assertIn("substack.com/subscribe", inhoud)
+
+
 class TestToekomstigeEdities(unittest.TestCase):
     """Een stuk van aanstaande zondag hoort donderdag niet op de voorpagina.
 
@@ -779,21 +841,30 @@ class TestUitgever(unittest.TestCase):
         "naam": "Testuitgever B.V.", "handelsnaam": "AI Bulletin",
         "adres": "Teststraat 1", "postcode": "1000 AA", "plaats": "Amsterdam",
         "land": "Nederland", "kvk": "12345678", "btw": "NL001234567B01",
-        "email": "post@example.nl", "correcties": "correcties@example.nl"}}
+        "email": "post@example.nl", "correcties": "correcties@example.nl"},
+        "verzending": {"substack": "https://aibulletin.substack.com"}}
 
     def test_lege_config_blokkeert_publicatie(self):
         blokkades = site.controleer_publicatiegereed({})
         self.assertTrue(blokkades)
         self.assertTrue(any("kvk" in b for b in blokkades))
 
-    def test_de_echte_config_is_publicatiegereed(self):
-        """Sinds 30 juli zijn de uitgeversgegevens bekend en mag de site live.
+    def test_de_uitgeversgegevens_blokkeren_niet_meer(self):
+        """Sinds 30 juli zijn ze bekend; bewaakt dat ze niet stilletjes verdwijnen."""
+        self.assertEqual(
+            [b for b in site.controleer_publicatiegereed(CONFIG) if "uitgever" in b],
+            [])
 
-        Deze test stond hiervóór omgekeerd: hij bewaakte dat er níét live werd
-        gegaan zolang de gegevens ontbraken. Nu bewaakt hij het omgekeerde —
-        dat ze niet stilletjes weer uit config.yaml verdwijnen.
+    def test_de_echte_config_wacht_nu_op_het_aanmeldadres(self):
+        """Publiceren mag pas als de aanmeldknop ergens heen gaat.
+
+        verzending.substack staat nog leeg omdat de publicatie nog gemaakt moet
+        worden. Zolang dat zo is publiceren we niet: een site met een knop die
+        bezoekers wegwerpt is erger dan geen site.
         """
-        self.assertEqual(site.controleer_publicatiegereed(CONFIG), [])
+        blokkades = site.controleer_publicatiegereed(CONFIG)
+        self.assertEqual(len(blokkades), 1, blokkades)
+        self.assertIn("aanmeldadres", blokkades[0])
 
     def test_een_weggevallen_veld_blokkeert_de_echte_config_alsnog(self):
         """De poort moet blijven werken nu hij eenmaal open staat."""
@@ -818,7 +889,7 @@ class TestUitgever(unittest.TestCase):
         self.assertTrue(any("correctie" in b for b in site.controleer_publicatiegereed(config)))
 
     def test_email_dekt_het_correctieadres_af(self):
-        config = {"uitgever": dict(self.VOLLEDIG["uitgever"], correcties="")}
+        config = dict(self.VOLLEDIG, uitgever=dict(self.VOLLEDIG["uitgever"], correcties=""))
         self.assertEqual(site.controleer_publicatiegereed(config), [])
 
     def test_colofon_toont_de_gegevens_en_geen_waarschuwing(self):
@@ -1156,6 +1227,8 @@ class TestVerzenden(unittest.TestCase):
     def test_naar_vreemden_mag_wel_met_volledige_gegevens(self):
         """Anders bewijst de vorige test alleen dat er íéts misgaat."""
         volledig = self.config(uitgever=dict(CONFIG["uitgever"]))
+        volledig["verzending"] = dict(volledig["verzending"],
+                                      substack="https://aibulletin.substack.com")
         v = verzenden.verstuur(self.editie(), volledig, naar=["iemand@anders.nl"],
                                uitschrijflink="https://aibulletin.nl/uit", proef=True)
         self.assertEqual(v.ontvangers, ["iemand@anders.nl"])

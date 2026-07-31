@@ -6,6 +6,18 @@
 # Verzending. De laag zelf bestaat nog niet — zie plan/dagelijks-publiceren.md
 # §3.2. Deze instellingen liggen vast zodat ze klaarstaan zodra die er is.
 verzending:
+  # Beslissing 23: de nieuwsbrief gaat via Substack, aibulletin.nl blijft het
+  # archief. Reden: het aanbevelingsnetwerk levert volgens Substack zelf een
+  # derde tot de helft van alle nieuwe abonnementen, en de Nederlandstalige
+  # AI-lezers zitten daar al. Zie plan/groei.md §4.
+  #
+  # Vul hier de publicatie-URL in zodra hij bestaat, bijvoorbeeld
+  # "https://aibulletin.substack.com". Het aanmeldformulier op de site stuurt
+  # bezoekers dan naar <die URL>/subscribe met hun adres alvast ingevuld.
+  # Zolang dit leeg is blokkeert site.controleer_publicatiegereed() de
+  # publicatie: een aanmeldknop die nergens heen gaat is erger dan geen knop.
+  substack: ""
+
   # Elke editie gaat altijd naar dit adres, ook vóór er abonnees zijn.
   # Vastgelegd door de opdrachtgever op 29 juli 2026.
   altijd_naar:

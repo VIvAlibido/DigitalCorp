@@ -147,7 +147,9 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | 1 | Naam **AI Bulletin**, domein aibulletin.nl | gekozen na afwijzen van "Het Kwartje" (leek op satire) |
 | 2 | 6 berichten per editie, 7 dagen per week | opdrachtgever, 29 juli |
 | 3 | Verzending om **06:00** via ingeplande ESP-campagne, niet via cron | GitHub Actions-cron loopt 15 min tot 2+ uur uit; zie plan/dagelijks-publiceren.md §1 |
-| 4 | ESP wordt **Laposta**, maar pas vanaf de tweede lezer | NL, EU-hosting, apart schedule-endpoint (nodig voor #3). Een ESP dient lijstbeheer, opt-in en afleverbaarheid; bij één lezer is dat overhead |
+| ~~4~~ | ~~ESP wordt Laposta~~ — **vervallen, zie 23** | Laposta heeft geen aanbevelingsnetwerk, en dat is 30–50% van de groei van een nieuwe nieuwsbrief |
+| 23 | **De nieuwsbrief gaat via Substack; aibulletin.nl blijft het archief** | opdrachtgever, 31 juli. Het aanbevelingsnetwerk levert volgens Substack zelf een derde tot de helft van alle nieuwe abonnementen, en de Nederlandstalige AI-lezers (AI Report, Klöpping) zitten daar al. Vastgelegd in `verzending.substack`; het aanmeldformulier stuurt naar `<publicatie>/subscribe` |
+| 24 | **Publiceren mag niet zolang de aanmeldknop nergens heen gaat** | Het formulier stond tot 31 juli op `action="#"`: wie zijn adres invulde raakten we kwijt zonder dat er zichtbaar iets misging. Dezelfde poort als de uitgeversgegevens — liever geen site dan een site die bezoekers wegwerpt |
 | 13 | Tot de tweede abonnee gaat de editie **via de Gmail-connector** naar kees@telemedia.es | scheelt een dag bouwwerk en een abonnement; de AVG gaat pas spelen zodra iemand anders zich moet kunnen uitschrijven |
 | 5 | Eigen tekst, nooit tekst van anderen overnemen | feiten zijn vrij, formulering niet; art. 15/15a Aw |
 | 6 | Feit (`wat`) en duiding (`waarom`) blijven zichtbaar gescheiden | geloofwaardigheid is de enige verdediging tegen "zoveelste AI-nieuwsbrief" |
@@ -174,7 +176,7 @@ Hier niet meer over discussiëren tenzij er nieuwe informatie is.
 | **D** | **Beantwoord op 30 juli — zie hieronder.** Rest: welk adres hoort in de colofon, en is aibulletin.nl geregistreerd? | Zie "Feiten die vaststaan". |
 | **E** | Wat betekent "nummer één" in een getal — abonnees, bezoekers, iets anders? | Kunnen beoordelen of een keuze over zes maanden heeft gewerkt. **Context sinds 30 juli:** AI Report zit op ~48.000 abonnees. "Nummer één" op breedte is daarmee geen doel maar een fantasie; zie plan/groei.md §1 |
 | **F** | **Wordt de doelgroep toetsbaar gemaakt** — een beroepsgroep, of een andere vorm van "voor wie is dit"? | De selectie. Niet omdat de markt bezet zou zijn (dat is hij niet, zie hieronder), maar omdat er bij "de geïnteresseerde professional" niets te toetsen valt en de editie dan terugglijdt naar algemeen AI-nieuws. Zie plan/groei.md §3 fase 0 |
-| **G** | **Blijft de ESP Laposta, of wordt het Substack?** | Fase 2 van de groei. Laposta heeft geen aanbevelingsnetwerk en dat netwerk is 30–50% van de groei van een nieuwe nieuwsbrief. Advies staat in plan/groei.md §4: Substack tot 1.000, aibulletin.nl blijft archief |
+| **H** | **De Substack-publicatie bestaat nog niet.** Aanmaken en de URL in `verzending.substack` zetten | **Alles.** Zolang dit leeg is blokkeert `site.controleer_publicatiegereed()` de publicatie en gaat de dagelijkse run rood na het archiveren. De editie wordt wél elke ochtend vastgelegd |
 
 *(A, B en C zijn beantwoord op 29 juli — zie "De lezer", "Het ene kenmerk" en
 beslissing 9.)*
