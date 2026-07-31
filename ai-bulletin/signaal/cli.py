@@ -10,6 +10,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 from . import pipeline, site, verzenden
+from .bronnen import ontdek
 from .model import Editie, Item
 
 PROJECT = Path(__file__).resolve().parent.parent
@@ -84,6 +85,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="bij --verstuur: alle controles doorlopen maar niets versturen",
     )
+    parser.add_argument(
+        "--bronnen",
+        action="store_true",
+        help="controleer alle bronnen en rapporteer welke leven; stop daarna",
+    )
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)
 
@@ -94,6 +100,22 @@ def main(argv: list[str] | None = None) -> int:
 
     config = pipeline.laad_config(args.config)
     uitvoermap = args.uitvoer or (PROJECT / config.get("output", {}).get("map", "edities"))
+
+    if args.bronnen:
+        # Draaien op een plek mét netwerk — de workflow dus. Vanuit de
+        # ontwikkelomgeving weigert de proxy elk nieuwsdomein, en dat is precies
+        # waarom feed-URL's daar niet te controleren zijn.
+        rapport = ontdek.gezondheid(config)
+        dood = [r for r in rapport if not r["feed"] or not r["items"]]
+        print(f"\nAI Bulletin — bronnen: {len(rapport) - len(dood)} van "
+              f"{len(rapport)} leveren berichten\n")
+        for r in sorted(rapport, key=lambda r: (r["blok"], -r["items"])):
+            teken = "OK " if r["items"] else "DOOD"
+            print(f"  {teken} [{r['blok']}] {r['opgegeven']}")
+            if r["feed"] and r["feed"] != r["opgegeven"]:
+                print(f"       feed: {r['feed']}")
+            print(f"       berichten: {r['items']}")
+        return 0
 
     if args.site is not None:
         paden = site.bouw(uitvoermap, args.site, config)

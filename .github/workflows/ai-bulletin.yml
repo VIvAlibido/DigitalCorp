@@ -41,6 +41,15 @@ jobs:
       - name: Draai tests
         run: python -m unittest discover -s tests
 
+      # Welke bron leeft er nog. Draait hier omdat dit de enige plek is mét
+      # netwerk: vanuit de ontwikkelomgeving weigert de proxy elk nieuwsdomein,
+      # en dat is precies waarom er op 31 juli drie dode Nederlandse feeds
+      # stonden zonder vervanging. Blokkeert niets — het maakt alleen zichtbaar
+      # wat anders stilletjes wegvalt.
+      - name: Controleer de bronnen
+        continue-on-error: true
+        run: python -m signaal.cli --bronnen
+
       - name: Stel de editie samen
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

@@ -140,37 +140,56 @@ bronnen:
     min_punten: 60
     max: 30
 
-  # Internationale RSS-bronnen.
+  # Internationale bronnen.
+  #
+  # `sites` bevat websites, geen feed-URL's. De feed wordt opgezocht in de
+  # <head> van de site zelf (zie bronnen/ontdek.py). Reden: op 31 juli kwamen
+  # vier van de zes berichten van Tweakers omdat drie Nederlandse feeds
+  # eerder waren uitgezet wegens 404 en er niets voor terugkwam — ik kon de
+  # vervangende URL's hier niet controleren en heb toen niets gedaan. Raden
+  # levert onzichtbare fouten op; de site vragen waar zijn feed staat niet.
   rss:
     actief: true
+    sites:
+      - https://openai.com
+      - https://www.anthropic.com/news
+      - https://deepmind.google/discover/blog
+      - https://huggingface.co/blog
+      - https://blog.google/technology/ai
+      - https://mistral.ai/news
+      - https://ai.meta.com/blog
+      - https://simonwillison.net
+      - https://www.interconnects.ai
+      - https://jack-clark.net
+      - https://www.technologyreview.com
+      - https://arstechnica.com
+      - https://techcrunch.com
+      - https://venturebeat.com
+      - https://digital-strategy.ec.europa.eu/en/news
     feeds:
-      - https://openai.com/blog/rss.xml
-      - https://deepmind.google/blog/rss.xml
-      - https://huggingface.co/blog/feed.xml
-      - https://blog.google/technology/ai/rss/
       - https://engineering.fb.com/feed/
-      # DOOD — 404 in run 30541853787 op 30 juli 2026:
-      # - https://www.anthropic.com/rss.xml
 
-  # Nederlandstalige bronnen — dit is wat de kloon onderscheidt.
-  #
-  # LET OP: van de zes stond op 30 juli de helft op 404 (run 30541853787).
-  # Wat overblijft is Tweakers (grotendeels gaming en consumentennieuws),
-  # Emerce en de AP. Dat is de reden dat de kandidatenlijst die dag vrijwel
-  # geheel uit Engelstalige GitHub-repo's bestond: de Nederlandse invoer
-  # bestaat nauwelijks. Vervangende feed-URL's zijn niet vanuit de
-  # ontwikkelomgeving te controleren (proxy weigert deze domeinen), dus ze
-  # staan hier uitgezet in plaats van geraden.
+  # Nederlandstalige bronnen — dit is wat de kloon onderscheidt, en dit is
+  # precies waar het op 31 juli misging: er waren er nog twee over.
   rss_nl:
     actief: true
+    sites:
+      - https://www.emerce.nl
+      - https://www.computable.nl
+      - https://www.agconnect.nl
+      - https://www.techzine.nl
+      - https://www.dutchitchannel.nl
+      - https://www.nu.nl
+      - https://nos.nl
+      - https://www.bnr.nl
+      - https://ibestuur.nl
+      - https://www.binnenlandsbestuur.nl
+      - https://mtsprout.nl
+      - https://www.rijksoverheid.nl
+      - https://autoriteitpersoonsgegevens.nl
+      - https://www.acm.nl
     feeds:
       - https://tweakers.net/feeds/mixed.xml
-      - https://www.emerce.nl/nieuws/rss
-      - https://autoriteitpersoonsgegevens.nl/rss.xml
-      # DOOD — 404 in run 30541853787 op 30 juli 2026:
-      # - https://www.bnr.nl/rss/podcast/onbeperkt-houdbaar
-      # - https://www.agconnect.nl/rss.xml
-      # - https://www.computable.nl/rss.xml
 
   # Zie README: Instagram heeft geen officiële API voor accounts van derden.
   instagram:

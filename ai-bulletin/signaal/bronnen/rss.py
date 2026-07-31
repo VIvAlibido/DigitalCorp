@@ -10,6 +10,7 @@ from urllib.parse import urlsplit
 
 from ..model import Item
 from .basis import haal_op, parse_feed, strip_html
+from .ontdek import feeds_van
 
 # Feeds als Tweakers zijn breed; filter op AI-signaalwoorden zodat er geen
 # telefoonreviews in de editie belanden.
@@ -51,8 +52,8 @@ def _lees_feeds(feeds: list[str], brontype: str, filteren: bool) -> list[Item]:
 
 def verzamel(cfg: dict) -> list[Item]:
     # Labs/vendors publiceren alleen AI-nieuws; filteren zou onterecht snoeien.
-    return _lees_feeds(cfg.get("feeds") or [], "rss", filteren=False)
+    return _lees_feeds(feeds_van(cfg), "rss", filteren=False)
 
 
 def verzamel_nl(cfg: dict) -> list[Item]:
-    return _lees_feeds(cfg.get("feeds") or [], "rss_nl", filteren=True)
+    return _lees_feeds(feeds_van(cfg), "rss_nl", filteren=True)

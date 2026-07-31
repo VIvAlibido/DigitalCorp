@@ -91,7 +91,37 @@ def _keur_opbouw(editie: Editie) -> list[Bevinding]:
     urls = [i.url for i in editie.items]
     for dubbel in {u for u in urls if urls.count(u) > 1}:
         b.append(Bevinding("blokkade", "editie", f"dezelfde bron twee keer: {dubbel}"))
+    b += _keur_spreiding(editie)
     return b
+
+
+# Hoeveel berichten hoogstens van één bron mogen komen. Op 31 juli kwamen er
+# vier van de zes van Tweakers en niemand die het tegenhield — niet omdat het
+# mocht, maar omdat er geen regel over bestond. Een editie die grotendeels één
+# site naschrijft is geen selectie maar een doorgeefluik.
+MAX_PER_BRON = 2
+
+
+def _keur_spreiding(editie: Editie) -> list[Bevinding]:
+    """Geen enkele bron mag de editie overnemen.
+
+    Waarschuwing en geen blokkade: op een dag waarop één toezichthouder drie
+    dingen tegelijk publiceert is dat legitiem, en een editie tegenhouden om de
+    spreiding is erger dan een scheve editie. Maar het moet wél in de log staan,
+    want dit was op 31 juli precies wat er misging zonder dat iemand het zag.
+    """
+    if len(editie.items) < 3:
+        return []
+    tellen: dict[str, int] = {}
+    for s in editie.items:
+        tellen[s.bron] = tellen.get(s.bron, 0) + 1
+    return [
+        Bevinding("waarschuwing", "editie",
+                  f"{aantal} van de {len(editie.items)} berichten komen van "
+                  f"{bron} (hoogstens {MAX_PER_BRON}) — te weinig spreiding")
+        for bron, aantal in sorted(tellen.items())
+        if aantal > MAX_PER_BRON
+    ]
 
 
 def _keur_koppen(editie: Editie) -> list[Bevinding]:

@@ -722,6 +722,119 @@ class TestBronnenlijst(unittest.TestCase):
                              len(resultaat.editie.bronlijst))
 
 
+class TestBronontdekking(unittest.TestCase):
+    """Feeds vinden in plaats van raden.
+
+    Op 31 juli kwamen vier van de zes berichten van Tweakers, omdat er nog maar
+    vijf bronnen de shortlist haalden. Drie Nederlandse feeds waren uitgezet
+    wegens 404 en er kwam niets voor terug — met als reden dat de URL's niet te
+    controleren waren vanuit de ontwikkelomgeving. Dat was een excuus.
+    """
+
+    KOP = ('<html><head><link rel="alternate" type="application/rss+xml" '
+           'href="/nieuws/feed.xml"></head><body>x</body></html>')
+    FEED = '<?xml version="1.0"?><rss version="2.0"><channel></channel></rss>'
+
+    def _nep(self, antwoorden: dict):
+        """haal_op vervangen door een tabel, zodat er geen netwerk aan te pas komt."""
+        def haal_op(url, *a, **kw):
+            return antwoorden.get(url)
+        return haal_op
+
+    def test_de_feed_uit_de_head_wint(self):
+        from signaal.bronnen import ontdek
+        origineel = ontdek.haal_op
+        ontdek.haal_op = self._nep({
+            "https://example.nl": self.KOP,
+            "https://example.nl/nieuws/feed.xml": self.FEED,
+        })
+        try:
+            self.assertEqual(ontdek.vind_feed("https://example.nl"),
+                             "https://example.nl/nieuws/feed.xml")
+        finally:
+            ontdek.haal_op = origineel
+
+    def test_zonder_link_wordt_een_gebruikelijk_pad_geprobeerd(self):
+        from signaal.bronnen import ontdek
+        origineel = ontdek.haal_op
+        ontdek.haal_op = self._nep({
+            "https://example.nl": "<html><head></head></html>",
+            "https://example.nl/feed/": self.FEED,
+        })
+        try:
+            self.assertEqual(ontdek.vind_feed("https://example.nl"),
+                             "https://example.nl/feed/")
+        finally:
+            ontdek.haal_op = origineel
+
+    def test_een_html_foutpagina_telt_niet_als_feed(self):
+        """Een 404-pagina met status 200 is de gemeenste variant."""
+        from signaal.bronnen import ontdek
+        origineel = ontdek.haal_op
+        ontdek.haal_op = self._nep({
+            "https://example.nl": "<html><head></head></html>",
+            "https://example.nl/feed/": "<html><body>Pagina niet gevonden</body></html>",
+        })
+        try:
+            self.assertIsNone(ontdek.vind_feed("https://example.nl"))
+        finally:
+            ontdek.haal_op = origineel
+
+    def test_er_staan_werkelijk_meer_bronnen_in_de_config(self):
+        """De aanleiding: er waren er nog twee over die iets opleverden."""
+        bronnen = CONFIG["bronnen"]
+        for blok, minimaal in (("rss", 10), ("rss_nl", 10)):
+            with self.subTest(blok=blok):
+                aantal = (len(bronnen[blok].get("sites") or [])
+                          + len(bronnen[blok].get("feeds") or []))
+                self.assertGreaterEqual(aantal, minimaal,
+                                        f"{blok} heeft er maar {aantal}")
+
+
+class TestSpreiding(unittest.TestCase):
+    """Geen enkele bron mag de editie overnemen.
+
+    Op 31 juli kwamen vier van de zes berichten van Tweakers en niets hield het
+    tegen — niet omdat het mocht, maar omdat er geen regel over bestond.
+    """
+
+    def bericht(self, n: int, bron: str) -> Selectie:
+        return Selectie(
+            kop=f"Bericht {n} met een kop die ergens over gaat",
+            kern="Kern.", wat="Wat er gebeurd is.", waarom="Wat het betekent.",
+            url=f"https://example.com/{n}", bron=bron, categorie="bedrijf",
+            datum="2026-07-31", kanttekening="Herkomst benoemd.")
+
+    def editie(self, bronnen: list[str]) -> Editie:
+        return maak_editie([self.bericht(n, b) for n, b in enumerate(bronnen, 1)],
+                           onderwerp="Een onderwerpregel van de juiste lengte")
+
+    def test_vier_van_de_zes_uit_een_bron_wordt_gemeld(self):
+        bevindingen = keuring.keur(self.editie(
+            ["Tweakers", "Tweakers", "Tweakers", "Tweakers", "Emerce", "GitHub"]))
+        spreiding = [x for x in bevindingen if "spreiding" in x.wat]
+        self.assertEqual(len(spreiding), 1)
+        self.assertIn("Tweakers", spreiding[0].wat)
+
+    def test_twee_van_dezelfde_bron_mag(self):
+        bevindingen = keuring.keur(self.editie(
+            ["Tweakers", "Tweakers", "Emerce", "NOS", "AP", "GitHub"]))
+        self.assertEqual([x for x in bevindingen if "spreiding" in x.wat], [])
+
+    def test_het_blokkeert_niet(self):
+        """Een scheve editie is beter dan geen editie — maar hij moet wél in de log."""
+        bevindingen = keuring.keur(self.editie(["A", "A", "A", "A", "A", "A"]))
+        self.assertTrue([x for x in bevindingen if "spreiding" in x.wat])
+        self.assertEqual([x for x in keuring.blokkades(bevindingen)
+                          if "spreiding" in x.wat], [])
+
+    def test_een_korte_editie_wordt_met_rust_gelaten(self):
+        """Bij twee berichten zegt spreiding niets."""
+        self.assertEqual(
+            [x for x in keuring.keur(self.editie(["A", "A"])) if "spreiding" in x.wat],
+            [])
+
+
 class TestAanmelden(unittest.TestCase):
     """Het formulier stond tot 31 juli op action="#" en ging dus nergens heen.
 
