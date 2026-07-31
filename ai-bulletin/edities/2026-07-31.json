@@ -1,0 +1,90 @@
+{
+  "datum": "2026-07-31",
+  "onderwerp": "EU zoekt bouwers voor 7 AI-gigafabrieken",
+  "preheader": "Plus: LinkedIn geeft je een knop om AI-spam te melden",
+  "intro": "De rode draad vandaag: overal wordt geprobeerd de gevolgen van goedkope AI in te dammen. Europa doet dat met rekencentra, LinkedIn met een meldknop, een Amerikaanse staat met een verbod — en in Amsterdam verdwijnt de kassa uit de stadionbar.",
+  "items": [
+    {
+      "kop": "EU legt 10 miljard euro neer voor 7 AI-gigafabrieken",
+      "kern": "De EU zoekt bedrijven die zeven grote AI-rekencentra in Europa willen bouwen en legt daar samen met de lidstaten maximaal 10 miljard euro voor op tafel.",
+      "wat": "De Europese Unie opende donderdag een aanbesteding voor maximaal zeven zogeheten AI-gigafactories: rekencentra vol AI-chips waarop grote modellen worden getraind. De EU en de lidstaten investeren daarin samen maximaal 10 miljard euro. Het doel is dat Europese bedrijven en onderzoekers geavanceerde AI kunnen maken zonder buiten Europa capaciteit te huren.",
+      "waarom": "Wie in Europa een eigen model wil trainen, huurt die rekenkracht nu vrijwel altijd bij Amerikaanse aanbieders. Voor de meeste bedrijven verandert dat pas over jaren, maar consortia, bouwers en energieleveranciers die willen meedoen, moeten nu de aanbestedingsstukken lezen.",
+      "url": "https://tweakers.net/nieuws/250548/eu-zoekt-bedrijven-die-7-ai-gigafabrieken-willen-bouwen.html",
+      "bron": "Tweakers",
+      "categorie": "infrastructuur",
+      "datum": "2026-07-30",
+      "kanttekening": "Locaties, deelnemers en opleverdata zijn nog niet bekend; de aanbesteding is de eerste stap, geen bouwbesluit."
+    },
+    {
+      "kop": "LinkedIn bouwt meldknop voor AI-spam in je tijdlijn",
+      "kern": "LinkedIn geeft toe dat het platform vol staat met machinaal geschreven posts en laat gebruikers die vanaf nu melden.",
+      "wat": "LinkedIn stelt dat AI het schrijven van een post te makkelijk maakt en dat veel gebruikers daar gretig gebruik van maken. Het platform noemt het resultaat AI-slop: massaal geproduceerde tekst die vlot leest maar niets zegt. Er komen detectiesystemen die zijn getraind door redacteuren, plus een nieuwe knop waarmee gebruikers AI-spam kunnen aangeven.",
+      "waarom": "Wie LinkedIn gebruikt voor acquisitie of employer branding, riskeert nu minder bereik met automatisch gegenereerde teksten. Zet in elke post minstens één eigen cijfer, naam of datum; generieke motivatieteksten zijn het eerste wat wegvalt.",
+      "url": "https://tweakers.net/nieuws/250550/linkedin-erkent-overvloed-aan-ai-slop-vraagt-gebruikers-ai-spam-te-melden.html",
+      "bron": "Tweakers",
+      "categorie": "bedrijf",
+      "datum": "2026-07-30",
+      "kanttekening": "LinkedIn maakt niet openbaar hoe de detectie werkt of wat een melding voor het bereik van een post betekent."
+    },
+    {
+      "kop": "Google laat twee robots een klus verdelen met Gemini ER 2",
+      "kern": "Het nieuwe robotmodel van Google kan een opdracht zelf in stappen opdelen en die stappen met een tweede robot verdelen.",
+      "wat": "Google presenteerde versie 2 van Gemini Robotics ER. Volgens Google helpt het model robots hun fysieke omgeving te zien en te interpreteren, taken in meerdere stappen op te splitsen en met elkaar samen te werken. Het doel dat Google noemt is robots die mensen bijstaan in alledaagse omgevingen.",
+      "waarom": "Voor logistiek en productie verschuift de vraag van 'kan die robot dit oppakken' naar 'kunnen twee machines een klus onderling verdelen'. Wie robotisering overweegt, kan bij een leverancier navragen welk model eronder zit en of het meerdere apparaten tegelijk aanstuurt.",
+      "url": "https://tweakers.net/nieuws/250554/google-laat-robots-samenwerken-in-de-fysieke-wereld-door-gemini-robotics-er-2.html",
+      "bron": "Tweakers",
+      "categorie": "model",
+      "datum": "2026-07-30",
+      "kanttekening": "De prestaties komen uit demonstraties en cijfers van Google zelf en zijn niet onafhankelijk getoetst."
+    },
+    {
+      "kop": "SpaceXAI daagt Minnesota om verbod op uitkleedapps",
+      "kern": "Het bedrijf achter chatbot Grok stapt naar de rechter om een Amerikaanse wet tegen apps die mensen digitaal uitkleden tegen te houden.",
+      "wat": "SpaceXAI heeft de staat Minnesota aangeklaagd vanwege een wet die het gebruik van zogeheten uitkleedapps verbiedt: software die van een gewone foto een naaktbeeld maakt. Grok, de AI-tool van het bedrijf, biedt die mogelijkheid aan gebruikers. SpaceXAI stelt dat de wet te ver reikt en daarom niet in werking mag treden.",
+      "waarom": "De zaak laat zien hoe een aanbieder omgaat met nationale beperkingen: niet het product aanpassen, maar de regel aanvechten. Wie zulke tools in een organisatie toelaat, kan er niet op rekenen dat lokale regels vanzelf in de software zijn ingebouwd.",
+      "url": "https://tweakers.net/nieuws/250546/spacexai-klaagt-amerikaanse-staat-aan-die-uitkleedapps-wil-verbieden.html",
+      "bron": "Tweakers",
+      "categorie": "regelgeving",
+      "datum": "2026-07-30",
+      "kanttekening": "Het is een aanklacht, geen uitspraak; de rechter heeft zich nog niet over de wet gebogen."
+    },
+    {
+      "kop": "Nativ draait taalmodellen op je Mac, zonder cloud",
+      "kern": "Een nieuwe gratis Mac-app laat je AI-modellen op je eigen laptop draaien, zodat de tekst die je erin zet je computer niet verlaat.",
+      "wat": "Ontwikkelaar Blaizzy publiceerde nativ, een macOS-app in Swift waarmee je MLX-modellen kunt chatten, draaien en in de gaten houden vanuit één programma. MLX is Apple's rekenbibliotheek voor de eigen chips, waarmee een model volledig op het apparaat werkt in plaats van op een server elders. Het project staat op ruim duizend GitHub-sterren, opgebouwd in ongeveer tien dagen.",
+      "waarom": "Voor gevoelige documenten — cv's, medische verslagen, contracten — is lokaal draaien de eenvoudigste route: er komt geen externe verwerker bij, dus ook geen extra afspraken onder de AVG. Reken wel op modellen die kleiner en trager zijn dan wat je van ChatGPT gewend bent.",
+      "url": "https://github.com/Blaizzy/nativ",
+      "bron": "GitHub",
+      "categorie": "tooling",
+      "datum": "2026-07-31",
+      "kanttekening": "De app werkt alleen op macOS met een Apple-chip en is nieuw; er is nog geen onafhankelijke beoordeling van beveiliging of stabiliteit."
+    },
+    {
+      "kop": "Bij de Johan Cruyff Arena loop je zonder afrekenen door",
+      "kern": "Amsterdam heeft de eerste stadionbar waar bezoekers hun drankje of snack pakken en gewoon doorlopen; camera's en sensoren regelen de betaling.",
+      "wat": "De Johan Cruyff Arena opende een kassaloze bar en noemt die de eerste in een Nederlands stadion. Bezoekers pakken een drankje of snack en lopen direct door; AI- en trackingtechnologie registreert wat iemand meeneemt en rekent dat af. Het stadion plaatst het initiatief onder de noemer gastvrijheid.",
+      "waarom": "De rij bij de bar is een van de weinige plekken waar een stadion in de pauze aantoonbaar omzet laat liggen, dus dit is eerder een rekensom dan een etalage. Wie zelf klanten met camera's wil volgen, moet vooraf vastleggen hoe bezoekers worden geïnformeerd en hoelang beelden bewaard blijven.",
+      "url": "https://emerce.nl/nieuws/eerste-kassaloze-stadionbar-geopend-arena",
+      "bron": "Emerce",
+      "categorie": "bedrijf",
+      "datum": "2026-07-31",
+      "kanttekening": "De claim dat dit de eerste kassaloze stadionbar van Nederland is, komt van het stadion zelf; over foutmarges of bezoekersaantallen is niets bekendgemaakt."
+    }
+  ],
+  "toepassing": {
+    "titel": "Posts die niet als AI-spam worden weggefilterd",
+    "intro": "Je hebt geen detectietool nodig, alleen je eigen tijdlijn en een kwartier.",
+    "stappen": [
+      "Open je laatste drie LinkedIn-posts en tel per post hoeveel zinnen een concreet gegeven bevatten: een getal, een naam of een datum.",
+      "Herschrijf de openingszin naar één concreet feit, bijvoorbeeld: 'Van de 40 sollicitaties die we deze maand kregen, waren er 12 woordelijk identiek.'",
+      "Vraag een collega één ding over de herschreven post: 'Zou je dit doorsturen?' Is het antwoord nee, publiceer hem dan niet."
+    ],
+    "niet_doen": "Je hoeft geen AI-detector aan te schaffen om je eigen teksten te controleren; die zijn onbetrouwbaar en LinkedIn beoordeelt op signalen die je toch niet kunt testen.",
+    "tijd": "15 minuten",
+    "categorie": "marketing"
+  },
+  "beschouwing": null,
+  "voor_bedrijven": "Laat medewerkers gevoelige klantgegevens niet in een cloud-chatbot plakken: met een app als nativ draait een taalmodel lokaal op een Mac met Apple-chip, waardoor die gegevens het apparaat niet verlaten.",
+  "kandidaten": 88,
+  "bronnen": 7
+}
