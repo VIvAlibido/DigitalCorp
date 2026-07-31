@@ -271,6 +271,20 @@ GitHub Actions-workflow die de editie vastlegt, en `vercel.json` +
 `bouw_site.py` voor Vercel — met een publicatieblokkade zolang de
 uitgeversgegevens ontbreken.
 
+**Aantoonbaarheid** (31 juli) — punt 2 van de doelstelling, twee van de drie af:
+- **Beslissing 20 draait.** `keuring._keur_herkomst()` blokkeert elk bericht met
+  een percentage, bedrag, groot getal of verhouding zonder kanttekening.
+  Natelbare aantallen ("7 gigafabrieken"), jaartallen en wetsartikelen tellen
+  niet mee. De regel vond meteen de verzonnen "3.700 pagina's" in de editie van
+  29 juli; die is verwijderd, niet van een kanttekening voorzien — een
+  kanttekening bij een verzinsel maakt het verzinsel officieel.
+- **Beslissing 21 draait.** `Editie.bronlijst` bevat de namen; de
+  methodeverantwoording noemt ze. Die tekst is bewust ingekort: onderzoek zegt
+  dat een lángere verantwoording het vertrouwen verder verlaagt. Oude edities
+  zonder namen vallen terug op het aantal.
+- **Beslissing 22 staat nog open**: "wat het niet haalde". Vereist dat de
+  afvalredenen meelopen in de shortlist.
+
 **Verzenden** (30 juli): `verzenden.py` stuurt de editie per SMTP naar
 `verzending.altijd_naar`, met tekst én HTML, en vervangt `{{unsubscribe}}` —
 zonder ESP vult niemand dat haakje in. Het is de derde en strengste poort:

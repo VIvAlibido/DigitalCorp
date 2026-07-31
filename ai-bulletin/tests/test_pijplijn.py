@@ -607,6 +607,121 @@ class TestZondagsstuk(unittest.TestCase):
             self.assertIn("is een mening, geen", html)
 
 
+class TestHerkomstVanCijfers(unittest.TestCase):
+    """Beslissing 20: elk cijfer heeft een herkomst, of het bericht gaat eruit.
+
+    Onder elke editie staat de belofte. Op 30 juli stond "900 miljoen wekelijkse
+    gebruikers van ChatGPT" zonder kanttekening terwijl vergelijkbare cijfers er
+    wél een kregen. Zo'n inconsequentie maakt de belofte onbetrouwbaar, en de
+    belofte is het product.
+    """
+
+    def bericht(self, wat: str, kanttekening: str = "") -> Selectie:
+        return Selectie(
+            kop="Een kop die iets zegt over wat er is gebeurd",
+            kern="De kern van het bericht.", wat=wat,
+            waarom="Wat het voor je werk betekent.",
+            url="https://example.com/x", bron="Bron", categorie="bedrijf",
+            datum="2026-07-30", kanttekening=kanttekening)
+
+    def test_het_cijfer_van_30_juli_wordt_nu_gevangen(self):
+        s = self.bericht("Daarmee kunnen de 900 miljoen wekelijkse gebruikers "
+                         "van ChatGPT bij de diensten van Bolt.")
+        self.assertEqual(keuring.cijfers_zonder_herkomst(s), ["900 miljoen"])
+
+    def test_soorten_cijfers_die_een_herkomst_nodig_hebben(self):
+        for tekst, verwacht in [
+            ("Van de instellingen stelt 44 procent die eis.", "44 procent"),
+            ("Een foutmarge van 0,0041%.", "0,0041%"),
+            ("De EU legt 10 miljard euro neer.", "10 miljard"),
+            ("Het rapport telt 3.700 pagina's.", "3.700"),
+            ("Ongeveer 1 op de 24.000 teksten.", "1 op de 24"),
+        ]:
+            with self.subTest(tekst=tekst):
+                gevonden = keuring.cijfers_zonder_herkomst(self.bericht(tekst))
+                self.assertTrue(any(verwacht in x for x in gevonden),
+                                f"{verwacht!r} niet gevonden in {gevonden}")
+
+    def test_een_kanttekening_lost_het_op(self):
+        s = self.bericht("Van de instellingen stelt 44 procent die eis.",
+                         kanttekening="Het cijfer komt uit het eigen onderzoek "
+                                      "van de leverancier.")
+        self.assertEqual(keuring.cijfers_zonder_herkomst(s), [])
+
+    def test_jaartallen_en_wetsartikelen_tellen_niet_mee(self):
+        """Een verwijzing is geen bewering over de wereld."""
+        s = self.bericht("Artikel 50 lid 2 gaat in 2026 in, na uitstel tot 2027.")
+        self.assertEqual(keuring.cijfers_zonder_herkomst(s), [])
+
+    def test_natelbare_aantallen_tellen_niet_mee(self):
+        """"Zeven fabrieken" is in de bron na te tellen; een percentage niet."""
+        s = self.bericht("De EU wil 7 gigafabrieken en koos 3 bedrijven.")
+        self.assertEqual(keuring.cijfers_zonder_herkomst(s), [])
+
+    def test_het_is_een_blokkade_en_geen_waarschuwing(self):
+        """Een waarschuwing had dit precies zo laten passeren als op 30 juli."""
+        editie = maak_editie([self.bericht("Ruim 84 procent van de markt.")],
+                             onderwerp="Een onderwerpregel van de juiste lengte")
+        blok = keuring.blokkades(keuring.keur(editie))
+        self.assertTrue([x for x in blok if "herkomst" in x.wat])
+
+    def test_alle_gepubliceerde_edities_voldoen(self):
+        for pad in sorted((PROJECT / "edities").glob("*.json")):
+            with self.subTest(editie=pad.name):
+                editie = Editie.from_dict(json.loads(pad.read_text(encoding="utf-8")))
+                for n, s in enumerate(editie.items, 1):
+                    self.assertEqual(
+                        keuring.cijfers_zonder_herkomst(s), [],
+                        f"{pad.name} bericht {n} heeft een cijfer zonder herkomst")
+
+
+class TestBronnenlijst(unittest.TestCase):
+    """Beslissing 21: elke editie publiceert zijn bronnen, bij naam.
+
+    Grond: ACM FAccT 2026 — een AI-melding kost vertrouwen, een uitgebreide
+    verantwoording maakt het erger, en het publiceren van de gebruikte bronnen
+    doet het effect grotendeels teniet. De oude verantwoording deed dus precies
+    het verkeerde.
+    """
+
+    def editie(self) -> Editie:
+        return maak_editie(
+            [], onderwerp="Een onderwerpregel van de juiste lengte",
+            kandidaten=88, bronlijst=["Emerce", "GitHub", "Tweakers"])
+
+    def test_de_bronnen_staan_er_bij_naam_in(self):
+        tekst = render.methodeverantwoording(self.editie())
+        for bron in ("Emerce", "GitHub", "Tweakers"):
+            self.assertIn(bron, tekst)
+        self.assertIn("88", tekst)
+
+    def test_de_verantwoording_blijft_kort(self):
+        """Een langere verantwoording verlaagt het vertrouwen juist — zie boven."""
+        zinnen = render.methodeverantwoording(self.editie()).count(". ")
+        self.assertLessEqual(zinnen, 4, "de verantwoording dijt weer uit")
+
+    def test_een_oude_editie_zonder_namen_valt_terug_op_het_aantal(self):
+        oud = maak_editie([], onderwerp="Een onderwerpregel van de juiste lengte",
+                          kandidaten=214, bronnen=31)
+        tekst = render.methodeverantwoording(oud)
+        self.assertIn("31 bronnen", tekst)
+
+    def test_de_lijst_overleeft_een_rondje_json(self):
+        terug = Editie.from_dict(json.loads(render.naar_json(self.editie())))
+        self.assertEqual(terug.bronlijst, ["Emerce", "GitHub", "Tweakers"])
+        self.assertEqual(terug.bronnen, 3, "het aantal loopt uit de pas met de lijst")
+
+    def test_de_pijplijn_vult_de_lijst(self):
+        items = _laad_fixtures(PROJECT / "fixtures" / "kandidaten.json")
+        with tempfile.TemporaryDirectory() as tmp:
+            resultaat = pipeline.draai(
+                CONFIG, uitvoermap=Path(tmp), vandaag=DATUM,
+                heuristisch=True, vooraf_verzameld=items)
+            self.assertTrue(resultaat.editie.bronlijst)
+            self.assertEqual(resultaat.editie.bronnen,
+                             len(resultaat.editie.bronlijst))
+
+
 class TestToekomstigeEdities(unittest.TestCase):
     """Een stuk van aanstaande zondag hoort donderdag niet op de voorpagina.
 
@@ -974,7 +1089,7 @@ class TestVerzenden(unittest.TestCase):
         """
         editie = self.editie()
         mail = render.naar_html(editie)
-        self.assertIn("kanttekening bij elk cijfer", mail)
+        self.assertIn("kanttekening over de herkomst", mail)
         met_kanttekening = [s for s in editie.items if getattr(s, "kanttekening", "")]
         self.assertTrue(met_kanttekening, "testeditie heeft geen enkele kanttekening")
         for s in met_kanttekening:

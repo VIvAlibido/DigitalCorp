@@ -40,13 +40,13 @@
     {
       "kop": "Drie bedrijven bezitten de AI's die jouw webshop moeten vinden",
       "kern": "De Franse mededingingswaakhond bouwde eigen AI-assistenten om te meten wie de markt beheerst, en kwam uit bij OpenAI, Google en Anthropic.",
-      "wat": "De Autorité de la concurrence, de Franse tegenhanger van onze ACM, publiceerde op 17 juli een advies over AI-agents: assistenten die niet alleen antwoord geven, maar zelfstandig taken uitvoeren zoals iets opzoeken, vergelijken en bestellen. De toezichthouder bouwde voor het onderzoek eigen agents, legde die 550 vragen over winkelen voor, en hield bij welke websites ze bezochten en noemden. De conclusie is dat OpenAI, Google en Anthropic samen ruim 84 procent van deze markt in handen hebben. Het rapport telt met bijlagen meer dan 3.700 pagina's.",
+      "wat": "De Autorité de la concurrence, de Franse tegenhanger van onze ACM, publiceerde op 17 juli een advies over AI-agents: assistenten die niet alleen antwoord geven, maar zelfstandig taken uitvoeren zoals iets opzoeken, vergelijken en bestellen. De toezichthouder bouwde voor het onderzoek eigen agents, legde die 550 vragen over winkelen voor, en hield bij welke websites ze bezochten en noemden. De conclusie is dat OpenAI, Google en Anthropic samen ruim 84 procent van deze markt in handen hebben.",
       "waarom": "Als straks een handvol assistenten bepaalt welke webshop een klant te zien krijgt, gaat vindbaarheid niet meer over je positie in Google maar over je positie in een AI. Zulke adviezen zijn doorgaans het startsein voor Brussel en de ACM, dus wie nu een agentplatform kiest, kiest een afhankelijkheid die over een jaar gereguleerd kan zijn.",
       "url": "https://www.autoritedelaconcurrence.fr/en/press-release/ai-agents-autorite-de-la-concurrence-issues-its-opinion-competitive-functioning-ai",
       "bron": "Autorité de la concurrence",
       "categorie": "regelgeving",
       "datum": "2026-07-17",
-      "kanttekening": ""
+      "kanttekening": "De 84 procent en de 550 testvragen komen uit het advies van de Autorité zelf; wij hebben het rapport niet kunnen openen en de meting niet nagerekend."
     },
     {
       "kop": "Sinds gisteren kan AI makkelijker bij je agenda en boekhouding",

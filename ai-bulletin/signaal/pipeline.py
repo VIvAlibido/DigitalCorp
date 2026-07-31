@@ -96,7 +96,10 @@ def draai(
             editie = rank.kies_heuristisch(lijst, config, vandaag)
 
     editie.kandidaten = kandidaten
-    editie.bronnen = len({i.bron for i in items})
+    # De namen, niet alleen het aantal — beslissing 21. Alfabetisch zodat twee
+    # edities met dezelfde bronnen er ook hetzelfde uitzien.
+    editie.bronlijst = sorted({i.bron for i in items if i.bron})
+    editie.bronnen = len(editie.bronlijst)
 
     # Eén keuring voor alles. Bij de automatische run blokkeren we niet: de
     # nieuwsbrief moet elke ochtend de deur uit, en een mindere editie is beter

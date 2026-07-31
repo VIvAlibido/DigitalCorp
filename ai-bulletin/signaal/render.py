@@ -72,21 +72,35 @@ def leestijd(editie: Editie) -> int:
 
 
 def methodeverantwoording(editie: Editie) -> str:
-    """Hoe deze editie tot stand kwam — in gewone taal, niet als disclaimer."""
-    omvang = (
-        f"Vandaag zijn {editie.kandidaten} berichten uit {editie.bronnen} bronnen "
-        "bekeken. "
-        if editie.kandidaten and editie.bronnen
-        else ""
+    """Hoe deze editie tot stand kwam.
+
+    Kort gehouden en met de bronnen erbij, en dat is geen stijlkeuze. Onderzoek
+    (ACM FAccT 2026; Toff & Simon 2025) laat zien dat lezers nieuws dat als
+    AI-gemaakt is gelabeld mínder vertrouwen, en dat een uitgebreide
+    verantwoording dat effect verergert in plaats van wegneemt — behalve wanneer
+    de gebruikte bronnen worden gepubliceerd. Dan wordt het grotendeels
+    tenietgedaan.
+
+    De vorige versie deed dus precies het verkeerde: vier regels over onze goede
+    bedoelingen en geen enkele bron bij naam. Zie beslissing 21.
+    """
+    delen = []
+    if editie.kandidaten and editie.bronlijst:
+        delen.append(
+            f"Vandaag zijn {editie.kandidaten} berichten bekeken uit deze bronnen: "
+            + ", ".join(editie.bronlijst) + ".")
+    elif editie.kandidaten and editie.bronnen:
+        # Oude editie zonder namen; dan liever het getal dan niets.
+        delen.append(
+            f"Vandaag zijn {editie.kandidaten} berichten uit "
+            f"{editie.bronnen} bronnen bekeken.")
+    delen.append(
+        "Selectie en tekst komen tot stand met een taalmodel onder vaste "
+        "redactieregels. Elk cijfer krijgt een kanttekening over de herkomst, "
+        "of het bericht gaat eruit. Wij toetsen niets onafhankelijk na — waar "
+        "een getal vandaan komt is wat we wél kunnen laten zien."
     )
-    return (
-        f"{omvang}Selectie en tekst komen tot stand met een taalmodel onder vaste "
-        "redactieregels: alleen verifieerbare feiten in de berichten, duiding "
-        "herkenbaar apart gezet, en een kanttekening bij elk cijfer dat niet "
-        "onafhankelijk is getoetst. We verwijzen naar de meest primaire bron — een "
-        "persbericht van de toezichthouder gaat voor een nieuwsbericht daarover — "
-        "en nemen geen teksten van anderen over."
-    )
+    return " ".join(delen)
 
 
 # ─────────────────────────────── JSON ────────────────────────────────

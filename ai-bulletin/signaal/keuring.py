@@ -20,6 +20,7 @@ Onderscheid tussen twee soorten bevindingen:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from . import koptoets, rank
@@ -61,6 +62,7 @@ def keur(editie: Editie, streng: bool = False) -> list[Bevinding]:
     b += _keur_opbouw(editie)
     b += _keur_koppen(editie)
     b += _keur_items(editie, streng)
+    b += _keur_herkomst(editie)
     b += _keur_toepassing(editie)
     b += _keur_beschouwing(editie)
     b += _keur_onderwerpregel(editie)
@@ -128,6 +130,67 @@ def _keur_items(editie: Editie, streng: bool) -> list[Bevinding]:
         nummer = bezwaar.split(".", 1)[0]
         b.append(Bevinding("waarschuwing", f"bericht {nummer}",
                            bezwaar.split(": ", 1)[-1]))
+    return b
+
+
+# Cijfers waarbij het uitmaakt waar ze vandaan komen. Bewust géén losse getallen
+# als "zeven fabrieken" of "drie bedrijven": die zijn na te tellen in de bron.
+# Wat hier staat is het soort cijfer dat een lezer overneemt zonder controle —
+# een percentage, een bedrag, een groot getal, een verhouding.
+_GROOT = r"\d{1,3}(?:[.\u00a0 ]\d{3})+"          # 3.700, 24 000
+_CIJFER = re.compile(
+    # Volgorde telt: de langste vorm eerst, anders knipt "1 op de 24.000" in
+    # tweeen en meldt de keuring '1 op de 2' en '4.000' als losse cijfers.
+    rf"""(
+        \b\d+\s+op\s+(?:de\s+)?(?:{_GROOT}|\d+)  # 1 op de 24.000
+      | \d+(?:[.,]\d+)?\s*(?:%|procent)          # 44%, 0,62 procent
+      | \d+(?:[.,]\d+)?\s*(?:duizend|miljoen|miljard|biljoen)
+      | (?:\u20ac|\$|EUR|USD)\s?\d                    # euro 10, $2,50
+      | \d+(?:[.,]\d+)?\s*(?:euro|dollar)
+      | {_GROOT}
+    )""",
+    re.VERBOSE | re.IGNORECASE,
+)
+
+# Wat eruitziet als zo'n cijfer maar het niet is. Een jaartal en een
+# wetsartikel zijn geen bewering over de wereld maar een verwijzing.
+_GEEN_CIJFER = re.compile(
+    r"\b(?:19|20|21)\d{2}\b|\bartikel\s+\d+|\blid\s+\d+", re.IGNORECASE)
+
+
+def cijfers_zonder_herkomst(s) -> list[str]:
+    """De cijfers in dit bericht die om een kanttekening vragen.
+
+    Leeg als het bericht een kanttekening heeft, want dan is de herkomst
+    benoemd. Wij toetsen niets onafhankelijk na — dat kan deze pijplijn niet —
+    dus is "waar komt dit vandaan" het enige wat we wél kunnen leveren.
+    """
+    if str(getattr(s, "kanttekening", "") or "").strip():
+        return []
+    tekst = _GEEN_CIJFER.sub(" ", f"{s.kern} {s.wat} {s.waarom}")
+    return sorted({m.group(0).strip() for m in _CIJFER.finditer(tekst)})
+
+
+def _keur_herkomst(editie: Editie) -> list[Bevinding]:
+    """Beslissing 20: elk cijfer heeft een herkomst, of het bericht gaat eruit.
+
+    Onder elke editie staat de belofte "een kanttekening bij elk cijfer dat niet
+    onafhankelijk is getoetst". Op 30 juli stond "900 miljoen wekelijkse
+    gebruikers van ChatGPT" zonder kanttekening, terwijl vergelijkbare cijfers
+    er wél een kregen. Die inconsequentie is erger dan strengheid: hij maakt de
+    belofte onbetrouwbaar, en de belofte is het product.
+
+    Blokkade, geen waarschuwing. Een waarschuwing had dit precies zo laten
+    passeren als op 30 juli.
+    """
+    b = []
+    for n, s in enumerate(editie.items, 1):
+        ontbreekt = cijfers_zonder_herkomst(s)
+        if ontbreekt:
+            b.append(Bevinding(
+                "blokkade", f"bericht {n}",
+                "cijfer zonder kanttekening over de herkomst: "
+                + ", ".join(f"'{x}'" for x in ontbreekt[:3])))
     return b
 
 

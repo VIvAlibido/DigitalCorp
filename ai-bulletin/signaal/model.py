@@ -172,9 +172,15 @@ class Editie:
     voor_bedrijven: str = ""
     # Alleen op zondag. Zie Beschouwing.
     beschouwing: Beschouwing | None = None
-    # Verantwoording: hoeveel kandidaten en bronnen deze editie opleverden.
+    # Verantwoording: hoeveel kandidaten deze editie opleverden, en uit welke
+    # bronnen. `bronnen` blijft het aantal — oude edities hebben alleen dat, en
+    # die mogen niet stukgaan. `bronlijst` zijn de namen, en dat is het veld dat
+    # ertoe doet: onderzoek (ACM FAccT 2026) wijst uit dat het publiceren van de
+    # gebruikte bronnen het vertrouwensverlies van een AI-melding grotendeels
+    # tenietdoet, en een langere verantwoording juist niet. Zie beslissing 21.
     kandidaten: int | None = None
     bronnen: int | None = None
+    bronlijst: list[str] = field(default_factory=list)
 
     @property
     def stam(self) -> str:
@@ -192,6 +198,7 @@ class Editie:
             "voor_bedrijven": self.voor_bedrijven,
             "kandidaten": self.kandidaten,
             "bronnen": self.bronnen,
+            "bronlijst": self.bronlijst,
         }
 
     @classmethod
@@ -208,7 +215,11 @@ class Editie:
             beschouwing=Beschouwing(**beschouwing) if beschouwing else None,
             voor_bedrijven=data.get("voor_bedrijven", ""),
             kandidaten=data.get("kandidaten"),
-            bronnen=data.get("bronnen"),
+            # Een oude editie heeft alleen het aantal; dan blijft de lijst leeg
+            # en valt de bronnenregel terug op het getal. Andersom leiden we het
+            # aantal af uit de lijst, zodat de twee niet uit elkaar kunnen lopen.
+            bronnen=data.get("bronnen") or (len(data.get("bronlijst") or []) or None),
+            bronlijst=list(data.get("bronlijst") or []),
         )
 
 
