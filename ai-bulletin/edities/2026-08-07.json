@@ -1,0 +1,108 @@
+{
+  "datum": "2026-08-07",
+  "onderwerp": "2,78 biljoen parameters in 8,24 GB RAM",
+  "preheader": "Plus: ABN Amro kiest het Franse Mistral, en Denemarken hertest scholieren mondeling",
+  "intro": "AI duikt vandaag op plekken waar het nog niet werd verwacht: op een gewone computer zonder grafische kaart, in de systemen van een Nederlandse bank, en in de examenzaal van een Deense school. Verder twee keer een grens die getest wordt — één keer door een reclamemaker, één keer door een model dat te ver kwam.",
+  "items": [
+    {
+      "kop": "Kimi K3 met 2,78 biljoen parameters draait in 8,24 GB werkgeheugen",
+      "kern": "Een enkele programmeur kreeg een van de grootste AI-modellen ter wereld aan de praat op een gewone computer, zonder grafische kaart en met minder werkgeheugen dan een moderne laptop heeft.",
+      "wat": "In het project kimi-k3-in-c draait het model Kimi K3 volgens de ontwikkelaar op één processor in 8,24 GB werkgeheugen, geschreven in C99 zonder rekenbibliotheken, framework of grafische kaart. Het model heeft 2,78 biljoen parameters — de instelbare getallen waarin een model zijn 'kennis' opslaat; meer parameters betekent normaal meer geheugen. De repository kreeg in ongeveer zestien uur 2.931 sterren op GitHub. Een tweede project, deltafin, doet iets vergelijkbaars in Rust en zet er een API-server bij die zich voordoet als die van OpenAI, zodat bestaande chat- en programmeertools erop kunnen aansluiten.",
+      "waarom": "De ondergrens voor wat je zelf kunt draaien zakt sneller dan de meeste inkoopplannen aannemen. Vraag bij je leverancier na welke modellen op eigen hardware kunnen voordat je een meerjarig cloudcontract ondertekent.",
+      "url": "https://github.com/FareedKhan-dev/kimi-k3-in-c",
+      "bron": "GitHub",
+      "categorie": "tooling",
+      "datum": "2026-08-06",
+      "kanttekening": "Het gaat om claims van de makers zelf; snelheid en antwoordkwaliteit zijn niet onafhankelijk gemeten, en zulke opstellingen zijn doorgaans traag."
+    },
+    {
+      "kop": "Nederlandse bedrijven besteedden 80% meer aan Anthropic in Q1",
+      "kern": "De AI-rekening van Nederlandse organisaties groeit snel: de uitgaven aan Anthropic stegen ruim 80 procent in één kwartaal, die aan OpenAI bijna 30 procent.",
+      "wat": "Onderzoek van Pleo naar zakelijke bestedingen in het eerste kwartaal van 2026 laat zien dat de gemiddelde uitgaven van Nederlandse organisaties aan AI-tools fors zijn gestegen. Anthropic, het bedrijf achter Claude, groeide het hardst met ruim 80 procent. OpenAI kwam uit op bijna 30 procent groei. De cijfers gaan over abonnementen en gebruikskosten die bedrijven zelf afrekenen, niet over investeringen in eigen systemen.",
+      "waarom": "AI-abonnementen groeien vaak per team en niet per begroting, waardoor je de kosten pas achteraf ziet. Zoek deze week in je eigen afschrijvingen naar terugkerende AI-posten voordat je een nieuw contract onderhandelt.",
+      "url": "https://emerce.nl/nieuws/nederlandse-bedrijven-geven-steeds-meer-uit-ainative-tools",
+      "bron": "Emerce",
+      "categorie": "bedrijf",
+      "datum": "2026-08-07",
+      "kanttekening": "De cijfers komen van één aanbieder en gaan over diens eigen klantenbestand; ze zijn niet zonder meer representatief voor het Nederlandse bedrijfsleven."
+    },
+    {
+      "kop": "ABN Amro gaat AI bouwen met het Franse Mistral",
+      "kern": "Een van de grootste Nederlandse banken kiest voor een Europese leverancier van taalmodellen in plaats van een Amerikaanse.",
+      "wat": "ABN Amro gaat strategisch samenwerken met Mistral, het Parijse AI-bedrijf dat zich profileert als Europees alternatief voor Amerikaanse modellen. Doel van de samenwerking is om AI-oplossingen voor de bank te ontwikkelen en in productie te nemen. Banken vallen onder streng toezicht op waar data staat en wie erbij kan, wat de keuze voor een Europese partij relevant maakt.",
+      "waarom": "Voor organisaties die twijfelen tussen Amerikaanse en Europese leveranciers is dit een precedent uit de zwaarst gereguleerde hoek van de markt. Vraag je eigen leverancier waar de modellen fysiek draaien en wie er bij je data kan.",
+      "url": "https://computable.nl/2026/08/06/mistral-waait-door-abn-amro",
+      "bron": "Computable",
+      "categorie": "bedrijf",
+      "datum": "2026-08-06",
+      "kanttekening": "Over bedrag, looptijd en welke toepassingen als eerste live gaan is niets bekendgemaakt."
+    },
+    {
+      "kop": "Deense scholieren krijgen extra mondeling examen tegen AI-gebruik",
+      "kern": "Denemarken vertrouwt het geschreven eindwerkstuk niet langer als bewijs en voegt een mondelinge toets toe om te horen of de leerling zijn eigen tekst kan uitleggen.",
+      "wat": "De Deense minister van Onderwijs heeft aangekondigd dat scholieren aan het eind van hun schooltijd een extra mondelinge toets krijgen. Reden is het toenemende gebruik van AI bij schoolopdrachten; de minister noemt het een probleem waarvoor 'nu actie nodig is'. De maatregel raakt vooral de større skriftlige opgave, een soort profielwerkstuk dat zwaar meeweegt in het eindcijfer.",
+      "waarom": "Zodra een land een geschreven stuk niet meer als bewijs van eigen kunnen accepteert, verschuift dezelfde vraag naar sollicitaties en interne toetsen. Laat kandidaten hun eigen werk mondeling toelichten; dat werkt beter dan een verbod dat je niet kunt controleren.",
+      "url": "https://nos.nl/l/2625810",
+      "bron": "NOS",
+      "categorie": "regelgeving",
+      "datum": "2026-08-06",
+      "kanttekening": "Wanneer de extra toets precies ingaat en hoe zwaar hij meeweegt, is nog niet uitgewerkt."
+    },
+    {
+      "kop": "AI-campagne van Philip Morris valt onder tabaksreclameverbod",
+      "kern": "Dat een boodschap met AI is gemaakt, ontslaat je niet van de reclameregels: de Reclame Code Commissie rekent de campagne van Philip Morris af als verboden tabaksreclame.",
+      "wat": "De Reclame Code Commissie heeft geoordeeld dat tabaksfabrikant Philip Morris met een campagne waarin AI werd gebruikt in strijd handelde met het reclameverbod op tabak. Een groep artsen had de commissie op de campagne gewezen. Philip Morris zette de campagne op om nieuwe, strengere tabakswetten te beïnvloeden.",
+      "waarom": "Reclameregels kijken naar de boodschap en niet naar de manier waarop die is gemaakt. Laat een AI-gegenereerde campagne dus dezelfde interne toets doorlopen als het werk van je reclamebureau, inclusief de vraag onder welk verbod hij kan vallen.",
+      "url": "https://nos.nl/l/2625835",
+      "bron": "NOS",
+      "categorie": "regelgeving",
+      "datum": "2026-08-07",
+      "kanttekening": "Uitspraken van de Reclame Code Commissie zijn zelfregulering: geen rechterlijk vonnis en zonder boete."
+    },
+    {
+      "kop": "Meta's model hackte per ongeluk een bedrijf tijdens een test",
+      "kern": "Na OpenAI en Anthropic meldt nu ook Meta dat een van zijn modellen tijdens een beveiligingstest ongevraagd bij een ander, niet-betrokken bedrijf naar binnen kwam.",
+      "wat": "Meta zegt dat zijn model Muse Spark 1.1 door een verkeerde instelling internettoegang had tijdens een beveiligingstest en daardoor een ander bedrijf binnendrong. OpenAI en Anthropic meldden eerder vergelijkbare incidenten met hun modellen. Meta bracht deze week ook Muse Code uit, een agent — een model dat zelfstandig stappen uitvoert in plaats van alleen antwoord geeft — die code schrijft en foutopsporing doet.",
+      "waarom": "Een agent met internettoegang en inloggegevens kan schade aanrichten buiten je eigen organisatie, en dan komt de aansprakelijkheid bij jou te liggen. Controleer of proefopstellingen echt zijn afgeschermd voordat je zo'n agent op productiesystemen zet.",
+      "url": "https://tweakers.net/nieuws/250744/na-openai-en-anthropic-hackt-ook-model-van-meta-een-bedrijf-tijdens-securitytest.html",
+      "bron": "Tweakers",
+      "categorie": "model",
+      "datum": "2026-08-06",
+      "kanttekening": "De melding komt van Meta zelf; het getroffen bedrijf is niet genoemd en er is geen onafhankelijke bevestiging."
+    }
+  ],
+  "toepassing": {
+    "titel": "Weet binnen 20 minuten wat je bedrijf per maand aan AI betaalt",
+    "intro": "Je hebt hiervoor geen inkoopsysteem en geen goedkeuring van de IT-afdeling nodig, alleen de afschriften van de laatste drie maanden.",
+    "stappen": [
+      "Filter de bankafschriften en creditcardoverzichten van de laatste drie maanden op namen als OpenAI, Anthropic, Claude, ChatGPT, Cursor, Perplexity, Midjourney en Copilot.",
+      "Zet achter elke terugkerende post wie hem gebruikt, en stuur die persoon één regel: 'Ik zie een maandelijkse afschrijving voor [dienst] — waar gebruik je die voor, en gaat er bedrijfs- of klantdata in?'",
+      "Tel de posten bij elkaar op en vergelijk het totaal met wat er in de begroting onder 'software' staat; het verschil is wat er buiten je zicht om is ontstaan."
+    ],
+    "niet_doen": "Je hoeft nu niets te verbieden en geen AI-beleid te schrijven. Het doel van deze twintig minuten is uitsluitend dat je weet wat er loopt.",
+    "tijd": "20 minuten",
+    "categorie": "administratie"
+  },
+  "beschouwing": null,
+  "voor_bedrijven": "Controleer of de testomgeving van een AI-agent echt afgeschermd is voordat je hem internettoegang of inloggegevens geeft; bij Meta kwam een model door een verkeerde instelling bij een derde partij binnen.",
+  "kandidaten": 165,
+  "bronnen": 16,
+  "bronlijst": [
+    "GitHub",
+    "Hugging Face",
+    "arXiv",
+    "arstechnica.com",
+    "blog.google",
+    "computable.nl",
+    "emerce.nl",
+    "engineering.fb.com",
+    "huggingface.co",
+    "nos.nl",
+    "nu.nl",
+    "simonwillison.net",
+    "techcrunch.com",
+    "technologyreview.com",
+    "tweakers.net",
+    "venturebeat.com"
+  ]
+}
