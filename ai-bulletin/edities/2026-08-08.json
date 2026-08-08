@@ -1,0 +1,106 @@
+{
+  "datum": "2026-08-08",
+  "onderwerp": "OpenAI vertraagt model dat zelf kan hacken",
+  "preheader": "Plus: gratis ChatGPT wordt onbeperkt en 160.000 techbanen verdwenen",
+  "intro": "Vandaag gaat het over de rekening en de rem. OpenAI zegt zelf een model af te remmen dat te goed kan inbreken, terwijl bedrijven ontdekken wat hun AI-gebruik werkelijk kost. Tegelijk wordt de gratis versie van ChatGPT ruimer en blijven proefprojecten in veel organisaties gewoon proefprojecten.",
+  "items": [
+    {
+      "kop": "OpenAI vertraagt Astra omdat het model zelf kan inbreken",
+      "kern": "OpenAI zegt de ontwikkeling van een nieuw model te hebben afgeremd omdat het zelfstandig cyberaanvallen kan uitvoeren op systemen die normaal goed beveiligd zijn.",
+      "wat": "Volgens OpenAI heeft het model Astra, dat nog in ontwikkeling is, een 'critical cybersecurity threshold' bereikt: een drempel uit het eigen risicokader van het bedrijf. Dat betekent volgens OpenAI dat het model zelf zwakke plekken kan vinden en er ook zelf een aanval op kan uitvoeren, zonder dat een mens de stappen aangeeft. Het bedrijf zegt de ontwikkeling daarom te hebben vertraagd. Het model is niet uitgebracht.",
+      "waarom": "Ga ervan uit dat aanvalskracht die nu zeldzaam is over een jaar te huur is: zet patchbeleid en tweefactor-inlog op orde voordat er een incident is. Neem de claim wel met een korrel zout, want alleen OpenAI heeft dit model gezien.",
+      "url": "https://techcrunch.com/2026/08/07/openai-says-it-slowed-astra-model-development-over-security-concerns",
+      "bron": "TechCrunch",
+      "categorie": "model",
+      "datum": "2026-08-07",
+      "kanttekening": "De inschatting komt volledig van OpenAI zelf; er is geen onafhankelijke toets van wat het model kan."
+    },
+    {
+      "kop": "ChatGPT Free krijgt onbeperkt chatten en GPT-5.6 Luna als standaard",
+      "kern": "Wie ChatGPT zonder abonnement gebruikt, kan vanaf volgende week onbeperkt tekstberichten sturen en werkt met hetzelfde standaardmodel als betalende gebruikers.",
+      "wat": "OpenAI schrapt de limiet op het aantal tekstberichten in de gratis variant van ChatGPT, meldt Tweakers. Gebruikers hoeven daardoor niet meer te wachten voordat ze verder kunnen chatten. Daarnaast wordt GPT-5.6 Luna het nieuwe standaardmodel voor ChatGPT, ook voor gebruikers zonder abonnement. De maatregel gaat volgens OpenAI volgende week in en betreft tekstberichten.",
+      "waarom": "Controleer of jullie betaalde ChatGPT-accounts nog iets doen wat de gratis versie niet kan; voor licht tekstwerk verdwijnt dat verschil. En reken erop dat medewerkers zonder licentie nu onbeperkt bedrijfsgegevens in een gratis account kunnen typen.",
+      "url": "https://tweakers.net/nieuws/250768/openai-schrapt-chatlimiet-voor-gratis-chatgpt-gebruikers.html",
+      "bron": "Tweakers",
+      "categorie": "model",
+      "datum": "2026-08-07",
+      "kanttekening": "Een exacte ingangsdatum is niet genoemd; het bericht spreekt alleen van 'volgende week'."
+    },
+    {
+      "kop": "160.000 techbanen weg, terwijl ceo's klagen over vastgelopen AI-pilots",
+      "kern": "Veel organisaties komen niet verder dan AI-proefprojecten en directies zijn ontevreden over het resultaat, terwijl er in de technologiesector ruim 160.000 banen verdwenen.",
+      "wat": "Computable meldt in zijn nieuwsoverzicht dat bedrijven blijven hangen in AI-pilots en dat ceo's ontevreden zijn over hun AI-projecten. In dezelfde inventarisatie staat dat ruim 160.000 banen in de technologiesector zijn verdwenen. Het overzicht noemt daarnaast een krimpende zakelijke telecommarkt in Nederland.",
+      "waarom": "Als een AI-project na een jaar nog 'pilot' heet, is dat geen fase maar een uitkomst: zet er een eigenaar en een einddatum op, of stop ermee. Vraag in de volgende stuurgroep welk proces meetbaar sneller of goedkoper is geworden.",
+      "url": "https://computable.nl/2026/08/07/kort-bedrijven-blijven-hangen-in-ai-pilots-veel-ontslagen-in-tech-sector-en-meer",
+      "bron": "Computable",
+      "categorie": "bedrijf",
+      "datum": "2026-08-07",
+      "kanttekening": "Het gaat om een kort nieuwsoverzicht; periode, regio en bron van het cijfer van 160.000 banen worden er niet bij genoemd."
+    },
+    {
+      "kop": "Rippling verbrandde miljoenen aan AI en bouwde toen een kostenmeter",
+      "kern": "Nadat het eigen AI-gebruik in enkele maanden miljoenen kostte, brengt softwarebedrijf Rippling een dienst uit die per medewerker en per team bijhoudt wat AI-tools kosten.",
+      "wat": "Rippling, dat software voor personeels- en salarisadministratie maakt, gaf in korte tijd miljoenen dollars uit aan AI zonder dat intern duidelijk was waaraan. Deze week presenteerde het bedrijf AI Spend Console, die de AI-uitgaven van individuele medewerkers en teams zichtbaar maakt. De achtergrond is dat veel AI-diensten per gebruik afrekenen in plaats van per vaste licentie, waardoor de kosten pas achteraf blijken.",
+      "waarom": "Vraag je financiële afdeling deze week wat er de laatste drie maanden aan AI-abonnementen en gebruiksfacturen is weggegaan; bij afrekenen per gebruik staat die post zelden op één plek. Daar heb je geen extra tool voor nodig, wel iemand die het optelt.",
+      "url": "https://techcrunch.com/2026/08/07/after-rippling-blew-millions-on-ai-in-months-it-built-an-employee-roi-tool",
+      "bron": "TechCrunch",
+      "categorie": "bedrijf",
+      "datum": "2026-08-07",
+      "kanttekening": "Hoeveel Rippling zelf precies kwijt was, is niet gespecificeerd."
+    },
+    {
+      "kop": "Cloudflare bouwt browser Kitesurf voor AI-agenten, niet voor mensen",
+      "kern": "Cloudflare biedt een browser die in een datacenter draait en is gemaakt voor AI-programma's die zelfstandig websites bezoeken, zonder alle onderdelen die een mens nodig heeft.",
+      "wat": "Kitesurf is een browser die niet op je laptop maar in de cloud loopt en bedoeld is voor agenten: AI-software die zelf stappen uitvoert, zoals inloggen, doorklikken en een formulier invullen. Volgens Cloudflare gebruikt Kitesurf voor gangbare automatiseringstaken minder rekenkracht dan Chromium, de motor onder Chrome en Edge. Het doel is dat ontwikkelaars goedkoper agenten kunnen bouwen die het web gebruiken.",
+      "waarom": "Beheer je een webshop of klantportaal, dan wordt bezoek door agenten goedkoper en dus talrijker: kijk of je formulieren, inlogpagina's en meetgegevens mens en machine nog uit elkaar houden. Voor wie zelf bouwt, scheelt het serverkosten en geen functionaliteit.",
+      "url": "https://techcrunch.com/2026/08/07/cloudflare-launches-kitesurf-a-browser-built-for-ai-agents",
+      "bron": "TechCrunch",
+      "categorie": "tooling",
+      "datum": "2026-08-07",
+      "kanttekening": "Dat Kitesurf minder rekenkracht kost dan Chromium is een claim van Cloudflare zelf."
+    },
+    {
+      "kop": "4 samenwerkende agenten verslaan Claude Opus 4.8 op bedrijfscode",
+      "kern": "Vier AI-programma's die tijdens het werk onderling overleggen, halen op grote programmeeropdrachten betere resultaten dan één topmodel dat de klus alleen doet.",
+      "wat": "Onderzoekers pakten een bekend probleem aan: bij taken die veel stappen en tussentijdse hulpmiddelen vragen, lopen AI-agenten vast in grote codebases. De meeste bestaande opzetten laten agenten niet halverwege de taak met elkaar afstemmen, maar werken een vast lijstje af. In het nieuwe systeem coördineren vier agenten in real time, en dat presteerde volgens de onderzoekers beter dan Claude Opus 4.8 op programmeertaken uit de bedrijfspraktijk.",
+      "waarom": "Zegt een leverancier 'wij gebruiken agenten', vraag dan of die tijdens de taak met elkaar afstemmen of alleen een vaste reeks stappen doorlopen — dat is precies het verschil dat hier gemeten is. Reken op hogere kosten: vier modellen die overleggen, rekenen ook vier keer af.",
+      "url": "https://venturebeat.com/orchestration/four-ai-agents-coordinating-in-real-time-outperformed-claude-opus-4-8-on-enterprise-coding-tasks",
+      "bron": "VentureBeat",
+      "categorie": "onderzoek",
+      "datum": "2026-08-07",
+      "kanttekening": "De vergelijking komt van de onderzoekers zelf en is niet onafhankelijk gereproduceerd."
+    }
+  ],
+  "toepassing": {
+    "titel": "Weet binnen 20 minuten wat AI je bedrijf per maand kost",
+    "intro": "Je hebt geen dashboard, adviseur of nieuwe tool nodig: je bankafschrift en één mailtje zijn genoeg.",
+    "stappen": [
+      "Vraag je boekhouding om alle facturen en kaartafschrijvingen van de afgelopen drie maanden waarin 'AI', 'OpenAI', 'Anthropic', 'Copilot', 'Gemini' of 'API' voorkomt.",
+      "Zet achter elk bedrag een naam en een taak, en mail bij twijfel: 'Waar gebruik je dit abonnement precies voor, en welk werk zou je zonder dit abonnement anders doen?'",
+      "Markeer elk bedrag dat niemand aan een taak kan koppelen en zeg het op, of zet er een einddatum van één maand op."
+    ],
+    "niet_doen": "Geen AI-beleidsdocument schrijven en geen inventarisatiesoftware aanschaffen — één lijst met bedragen en namen levert nu meer op dan beide.",
+    "tijd": "20 minuten",
+    "categorie": "administratie"
+  },
+  "beschouwing": null,
+  "voor_bedrijven": "Zet deze week één AI-pilot om in een besluit — uitrollen met een eigenaar en een datum, of stoppen — en leg de kosten van de afgelopen drie maanden ernaast.",
+  "kandidaten": 90,
+  "bronnen": 14,
+  "bronlijst": [
+    "GitHub",
+    "Hugging Face",
+    "arstechnica.com",
+    "blog.google",
+    "computable.nl",
+    "emerce.nl",
+    "huggingface.co",
+    "nos.nl",
+    "nu.nl",
+    "simonwillison.net",
+    "techcrunch.com",
+    "technologyreview.com",
+    "tweakers.net",
+    "venturebeat.com"
+  ]
+}
